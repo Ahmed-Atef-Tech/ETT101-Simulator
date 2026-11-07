@@ -1,0 +1,95 @@
+# Builds the Windows installer and the Mac app, and publishes them as a GitHub Release.
+# The installed apps check this repo's latest release and update themselves.
+#
+# Two ways to release:
+#   1) Actions tab -> "Release" -> "Run workflow" -> type the new version (e.g. 0.27.0)
+#   2) push a tag:  git tag v0.27.0 && git push origin v0.27.0
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "New version number, e.g. 0.27.0 (must be higher than the last one)"
+        required: true
+      notes:
+        description: "What changed (optional, shown on the release page)"
+        required: false
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+      tag: ${{ steps.v.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: v
+        name: Work out the version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then V="${{ github.event.inputs.version }}"; else V="${GITHUB_REF_NAME#v}"; fi
+          V="${V#v}"
+          echo "$V" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$' || { echo "::error::Version must look like 1.2.3 (got '$V')"; exit 1; }
+          echo "version=$V" >> "$GITHUB_OUTPUT"; echo "tag=v$V" >> "$GITHUB_OUTPUT"
+      - name: Create a draft release (stays hidden from the apps until both builds are uploaded)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NOTES: ${{ github.event.inputs.notes }}
+        run: |
+          T="${{ steps.v.outputs.tag }}"
+          if gh release view "$T" >/dev/null 2>&1; then echo "Release $T already exists"; exit 0; fi
+          gh release create "$T" --draft --target "${{ github.sha }}" --title "ETT-101 Simulator $T" --notes "${NOTES:-Version ${{ steps.v.outputs.version }}}"
+
+  build:
+    needs: prepare
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - os: windows-latest
+            target: --win
+          - os: macos-latest
+            target: --mac
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Set the version
+        run: npm version ${{ needs.prepare.outputs.version }} --no-git-tag-version --allow-same-version
+      - name: Build the simulator page
+        run: node build.mjs
+      - name: Build and upload the app
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+        run: npx electron-builder ${{ matrix.target }} --publish always
+
+  publish:
+    needs: [prepare, build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Attach the experiment setup files and the model reference
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          (cd setups && zip -qr ../ETT101-Experiments-Setups.zip .)
+          cp SPEC.md ETT101-Model-Reference.md
+          gh release upload "${{ needs.prepare.outputs.tag }}" ETT101-Experiments-Setups.zip ETT101-Model-Reference.md --clobber
+      - name: Publish the release (the apps will now see the update)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release edit "${{ needs.prepare.outputs.tag }}" --repo "${{ github.repository }}" --draft=false --latest

@@ -1,0 +1,109 @@
+{
+ "v": 2,
+ "headphones": false,
+ "title": "Term 2 Exp 15 Part A (Figure 2): ASK - 2 kHz SINE switched by the X data (scope triggered by SYNC on EXT)",
+ "leads": [
+  {
+   "a": "master.DIG2",
+   "b": "seq.CLK",
+   "color": "yellow"
+  },
+  {
+   "a": "seq.X",
+   "b": "das.C2",
+   "color": "red"
+  },
+  {
+   "a": "master.SINE2",
+   "b": "das.IN2",
+   "color": "blue"
+  }
+ ],
+ "probes": {
+  "CH1": "seq.X",
+  "CH2": "das.OUT",
+  "EXT": "seq.SYNC"
+ },
+ "mods": {
+  "seq": {
+   "S1": 0,
+   "S2": 0
+  }
+ },
+ "scope": {
+  "ch": {
+   "CH1": {
+    "on": true,
+    "vd": 11,
+    "fine": 1,
+    "pos": 1.5,
+    "cpl": "DC",
+    "bw": false,
+    "finemode": false,
+    "probe": 0,
+    "inv": false
+   },
+   "CH2": {
+    "on": true,
+    "vd": 10,
+    "fine": 1,
+    "pos": -2,
+    "cpl": "DC",
+    "bw": false,
+    "finemode": false,
+    "probe": 0,
+    "inv": false
+   }
+  },
+  "sel": "CH1",
+  "td": 10,
+  "hpos": 0,
+  "zoom": false,
+  "ztd": 4,
+  "zpos": 0,
+  "trig": {
+   "src": "EXT",
+   "slope": "R",
+   "mode": "AUTO",
+   "cpl": "DC",
+   "level": 2.5
+  },
+  "run": true,
+  "acq": "Sample",
+  "avgN": 16,
+  "disp": {
+   "type": "Vectors",
+   "persist": 0,
+   "fmt": "YT",
+   "grid": "Dots"
+  },
+  "math": {
+   "on": false,
+   "kind": "FFT",
+   "op": "+",
+   "fftSrc": "CH1",
+   "win": "Hanning",
+   "dbdiv": 20,
+   "fpos": 0,
+   "unit": "dBVrms",
+   "vrd": 7
+  },
+  "meas": {
+   "src": "CH2",
+   "items": [
+    "Vpp",
+    "Freq",
+    null
+   ],
+   "all": false
+  },
+  "cur": {
+   "type": "Off",
+   "src": "CH1",
+   "act": "A",
+   "a": -3,
+   "b": 3
+  },
+  "menu": null
+ }
+}

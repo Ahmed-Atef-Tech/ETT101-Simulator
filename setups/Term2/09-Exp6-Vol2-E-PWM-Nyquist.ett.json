@@ -1,0 +1,145 @@
+{
+ "v": 2,
+ "headphones": false,
+ "title": "Term 2 Exp 6 Part E: VCO (LO, GAIN anticlockwise, FREQ fully clockwise) as the message - turn FREQ down past half the sample rate",
+ "leads": [
+  {
+   "a": "master.DIG8",
+   "b": "tpg.CLK",
+   "color": "yellow"
+  },
+  {
+   "a": "tpg.Q2",
+   "b": "util.DIODE_IN",
+   "color": "red"
+  },
+  {
+   "a": "vdc.VDC",
+   "b": "adder.B",
+   "color": "blue"
+  },
+  {
+   "a": "adder.OUT",
+   "b": "util.REF",
+   "color": "green"
+  },
+  {
+   "a": "util.DIODE",
+   "b": "util.CIN",
+   "color": "black"
+  },
+  {
+   "a": "util.COMP",
+   "b": "tlpf.IN",
+   "color": "red"
+  },
+  {
+   "a": "vco.SINE",
+   "b": "adder.A",
+   "color": "red"
+  }
+ ],
+ "probes": {
+  "CH1": "vco.SINE",
+  "CH2": "tlpf.OUT",
+  "EXT": null
+ },
+ "mods": {
+  "tpg": {
+   "WIDTH": 0,
+   "DELAY": 0
+  },
+  "vdc": {
+   "VDC": 0.03
+  },
+  "adder": {
+   "G": 0.3821,
+   "g": 0.4912
+  },
+  "tlpf": {
+   "GAIN": 0.5,
+   "FC": 0.1837
+  },
+  "vco": {
+   "HI": 0,
+   "GAIN": 0,
+   "FREQ": 1
+  }
+ },
+ "scope": {
+  "ch": {
+   "CH1": {
+    "on": true,
+    "vd": 9,
+    "fine": 1,
+    "pos": 2,
+    "cpl": "DC",
+    "bw": false,
+    "finemode": false,
+    "probe": 0,
+    "inv": false
+   },
+   "CH2": {
+    "on": true,
+    "vd": 9,
+    "fine": 1,
+    "pos": -2,
+    "cpl": "DC",
+    "bw": false,
+    "finemode": false,
+    "probe": 0,
+    "inv": false
+   }
+  },
+  "sel": "CH1",
+  "td": 7,
+  "hpos": 0,
+  "zoom": false,
+  "ztd": 4,
+  "zpos": 0,
+  "trig": {
+   "src": "CH1",
+   "slope": "R",
+   "mode": "AUTO",
+   "cpl": "DC",
+   "level": 0
+  },
+  "run": true,
+  "acq": "Sample",
+  "avgN": 16,
+  "disp": {
+   "type": "Vectors",
+   "persist": 0,
+   "fmt": "YT",
+   "grid": "Dots"
+  },
+  "math": {
+   "on": false,
+   "kind": "FFT",
+   "op": "+",
+   "fftSrc": "CH1",
+   "win": "Hanning",
+   "dbdiv": 20,
+   "fpos": 0,
+   "unit": "dBVrms",
+   "vrd": 7
+  },
+  "meas": {
+   "src": "CH2",
+   "items": [
+    "Vpp",
+    "Freq",
+    null
+   ],
+   "all": false
+  },
+  "cur": {
+   "type": "Off",
+   "src": "CH1",
+   "act": "A",
+   "a": -3,
+   "b": 3
+  },
+  "menu": null
+ }
+}

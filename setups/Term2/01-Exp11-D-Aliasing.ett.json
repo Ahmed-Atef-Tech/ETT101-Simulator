@@ -1,0 +1,114 @@
+{
+ "v": 2,
+ "headphones": false,
+ "title": "Term 2 Exp 11 Part D (Figure 9): VCO DIGITAL (LO, fully clockwise) is the sample clock - turn FREQ down to see aliasing",
+ "leads": [
+  {
+   "a": "master.SINE2",
+   "b": "das.SHIN",
+   "color": "yellow"
+  },
+  {
+   "a": "das.SH",
+   "b": "tlpf.IN",
+   "color": "blue"
+  },
+  {
+   "a": "vco.DIG",
+   "b": "das.C1",
+   "color": "blue"
+  }
+ ],
+ "probes": {
+  "CH1": "master.SINE2",
+  "CH2": "tlpf.OUT",
+  "EXT": null
+ },
+ "mods": {
+  "tlpf": {
+   "GAIN": 0.5,
+   "FC": 0.1497
+  },
+  "vco": {
+   "HI": 0,
+   "FREQ": 1,
+   "GAIN": 0.5
+  }
+ },
+ "scope": {
+  "ch": {
+   "CH1": {
+    "on": true,
+    "vd": 9,
+    "fine": 1,
+    "pos": 2,
+    "cpl": "DC",
+    "bw": false,
+    "finemode": false,
+    "probe": 0,
+    "inv": false
+   },
+   "CH2": {
+    "on": true,
+    "vd": 9,
+    "fine": 1,
+    "pos": -2,
+    "cpl": "DC",
+    "bw": false,
+    "finemode": false,
+    "probe": 0,
+    "inv": false
+   }
+  },
+  "sel": "CH1",
+  "td": 7,
+  "hpos": 0,
+  "zoom": false,
+  "ztd": 4,
+  "zpos": 0,
+  "trig": {
+   "src": "CH1",
+   "slope": "R",
+   "mode": "AUTO",
+   "cpl": "DC",
+   "level": 0
+  },
+  "run": true,
+  "acq": "Sample",
+  "avgN": 16,
+  "disp": {
+   "type": "Vectors",
+   "persist": 0,
+   "fmt": "YT",
+   "grid": "Dots"
+  },
+  "math": {
+   "on": false,
+   "kind": "FFT",
+   "op": "+",
+   "fftSrc": "CH1",
+   "win": "Hanning",
+   "dbdiv": 20,
+   "fpos": 0,
+   "unit": "dBVrms",
+   "vrd": 7
+  },
+  "meas": {
+   "src": "CH2",
+   "items": [
+    "Vpp",
+    "Freq",
+    null
+   ],
+   "all": false
+  },
+  "cur": {
+   "type": "Off",
+   "src": "CH1",
+   "act": "A",
+   "a": -3,
+   "b": 3
+  },
+  "menu": null
+ }
+}

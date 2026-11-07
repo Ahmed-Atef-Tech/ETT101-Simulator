@@ -1,0 +1,114 @@
+{
+ "v": 2,
+ "headphones": false,
+ "title": "Term 2 Exp 9 Part B (Figure 3): the noisy data band-limited by the BASEBAND LPF",
+ "leads": [
+  {
+   "a": "master.DIG2",
+   "b": "seq.CLK",
+   "color": "yellow"
+  },
+  {
+   "a": "seq.LINE",
+   "b": "adder2.SIGNAL",
+   "color": "red"
+  },
+  {
+   "a": "noise.N20",
+   "b": "adder2.NOISE",
+   "color": "blue"
+  },
+  {
+   "a": "adder2.OUT",
+   "b": "channel.BB_IN",
+   "color": "green"
+  }
+ ],
+ "probes": {
+  "CH1": "channel.BB",
+  "CH2": null,
+  "EXT": "seq.SYNC"
+ },
+ "mods": {
+  "seq": {
+   "S1": 0,
+   "S2": 0
+  }
+ },
+ "scope": {
+  "ch": {
+   "CH1": {
+    "on": true,
+    "vd": 9,
+    "fine": 1,
+    "pos": 0,
+    "cpl": "DC",
+    "bw": false,
+    "finemode": false,
+    "probe": 0,
+    "inv": false
+   },
+   "CH2": {
+    "on": false,
+    "vd": 9,
+    "fine": 1,
+    "pos": 0,
+    "cpl": "DC",
+    "bw": false,
+    "finemode": false,
+    "probe": 0,
+    "inv": false
+   }
+  },
+  "sel": "CH1",
+  "td": 10,
+  "hpos": 0,
+  "zoom": false,
+  "ztd": 4,
+  "zpos": 0,
+  "trig": {
+   "src": "EXT",
+   "slope": "R",
+   "mode": "AUTO",
+   "cpl": "DC",
+   "level": 2.5
+  },
+  "run": true,
+  "acq": "Sample",
+  "avgN": 16,
+  "disp": {
+   "type": "Vectors",
+   "persist": 0,
+   "fmt": "YT",
+   "grid": "Dots"
+  },
+  "math": {
+   "on": false,
+   "kind": "FFT",
+   "op": "+",
+   "fftSrc": "CH1",
+   "win": "Hanning",
+   "dbdiv": 20,
+   "fpos": 0,
+   "unit": "dBVrms",
+   "vrd": 7
+  },
+  "meas": {
+   "src": "CH2",
+   "items": [
+    "Vpp",
+    "Freq",
+    null
+   ],
+   "all": false
+  },
+  "cur": {
+   "type": "Off",
+   "src": "CH1",
+   "act": "A",
+   "a": -3,
+   "b": 3
+  },
+  "menu": null
+ }
+}

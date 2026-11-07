@@ -1,0 +1,146 @@
+{
+ "v": 2,
+ "headphones": false,
+ "title": "Term 2 Exp 16 Part C (Figure 14): TUNEABLE LPF on the delta signal; fc turned down from fully clockwise until the message is recovered",
+ "leads": [
+  {
+   "a": "master.SINE2",
+   "b": "adder.A",
+   "color": "yellow"
+  },
+  {
+   "a": "util.RC",
+   "b": "adder.B",
+   "color": "red"
+  },
+  {
+   "a": "adder.OUT",
+   "b": "util.REF",
+   "color": "blue"
+  },
+  {
+   "a": "gnd2",
+   "b": "util.CIN",
+   "color": "green"
+  },
+  {
+   "a": "util.COMP",
+   "b": "s2p.SERIAL",
+   "color": "black"
+  },
+  {
+   "a": "master.DIG100",
+   "b": "s2p.CLK",
+   "color": "yellow"
+  },
+  {
+   "a": "s2p.X1",
+   "b": "util.RC_IN",
+   "color": "red"
+  },
+  {
+   "a": "master.SINE2",
+   "b": "buffer.IN",
+   "color": "blue"
+  },
+  {
+   "a": "s2p.X1",
+   "b": "tlpf.IN",
+   "color": "green"
+  }
+ ],
+ "probes": {
+  "CH1": "master.SINE2",
+  "CH2": "tlpf.OUT",
+  "EXT": null
+ },
+ "mods": {
+  "adder": {
+   "G": 0.5,
+   "g": 0.5
+  },
+  "buffer": {
+   "GAIN": 0.3053
+  },
+  "tlpf": {
+   "GAIN": 0.5,
+   "FC": 0.1837
+  }
+ },
+ "scope": {
+  "ch": {
+   "CH1": {
+    "on": true,
+    "vd": 9,
+    "fine": 1,
+    "pos": 2,
+    "cpl": "DC",
+    "bw": false,
+    "finemode": false,
+    "probe": 0,
+    "inv": false
+   },
+   "CH2": {
+    "on": true,
+    "vd": 9,
+    "fine": 1,
+    "pos": -2,
+    "cpl": "DC",
+    "bw": false,
+    "finemode": false,
+    "probe": 0,
+    "inv": false
+   }
+  },
+  "sel": "CH1",
+  "td": 7,
+  "hpos": 0,
+  "zoom": false,
+  "ztd": 4,
+  "zpos": 0,
+  "trig": {
+   "src": "CH1",
+   "slope": "R",
+   "mode": "AUTO",
+   "cpl": "DC",
+   "level": 0
+  },
+  "run": true,
+  "acq": "Sample",
+  "avgN": 16,
+  "disp": {
+   "type": "Vectors",
+   "persist": 0,
+   "fmt": "YT",
+   "grid": "Dots"
+  },
+  "math": {
+   "on": false,
+   "kind": "FFT",
+   "op": "+",
+   "fftSrc": "CH1",
+   "win": "Hanning",
+   "dbdiv": 20,
+   "fpos": 0,
+   "unit": "dBVrms",
+   "vrd": 7
+  },
+  "meas": {
+   "src": "CH2",
+   "items": [
+    "Vpp",
+    "Freq",
+    null
+   ],
+   "all": false
+  },
+  "cur": {
+   "type": "Off",
+   "src": "CH1",
+   "act": "A",
+   "a": -3,
+   "b": 3
+  },
+  "menu": null
+ }
+}

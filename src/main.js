@@ -1,0 +1,345 @@
+import { Sim } from './engine/sim.js';
+import { FS } from './engine/dsp.js';
+import { SOCKETS } from './engine/modules.js';
+import { el } from './ui/svg.js';
+import { Panel, knobReadout } from './ui/panel.js';
+import { Scope, fmtV, fmtF } from './ui/scope.js';
+import { Wires, LEAD_COLORS } from './ui/wires.js';
+import { Audio } from './ui/audio.js';
+import { SOCKET_NAME, SOCKET_POS, BLOCKS } from './ui/layout.js';
+import { MODULE_INFO, HELP_LINKS, HELP, EXPERIMENTS } from './ui/content.js';
+import { t, tr, getLang, setLang } from './ui/i18n.js';
+
+const $ = s => document.querySelector(s);
+const sim = new Sim();
+const audio = new Audio(sim);
+const links = Object.assign({}, HELP_LINKS, (window.ett && window.ett.links) || {});
+let training = true;
+try { const v = localStorage.getItem('ett.training'); if (v !== null) training = v === '1'; } catch (e) { }
+const esc = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+
+// =============================================== workbench svg ===============================================
+const svg = $('#bench');
+const VB = { x: 0, y: -10, w: 2380, h: 1030 };
+el('defs', {}, svg).innerHTML = `
+<radialGradient id="boardGrad" cx="40%" cy="30%" r="90%"><stop offset="0" stop-color="#1c1c1e"/><stop offset="1" stop-color="#0b0b0c"/></radialGradient>
+<radialGradient id="creamGrad" cx="35%" cy="30%" r="80%"><stop offset="0" stop-color="#fbf5e1"/><stop offset=".7" stop-color="#e2d6b2"/><stop offset="1" stop-color="#bfae82"/></radialGradient>
+<linearGradient id="potGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4e3a5"/><stop offset=".55" stop-color="#e2c979"/><stop offset="1" stop-color="#b99c4c"/></linearGradient>
+<radialGradient id="rotorGrad" cx="40%" cy="35%" r="75%"><stop offset="0" stop-color="#fbeec0"/><stop offset="1" stop-color="#d7bb6c"/></radialGradient>
+<radialGradient id="screwGrad" cx="35%" cy="30%" r="80%"><stop offset="0" stop-color="#e8e8e8"/><stop offset="1" stop-color="#7c7c7c"/></radialGradient>
+<linearGradient id="slideGrad" x1="0" x2="1"><stop offset="0" stop-color="#bdbdbd"/><stop offset="1" stop-color="#8d8d8d"/></linearGradient>
+<linearGradient id="thumbGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#cfcfcf"/></linearGradient>
+<radialGradient id="micGrad"><stop offset="0" stop-color="#2d2d2d"/><stop offset="1" stop-color="#5a5a5a"/></radialGradient>
+<radialGradient id="bncGrad" cx="35%" cy="30%" r="80%"><stop offset="0" stop-color="#f4f4f4"/><stop offset=".6" stop-color="#b8b8b8"/><stop offset="1" stop-color="#7a7a7a"/></radialGradient>
+<linearGradient id="scopeBody" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#efece6"/><stop offset="1" stop-color="#d9d5cd"/></linearGradient>
+<linearGradient id="scopeRight" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e3e0d9"/><stop offset="1" stop-color="#d2cec6"/></linearGradient>
+<linearGradient id="btnGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7f6f3"/><stop offset="1" stop-color="#c9c5bd"/></linearGradient>
+<linearGradient id="blueBtn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6aa8f5"/><stop offset="1" stop-color="#2f62bd"/></linearGradient>
+<radialGradient id="knobGrad" cx="40%" cy="35%" r="75%"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d6d2c9"/></radialGradient>
+<radialGradient id="knobTop" cx="40%" cy="35%" r="75%"><stop offset="0" stop-color="#fbfaf7"/><stop offset="1" stop-color="#e2ded6"/></radialGradient>
+<filter id="ledGlow" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<filter id="shadow" x="-5%" y="-5%" width="110%" height="115%"><feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#000" flood-opacity=".45"/></filter>`;
+const world = el('g', { id: 'world' }, svg);
+el('rect', { x: -5000, y: -5000, width: 12000, height: 12000, fill: 'transparent', class: 'mat' }, world);
+const benchG = el('g', { filter: 'url(#shadow)' }, world);
+const HPX = 1560, HPY = 690; const hpG = el('g', { id: 'hp', transform: `translate(${HPX},${HPY})` }, world);
+
+let dragKnob = false, hoverKnobOn = false; // dragKnob: a knob is being turned with the mouse held down
+const hooks = {
+  changed: () => { },
+  click: () => audio.ensure(),
+  info: id => showInfo(id),
+  knobTip: (mod, p, e, wheel) => showKnobTip(mod, p, e, wheel),
+  hoverKnob: (mod, p, e) => { hoverKnobOn = !!mod; if (mod) { if (training) showTip(`<b dir="ltr">${knobReadout(sim, mod, p)}</b>`, e); } else if (!dragKnob) hideTip(); },
+  toggleHeadphones: () => { audio.ensure(); sim.setHeadphones(!sim.headphones); drawHeadphones(); },
+  screenshot: cv => saveImage(cv),
+  scopeHelp: () => showModal(t('scopeHelp'), HELP[getLang()].scope, links.scope),
+  plugged: () => audio.ensure(),
+  hoverTarget: () => { },
+  hoverLead: (l, e) => { if (l && training) showTip(`<bdi>${SOCKET_NAME[l.a]}</bdi> ⟷ <bdi>${SOCKET_NAME[l.b]}</bdi><br><span class="dim">${t('leadTip')}</span>`, e); else hideTip(); },
+  leadMenu: (l, e) => leadMenu(l, e),
+};
+const panel = new Panel(benchG, sim, hooks);
+const scope = new Scope(benchG, sim, hooks);
+const wireLayer = el('g', { id: 'wires' }, world);
+const ghostLayer = el('g', { id: 'ghost' }, world);
+const wires = new Wires(svg, wireLayer, sim, scope, hooks);
+
+function drawHeadphones() {
+  hpG.innerHTML = '';
+  const [jx, jy] = [652, 468], rtl = getLang() === 'ar';
+  const label = (txt, x, y) => el('text', { x, y, text: txt, fill: '#93a8ad', 'font-size': 20, 'font-family': rtl ? 'Plex Arabic, sans-serif' : 'Barlow SC, sans-serif', direction: rtl ? 'rtl' : 'ltr', 'text-anchor': 'start' }, hpG);
+  if (!sim.headphones) { label(t('hpOff'), rtl ? 640 : 0, 0); return; }
+  const g = el('g', {}, hpG);
+  const cab = `M${jx - HPX},${jy - HPY} C${jx - HPX},${jy - HPY + 260} -60,160 0,60`;
+  el('path', { d: cab, stroke: 'transparent', 'stroke-width': 18, fill: 'none' }, g); el('path', { d: cab, stroke: '#111', 'stroke-width': 6, fill: 'none' }, g);
+  el('path', { d: 'M-50,60 v-30 a50,50 0 0 1 100,0 v30', stroke: '#1d1d1d', 'stroke-width': 10, fill: 'none' }, g);
+  el('rect', { x: -66, y: 40, width: 30, height: 52, rx: 12, fill: '#2b2b2b' }, g); el('rect', { x: 36, y: 40, width: 30, height: 52, rx: 12, fill: '#2b2b2b' }, g);
+  label(audio.muted ? t('hpMuted') : t('hpOn'), rtl ? 640 : 90, 75);
+  const pl = el('g', { transform: `translate(${jx - HPX},${jy - HPY})` }, g); el('circle', { r: 9, fill: '#c9c9c9', stroke: '#555', 'stroke-width': 2 }, pl);
+  el('circle', { r: 16, fill: 'transparent' }, pl);
+  // the plug, cable and headphones all sit over the jack: clicking any of them unplugs
+  g.style.cursor = 'pointer'; g.setAttribute('class', 'hpProp');
+  g.addEventListener('pointerdown', e => { if (e.button !== 0) return; e.stopPropagation(); hooks.toggleHeadphones(); });
+  g.addEventListener('pointerenter', e => { if (training) showTip(t('hpUnplug'), e); });
+  g.addEventListener('pointerleave', () => hideTip());
+}
+
+// =============================================== views: kit / both / scope / free zoom ===============================================
+let view = { ...VB }, viewMode = 'both';
+try { const v = localStorage.getItem('ett.view'); if (v) viewMode = v; } catch (e) { }
+function applyView() { svg.setAttribute('viewBox', `${view.x} ${view.y} ${view.w} ${view.h}`); }
+function focusRect(x, y, w, h, pad = 0.02) {
+  const r = svg.getBoundingClientRect(), a = r.width / r.height; x -= w * pad; y -= h * pad; w *= 1 + 2 * pad; h *= 1 + 2 * pad;
+  let vw = w, vh = h; if (vw / vh < a) vw = vh * a; else vh = vw / a;
+  view = { x: x + w / 2 - vw / 2, y: y + h / 2 - vh / 2, w: vw, h: vh }; applyView();
+}
+const RECTS = { kit: [26, 6, 1192, 996], scope: [scope.X, scope.Y, 1400 * scope.S, 545 * scope.S], both: [VB.x, VB.y, VB.w, VB.h] };
+function setView(m) {
+  viewMode = m; try { localStorage.setItem('ett.view', m); } catch (e) { }
+  for (const [id, k] of [['vKit', 'kit'], ['vBoth', 'both'], ['vScope', 'scope']]) $('#' + id).classList.toggle('on', m === k);
+  if (RECTS[m]) focusRect(...RECTS[m], m === 'both' ? 0 : 0.015);
+}
+window.addEventListener('resize', () => { if (RECTS[viewMode]) setView(viewMode); });
+function toSvg(e) { const p = svg.createSVGPoint(); p.x = e.clientX; p.y = e.clientY; return p.matrixTransform(svg.getScreenCTM().inverse()); }
+function zoomAt(e, k) {
+  const p = toSvg(e); const nw = Math.max(250, Math.min(VB.w * 2, view.w * k)), nh = nw * view.h / view.w;
+  view.x = p.x - (p.x - view.x) * nw / view.w; view.y = p.y - (p.y - view.y) * nh / view.h; view.w = nw; view.h = nh; applyView();
+  if (viewMode !== 'free') setView('free');
+}
+// Ctrl + wheel (and touchpad pinch) zooms anywhere; capture phase so knobs don't steal it and the page itself never zooms
+window.addEventListener('wheel', e => {
+  if (!e.ctrlKey) return; e.preventDefault(); e.stopPropagation();
+  if (e.target.closest && e.target.closest('#bench')) zoomAt(e, Math.exp(e.deltaY * 0.0018));
+}, { passive: false, capture: true });
+// plain wheel on the empty bench scrolls the view
+svg.addEventListener('wheel', e => {
+  if (e.ctrlKey || !e.target.classList.contains('mat')) return; e.preventDefault();
+  const r = svg.getBoundingClientRect(), s = view.w / r.width;
+  if (e.shiftKey) view.x += e.deltaY * s; else { view.x += e.deltaX * s; view.y += e.deltaY * s; }
+  applyView(); if (viewMode !== 'free') setView('free');
+}, { passive: false });
+// drag the empty bench (left button) or anything with the middle/right button to pan
+let pan = null, suppressCtx = false;
+svg.addEventListener('pointerdown', e => {
+  const onMat = e.target.classList.contains('mat') || e.target === svg;
+  if ((e.button === 0 && onMat) || e.button === 1 || e.button === 2) { pan = { x: e.clientX, y: e.clientY, vx: view.x, vy: view.y, moved: false }; if (e.button !== 2) e.preventDefault(); }
+});
+window.addEventListener('pointermove', e => {
+  if (!pan) return; const dx = e.clientX - pan.x, dy = e.clientY - pan.y; if (!pan.moved && Math.hypot(dx, dy) < 4) return;
+  if (!pan.moved) { pan.moved = true; svg.classList.add('panning'); if (viewMode !== 'free') setView('free'); }
+  const r = svg.getBoundingClientRect(), s = view.w / r.width; view.x = pan.vx - dx * s; view.y = pan.vy - dy * s; applyView();
+});
+window.addEventListener('pointerup', () => { if (pan && pan.moved) suppressCtx = true; pan = null; svg.classList.remove('panning'); });
+svg.addEventListener('dblclick', e => { if (e.target.classList.contains('mat')) setView('both'); });
+svg.addEventListener('contextmenu', e => { if (suppressCtx) { e.preventDefault(); suppressCtx = false; return; } if (!e.target.closest('.lead')) e.preventDefault(); });
+// full screen
+function toggleFull() { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen().catch(() => { }); }
+document.addEventListener('fullscreenchange', () => { $('#btnFull').title = document.fullscreenElement ? t('exitFullscreen') : t('fullscreen'); setTimeout(() => { if (RECTS[viewMode]) setView(viewMode); }, 60); });
+
+// =============================================== tooltips ===============================================
+const tip = $('#tip');
+let lastMouse = { clientX: 0, clientY: 0 };
+window.addEventListener('pointermove', e => { lastMouse = e; });
+function showTip(html, e) {
+  tip.innerHTML = html; tip.dir = getLang() === 'ar' ? 'rtl' : 'ltr'; tip.style.display = 'block';
+  const x = e.clientX + 16, y = e.clientY + 18; tip.style.left = Math.min(x, innerWidth - tip.offsetWidth - 8) + 'px'; tip.style.top = Math.min(y, innerHeight - tip.offsetHeight - 8) + 'px';
+}
+function hideTip() { tip.style.display = 'none'; }
+function showKnobTip(mod, p, e, wheel) {
+  if (!mod) { dragKnob = false; if (!hoverKnobOn) hideTip(); return; } // mouse released: keep the readout only while still over the knob
+  if (!training) return; if (!wheel) dragKnob = true; showTip(`<b dir="ltr">${knobReadout(sim, mod, p)}</b>`, e || lastMouse);
+}
+let hoverSock = null, hoverT = 0;
+svg.addEventListener('pointerover', e => {
+  const s = e.target.closest && e.target.closest('[data-socket]');
+  if (s && training && !wires.tmp && !pan) { const id = s.getAttribute('data-socket'); if (id !== hoverSock) { hoverSock = id; sim.setProbe('HOV', id); hoverT = performance.now(); } showSockTip(e); }
+  else if (!s && hoverSock) { hoverSock = null; sim.setProbe('HOV', null); if (!dragKnob) hideTip(); }
+});
+svg.addEventListener('pointermove', e => { if (hoverSock) showSockTip(e); });
+svg.addEventListener('pointerout', e => { // leaving a socket for something that is not a socket (or for outside the panel)
+  if (!hoverSock) return; const to = e.relatedTarget; if (to && to.closest && to.closest('[data-socket]')) return;
+  hoverSock = null; sim.setProbe('HOV', null); if (!dragKnob) hideTip();
+});
+for (const ev of ['pointerleave', 'blur']) (ev === 'blur' ? window : document.documentElement).addEventListener(ev, () => { if (!dragKnob) hideTip(); });
+function showSockTip(e) {
+  const id = hoverSock; const [, , dir, kind] = SOCKETS[id];
+  const dirTxt = dir === 'in' ? t('input') : dir === 'out' ? t('output') : t('ground');
+  let meas = '';
+  if (performance.now() - hoverT > 120) {
+    const st = sim.netState(id);
+    if (st === 'float') meas = `<span class="dim">${t('notConnected')}</span>`;
+    else {
+      const n = 24000, b = sim.read('HOV', sim.t, n, new Float32Array(n)); let mx = -1e9, mn = 1e9, s = 0; for (const v of b) { if (v > mx) mx = v; if (v < mn) mn = v; s += v; }
+      const avg = s / n; let f = 0;
+      if (mx - mn > 0.02) { const mid = (mx + mn) / 2, h = (mx - mn) * 0.1; let stt = 0, c = 0, a0 = -1, a1 = -1; for (let i = 0; i < n; i++) { if (!stt && b[i] > mid + h) { stt = 1; if (a0 < 0) a0 = i; else { c++; a1 = i; } } else if (stt && b[i] < mid - h) stt = 0; } if (c) f = c / ((a1 - a0) / FS); }
+      meas = `<span dir="ltr">Vp-p <b>${fmtV(mx - mn)}</b>&nbsp;&nbsp; DC <b>${fmtV(avg)}</b>${f ? `&nbsp;&nbsp; f <b>${fmtF(f)}</b>` : ''}</span>`;
+      if (st === 'short') meas += `<br><span class="warn">${t('shorted')}</span>`;
+    }
+  }
+  showTip(`<b><bdi>${SOCKET_NAME[id]}</bdi></b><br><span class="dim">${dirTxt}, ${kind === 'd' ? t('digital') : t('analog')}</span><br>${meas}`, e);
+}
+
+// =============================================== lead menu ===============================================
+function leadMenu(l, e) {
+  closeMenus();
+  const m = document.createElement('div'); m.className = 'ctx'; m.style.left = e.clientX + 'px'; m.style.top = e.clientY + 'px';
+  m.innerHTML = Object.keys(LEAD_COLORS).map(c => `<button class="plugsw ${c === l.color ? 'sel' : ''}" data-c="${c}" title="${t('colors')[c]}" style="background:${LEAD_COLORS[c]}"></button>`).join('') + `<button class="rm">${t('removeLead')}</button>`;
+  m.addEventListener('click', ev => { const c = ev.target.dataset.c; if (c) { l.color = c; wires.render(); } if (ev.target.classList.contains('rm')) wires.removeLead(l.id); closeMenus(); });
+  document.body.appendChild(m);
+}
+function closeMenus() { document.querySelectorAll('.ctx').forEach(x => x.remove()); }
+window.addEventListener('pointerdown', e => {
+  if (!e.target.closest('.ctx')) closeMenus();
+  if (!e.target.closest('#settings') && !e.target.closest('#btnSettings')) $('#settings').classList.remove('open');
+});
+
+// =============================================== modal ===============================================
+function openLink(url) { if (!url) return; if (window.ett && window.ett.openExternal) window.ett.openExternal(url); else window.open(url, '_blank'); }
+function showModal(title, html, link) {
+  $('#modalTitle').textContent = title; $('#modalBody').innerHTML = html;
+  const yt = $('#modalYT'); yt.disabled = !link; yt.querySelector('span').textContent = link ? t('watch') : t('videoSoon'); yt.onclick = link ? () => openLink(link) : null;
+  $('#modal').classList.add('open');
+}
+const closeModal = () => $('#modal').classList.remove('open');
+$('#modalClose').onclick = closeModal; $('#modalX').onclick = closeModal;
+$('#modal').addEventListener('pointerdown', e => { if (e.target.id === 'modal') closeModal(); });
+function showInfo(id) {
+  const m = MODULE_INFO[id]; if (!m) return; const c = m[getLang()] || m.en;
+  const html = `<p class="lead">${c.d}</p>${m.eq ? `<pre class="eq">${esc(m.eq)}</pre>` : ''}${c.spec.length ? `<h4>${t('spec')}</h4><ul>${c.spec.map(x => `<li>${x}</li>`).join('')}</ul>` : ''}${c.use.length ? `<h4>${t('use')}</h4><ul>${c.use.map(x => `<li>${x}</li>`).join('')}</ul>` : ''}`;
+  showModal(m.t, html, links[id]);
+  const b = BLOCKS[id]; if (b) flash(b);
+}
+function flash([x1, y1, x2, y2]) { const r = el('rect', { x: x1 + 2, y: y1 + 2, width: x2 - x1 - 4, height: y2 - y1 - 4, fill: 'rgba(242,194,27,.16)', stroke: '#f2c21b', 'stroke-width': 3 }, world); setTimeout(() => r.remove(), 1600); }
+
+// =============================================== lab sheet (experiment guide) ===============================================
+let exp = null, stepI = 0, ghost = false;
+const sameNet = (a, b) => sim.netOf(a) === sim.netOf(b);
+const probeOk = (ch, s) => sim.probes[ch] && sameNet(sim.probes[ch], s);
+const stepDone = st => (st.c || st.p) && (st.c || []).every(([a, b]) => sameNet(a, b)) && Object.entries(st.p || {}).every(([ch, s]) => probeOk(ch, s));
+const X_ICON = '<svg width="12" height="12" viewBox="0 0 12 12" stroke="currentColor" stroke-width="1.6"><path d="M2 2l8 8M10 2l-8 8"/></svg>';
+function renderGuide() {
+  const g = $('#guide');
+  const head = title => `<div class="sheetHead"><h2>${title}</h2><button class="x" id="gClose" aria-label="${t('close')}">${X_ICON}</button></div>`;
+  if (!exp) {
+    g.innerHTML = head(t('guideTitle')) + `<ol class="explist">${EXPERIMENTS.map((x, i) => `<li><button data-e="${x.id}"><span class="n">${i + 1}</span><span>${tr(x.title)}</span></button></li>`).join('')}</ol>`;
+    g.querySelectorAll('[data-e]').forEach(b => b.onclick = () => { exp = EXPERIMENTS.find(x => x.id === b.dataset.e); stepI = 0; renderGuide(); });
+  } else {
+    const st = exp.steps[stepI], n = EXPERIMENTS.indexOf(exp) + 1;
+    const checks = [...(st.c || []).map(([a, b]) => [sameNet(a, b), `<bdi>${SOCKET_NAME[a]}</bdi> → <bdi>${SOCKET_NAME[b]}</bdi>`]),
+      ...Object.entries(st.p || {}).map(([ch, s]) => [probeOk(ch, s), `<bdi>${ch}</bdi> → <bdi>${SOCKET_NAME[s]}</bdi>`])];
+    g.innerHTML = head(t('guideTitle')) + `
+      <button class="crumb" id="gBack">${t('back')}</button>
+      <div class="expTitle">${n}. ${tr(exp.title)}</div>
+      <div class="stepbar">${exp.steps.map((s, i) => `<button data-i="${i}" class="${i === stepI ? 'cur' : ''} ${stepDone(s) ? 'done' : ''}" title="${t('step')} ${i + 1}">${i + 1}</button>`).join('')}</div>
+      <p class="stepText">${tr(st)}</p>
+      ${checks.length ? `<ul class="checks" dir="ltr">${checks.map(([ok, txt]) => `<li class="${ok ? 'ok' : ''}"><span class="box">${ok ? '✓' : ''}</span><span>${txt}</span></li>`).join('')}</ul>` : ''}
+      ${st.q ? `<div class="question">${tr(st.q)}<div class="lines"></div></div>` : ''}
+      <div class="sheetNav"><button id="gPrev" ${stepI === 0 ? 'disabled' : ''}>${t('prev')}</button>
+        <label><input type="checkbox" id="gGhost" ${ghost ? 'checked' : ''}> ${t('showWiring')}</label>
+        ${links[exp.id] ? `<button class="video" id="gVideo">${t('watch')}</button>` : ''}
+        <button id="gNext" class="primary" ${stepI === exp.steps.length - 1 ? 'disabled' : ''}>${t('next')}</button></div>`;
+    $('#gBack').onclick = () => { exp = null; renderGuide(); };
+    $('#gPrev').onclick = () => { stepI--; renderGuide(); }; $('#gNext').onclick = () => { stepI++; renderGuide(); };
+    $('#gGhost').onchange = e => { ghost = e.target.checked; drawGhost(); };
+    if ($('#gVideo')) $('#gVideo').onclick = () => openLink(links[exp.id]);
+    g.querySelectorAll('.stepbar button').forEach(b => b.onclick = () => { stepI = +b.dataset.i; renderGuide(); });
+  }
+  $('#gClose').onclick = () => { g.classList.remove('open'); drawGhost(); };
+  drawGhost();
+}
+function drawGhost() {
+  ghostLayer.innerHTML = ''; if (!exp || !ghost || !$('#guide').classList.contains('open')) return;
+  const st = exp.steps[stepI];
+  for (const [a, b] of st.c || []) { if (sameNet(a, b)) continue; const pa = SOCKET_POS[a], pb = SOCKET_POS[b]; el('path', { d: wires.curve(pa, pb), stroke: '#f2c21b', 'stroke-width': 4, 'stroke-dasharray': '10 7', fill: 'none' }, ghostLayer); for (const p of [pa, pb]) el('circle', { cx: p[0], cy: p[1], r: 15, fill: 'none', stroke: '#f2c21b', 'stroke-width': 3, class: 'ghostRing' }, ghostLayer); }
+  for (const [ch, s] of Object.entries(st.p || {})) { if (probeOk(ch, s)) continue; const pa = scope.bncPos(ch), pb = SOCKET_POS[s]; el('path', { d: wires.curve(pa, pb, true), stroke: '#7fd3ff', 'stroke-width': 4, 'stroke-dasharray': '10 7', fill: 'none' }, ghostLayer); el('circle', { cx: pb[0], cy: pb[1], r: 15, fill: 'none', stroke: '#7fd3ff', 'stroke-width': 3, class: 'ghostRing' }, ghostLayer); }
+}
+
+// =============================================== rail & settings ===============================================
+function applyTexts() {
+  document.querySelectorAll('[data-t]').forEach(n => { n.textContent = t(n.dataset.t); });
+  document.querySelectorAll('[data-hint]').forEach(n => { n.title = t(n.dataset.hint); });
+  $('#btnFull').title = document.fullscreenElement ? t('exitFullscreen') : t('fullscreen');
+  document.querySelectorAll('[data-lang]').forEach(b => b.classList.toggle('on', b.dataset.lang === getLang()));
+  document.querySelectorAll('[data-snd]').forEach(b => b.classList.toggle('on', (b.dataset.snd === '1') === !audio.muted));
+  colorsEl.querySelectorAll('.plugsw').forEach(b => b.title = t('colors')[b.dataset.c]);
+  $('#tGuide .state').textContent = training ? t('on') : t('off');
+  drawHeadphones(); if ($('#guide').classList.contains('open')) renderGuide();
+}
+function setTraining(on) {
+  training = on; document.body.classList.toggle('training', on);
+  $('#tGuide').setAttribute('aria-checked', on ? 'true' : 'false'); $('#tGuide .state').textContent = on ? t('on') : t('off');
+  try { localStorage.setItem('ett.training', on ? '1' : '0'); } catch (e) { }
+  if (!on) { $('#guide').classList.remove('open'); hideTip(); drawGhost(); }
+}
+$('#tGuide').onclick = () => setTraining(!training);
+$('#btnGuide').onclick = () => { const g = $('#guide'); g.classList.toggle('open'); if (g.classList.contains('open')) { if (!training) setTraining(true); renderGuide(); } else drawGhost(); };
+$('#vKit').onclick = () => setView('kit'); $('#vBoth').onclick = () => setView('both'); $('#vScope').onclick = () => setView('scope');
+$('#btnFull').onclick = toggleFull;
+$('#btnSettings').onclick = () => $('#settings').classList.toggle('open');
+document.querySelectorAll('[data-lang]').forEach(b => b.onclick = () => { setLang(b.dataset.lang); applyTexts(); });
+document.querySelectorAll('[data-snd]').forEach(b => b.onclick = () => { audio.ensure(); audio.muted = b.dataset.snd !== '1'; applyTexts(); });
+$('#btnClear').onclick = () => { $('#settings').classList.remove('open'); if (confirm(t('confirmClear'))) wires.clearAll(); };
+$('#btnHelp').onclick = () => { $('#settings').classList.remove('open'); showModal(t('help'), HELP[getLang()].app, links._channel); };
+$('#btnScopeHelp').onclick = () => { $('#settings').classList.remove('open'); hooks.scopeHelp(); };
+const colorsEl = $('#colors');
+colorsEl.innerHTML = Object.keys(LEAD_COLORS).map(c => `<button class="plugsw ${c === wires.color ? 'sel' : ''}" data-c="${c}" style="background:${LEAD_COLORS[c]}"></button>`).join('');
+colorsEl.onclick = e => { const c = e.target.dataset.c; if (!c) return; wires.color = c; colorsEl.querySelectorAll('.plugsw').forEach(s => s.classList.toggle('sel', s.dataset.c === c)); };
+
+// save / open setups
+function snapshot() {
+  const mods = {}; for (const id in sim.mods) mods[id] = { ...sim.mods[id].p };
+  return { v: 2, leads: sim.leads.map(({ a, b, color }) => ({ a, b, color })), probes: { CH1: sim.probes.CH1, CH2: sim.probes.CH2, EXT: sim.probes.EXT }, mods, scope: scope.st, headphones: sim.headphones };
+}
+function restore(s) {
+  sim.leads = []; for (const l of s.leads || []) if (SOCKETS[l.a] && SOCKETS[l.b]) sim.leads.push({ id: 'L' + Math.random().toString(36).slice(2, 9), ...l });
+  for (const k of ['CH1', 'CH2', 'EXT']) { const v = (s.probes || {})[k]; sim.probes[k] = v && SOCKETS[v] ? v : null; }
+  for (const id in s.mods || {}) if (sim.mods[id]) for (const p in s.mods[id]) sim.mods[id].set(p, s.mods[id][p]);
+  // v1 files: the V/div list started at 2 mV; v2 adds 1 mV/div in front (UTD2000: 1 mV .. 20 V/div)
+  if (s.scope && !(s.v >= 2)) { s = JSON.parse(JSON.stringify(s)); for (const k of ['CH1', 'CH2']) if (s.scope.ch && s.scope.ch[k] && typeof s.scope.ch[k].vd === 'number') s.scope.ch[k].vd += 1; }
+  if (s.scope && s.scope.math) delete s.scope.math.fz;
+  if (s.scope) { const d = scope.st; for (const k in s.scope) d[k] = (d[k] && typeof d[k] === 'object' && !Array.isArray(d[k])) ? Object.assign(d[k], s.scope[k]) : s.scope[k]; d.run = true; }
+  sim.headphones = !!s.headphones; sim.rebuild(); wires.render(); panel.refreshAll(); drawHeadphones();
+}
+$('#btnSave').onclick = () => { $('#settings').classList.remove('open'); download(new Blob([JSON.stringify(snapshot(), null, 1)], { type: 'application/json' }), `setup-${stamp()}.ett.json`); toast(t('savedSetup')); };
+$('#btnLoad').onclick = () => { $('#settings').classList.remove('open'); $('#fileIn').click(); };
+$('#fileIn').onchange = async e => { const f = e.target.files[0]; if (!f) return; try { const s = JSON.parse(await f.text()); if (!s.leads) throw 0; restore(s); toast(s.title ? s.title : f.name); } catch (err) { alert(t('badFile')); } e.target.value = ''; };
+function stamp() { const d = new Date(), p = n => String(n).padStart(2, '0'); return `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`; }
+function download(blob, name) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); }
+function saveImage(cv) { cv.toBlob(b => download(b, `scope-${stamp()}.png`)); toast(t('savedImage')); }
+function toast(msg) { const d = $('#toast'); d.textContent = msg; d.classList.add('show'); clearTimeout(d._t); d._t = setTimeout(() => d.classList.remove('show'), 1800); }
+setInterval(() => { try { localStorage.setItem('ett.autosave', JSON.stringify(snapshot())); } catch (e) { } }, 3000);
+try { const a = localStorage.getItem('ett.autosave'); if (a) restore(JSON.parse(a)); } catch (e) { }
+
+window.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeModal(); closeMenus(); $('#settings').classList.remove('open'); }
+  if (e.target.tagName === 'INPUT' || e.ctrlKey || e.altKey || e.metaKey) return;
+  if (e.key === '1') setView('kit'); if (e.key === '2') setView('both'); if (e.key === '3') setView('scope');
+  if (e.key === 'f' || e.key === 'F') toggleFull();
+});
+// keep the browser itself from zooming with Ctrl +/-; map them to the bench
+window.addEventListener('keydown', e => { if (e.ctrlKey && ['+', '=', '-', '0'].includes(e.key)) { e.preventDefault(); if (e.key === '0') setView('both'); else zoomAt({ clientX: innerWidth / 2, clientY: innerHeight / 2 }, e.key === '-' ? 1.25 : 0.8); } });
+document.addEventListener('pointerdown', () => audio.ensure(), { once: true });
+
+setLang(getLang()); applyTexts(); setTraining(training); wires.render();
+requestAnimationFrame(() => setView(viewMode));
+
+// =============================================== main loop ===============================================
+let last = performance.now(), frame = 0, guideTick = 0, loadAvg = 0;
+function loop(now) {
+  let dt = Math.min(0.05, (now - last) / 1000); last = now;
+  if (sim.headphones && audio.ctx && audio.ctx.state === 'running') { const q = sim.audioQueued(); dt *= q < 3000 ? 1.15 : q > 9000 ? 0.85 : 1; }
+  const t0 = performance.now();
+  sim.run(Math.round(dt * FS));
+  loadAvg = loadAvg * 0.95 + (performance.now() - t0) * 0.05;
+  if (sim.order.includes(sim.mods.speech) && !audio.micOn && !audio.micErr) audio.startMic();
+  if (frame++ % 2 === 0) scope.update();
+  panel.updateLeds();
+  if (++guideTick % 20 === 0 && exp && $('#guide').classList.contains('open') && document.activeElement?.id !== 'gGhost') {
+    const h = JSON.stringify([sim.version, sim.probes]); if (h !== renderGuide._h) { renderGuide._h = h; renderGuide(); }
+  }
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+window.__sim = sim; window.__perf = () => loadAvg;
+window.__app = { sim, wires, scope, panel, restore, snapshot, setView, setLang: l => { setLang(l); applyTexts(); } };

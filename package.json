@@ -1,0 +1,67 @@
+{
+  "name": "ett101-simulator",
+  "productName": "Telecoms-Trainer 101 Simulator",
+  "version": "0.26.0",
+  "description": "Interactive simulator of the Emona ETT-101 telecoms trainer kit with a UTD2000-style oscilloscope",
+  "author": "Ahmed Atef",
+  "license": "UNLICENSED",
+  "private": true,
+  "type": "module",
+  "main": "electron/main.cjs",
+  "repository": { "type": "git", "url": "https://github.com/Ahmed-Atef-Tech/ETT101-Simulator.git" },
+  "scripts": {
+    "build:web": "node build.mjs",
+    "start": "node build.mjs && electron .",
+    "dist:win": "node build.mjs && electron-builder --win --publish never",
+    "dist:mac": "node build.mjs && electron-builder --mac --publish never",
+    "test": "node tools/check_setups.mjs && node tools/verify_book.mjs && node tools/verify_more.mjs && node tools/verify_vol2.mjs"
+  },
+  "dependencies": {
+    "electron-updater": "^6.3.9"
+  },
+  "devDependencies": {
+    "@fontsource/barlow-semi-condensed": "^5.3.0",
+    "@fontsource/ibm-plex-sans-arabic": "^5.3.0",
+    "electron": "33.4.11",
+    "electron-builder": "^25.1.8",
+    "esbuild": "^0.24.2",
+    "resedit": "^2.0.3"
+  },
+  "build": {
+    "appId": "edu.ece.telecomstrainer101.sim",
+    "productName": "Telecoms-Trainer 101 Simulator",
+    "directories": { "output": "release" },
+    "files": ["electron/**/*", "package.json"],
+    "extraFiles": [{ "from": "electron/help-links.json", "to": "help-links.json" }],
+    "asar": true,
+    "afterPack": "./scripts/afterPack.cjs",
+    "publish": [{ "provider": "github", "owner": "Ahmed-Atef-Tech", "repo": "ETT101-Simulator", "releaseType": "draft" }],
+    "win": {
+      "icon": "electron/icon.ico",
+      "target": [{ "target": "nsis", "arch": ["x64"] }],
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "ETT-101 Simulator",
+      "artifactName": "ETT101-Simulator-Setup-${version}.exe",
+      "installerIcon": "electron/icon.ico",
+      "uninstallerIcon": "electron/icon.ico",
+      "language": "1025"
+    },
+    "mac": {
+      "icon": "electron/icon.png",
+      "category": "public.app-category.education",
+      "target": [{ "target": "dmg", "arch": ["universal"] }, { "target": "zip", "arch": ["universal"] }],
+      "identity": "-",
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false,
+      "artifactName": "ETT101-Simulator-${version}-mac.${ext}"
+    },
+    "dmg": { "artifactName": "ETT101-Simulator-${version}-mac.dmg" }
+  }
+}

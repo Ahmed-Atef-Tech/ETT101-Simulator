@@ -1,0 +1,129 @@
+{
+ "v": 2,
+ "headphones": false,
+ "title": "Vol.1 Exp 14 (DATEx Exp 16) Part A: PCM DATA through the TUNEABLE LPF (the channel); turn fc down until the decoder output shows errors. Message = VDC (the DATEx uses a 20 Hz sine)",
+ "leads": [
+  {
+   "a": "vdc.VDC",
+   "b": "pcmenc.IN1",
+   "color": "yellow"
+  },
+  {
+   "a": "master.DIG2",
+   "b": "pcmenc.CLK",
+   "color": "red"
+  },
+  {
+   "a": "master.DIG2",
+   "b": "pcmdec.CLK",
+   "color": "blue"
+  },
+  {
+   "a": "pcmenc.FS",
+   "b": "pcmdec.FS",
+   "color": "green"
+  },
+  {
+   "a": "pcmenc.DATA",
+   "b": "tlpf.IN",
+   "color": "black"
+  },
+  {
+   "a": "tlpf.OUT",
+   "b": "pcmdec.DATA",
+   "color": "yellow"
+  }
+ ],
+ "probes": {
+  "CH1": "vdc.VDC",
+  "CH2": "pcmdec.OUT1",
+  "EXT": null
+ },
+ "mods": {
+  "pcmenc": {
+   "TDM": 0
+  },
+  "vdc": {
+   "VDC": 0.7
+  },
+  "tlpf": {
+   "GAIN": 0.5,
+   "FC": 0.5
+  }
+ },
+ "scope": {
+  "ch": {
+   "CH1": {
+    "on": true,
+    "vd": 9,
+    "fine": 1,
+    "pos": 1,
+    "cpl": "DC",
+    "bw": false,
+    "finemode": false,
+    "probe": 0,
+    "inv": false
+   },
+   "CH2": {
+    "on": true,
+    "vd": 9,
+    "fine": 1,
+    "pos": -2,
+    "cpl": "DC",
+    "bw": false,
+    "finemode": false,
+    "probe": 0,
+    "inv": false
+   }
+  },
+  "sel": "CH1",
+  "hpos": 0,
+  "zoom": false,
+  "ztd": 4,
+  "zpos": 0,
+  "trig": {
+   "src": "CH1",
+   "slope": "R",
+   "mode": "AUTO",
+   "cpl": "DC",
+   "level": 0
+  },
+  "run": true,
+  "acq": "Sample",
+  "avgN": 16,
+  "disp": {
+   "type": "Vectors",
+   "persist": 0,
+   "fmt": "YT",
+   "grid": "Dots"
+  },
+  "math": {
+   "on": false,
+   "kind": "FFT",
+   "op": "+",
+   "fftSrc": "CH1",
+   "win": "Hanning",
+   "dbdiv": 20,
+   "fpos": 0,
+   "unit": "dBVrms",
+   "vrd": 7
+  },
+  "meas": {
+   "src": "CH2",
+   "items": [
+    "Vpp",
+    "Freq",
+    null
+   ],
+   "all": false
+  },
+  "cur": {
+   "type": "Off",
+   "src": "CH1",
+   "act": "A",
+   "a": -3,
+   "b": 3
+  },
+  "menu": null
+ }
+}

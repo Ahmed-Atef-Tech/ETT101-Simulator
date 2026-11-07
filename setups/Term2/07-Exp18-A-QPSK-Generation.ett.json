@@ -1,0 +1,152 @@
+{
+ "v": 2,
+ "headphones": false,
+ "title": "Term 2 Exp 18 Part A (Figures 5-9): QPSK = X1 x 100 kHz SINE + X2 x 100 kHz COS, each set for 4 Vp-p on the ADDER",
+ "leads": [
+  {
+   "a": "master.DIG8",
+   "b": "seq.CLK",
+   "color": "yellow"
+  },
+  {
+   "a": "master.DIG8",
+   "b": "div.IN",
+   "color": "red"
+  },
+  {
+   "a": "div.OUT",
+   "b": "s2p.CLK",
+   "color": "blue"
+  },
+  {
+   "a": "seq.X",
+   "b": "s2p.SERIAL",
+   "color": "green"
+  },
+  {
+   "a": "s2p.X1",
+   "b": "mult1.XDC",
+   "color": "black"
+  },
+  {
+   "a": "master.SINE100",
+   "b": "mult1.YDC",
+   "color": "yellow"
+  },
+  {
+   "a": "s2p.X2",
+   "b": "mult2.XDC",
+   "color": "red"
+  },
+  {
+   "a": "master.COS100",
+   "b": "mult2.YDC",
+   "color": "blue"
+  },
+  {
+   "a": "mult1.KXY",
+   "b": "adder.A",
+   "color": "green"
+  },
+  {
+   "a": "mult2.KXY",
+   "b": "adder.B",
+   "color": "black"
+  }
+ ],
+ "probes": {
+  "CH1": "adder.OUT",
+  "CH2": "s2p.X1",
+  "EXT": "seq.SYNC"
+ },
+ "mods": {
+  "seq": {
+   "S1": 0,
+   "S2": 0
+  },
+  "div": {
+   "S1": 0,
+   "S2": 1
+  },
+  "adder": {
+   "g": 0.2569,
+   "G": 0.2568
+  }
+ },
+ "scope": {
+  "ch": {
+   "CH1": {
+    "on": true,
+    "vd": 10,
+    "fine": 1,
+    "pos": 1.5,
+    "cpl": "DC",
+    "bw": false,
+    "finemode": false,
+    "probe": 0,
+    "inv": false
+   },
+   "CH2": {
+    "on": true,
+    "vd": 10,
+    "fine": 1,
+    "pos": -2.5,
+    "cpl": "DC",
+    "bw": false,
+    "finemode": false,
+    "probe": 0,
+    "inv": false
+   }
+  },
+  "sel": "CH1",
+  "td": 8,
+  "hpos": 0,
+  "zoom": false,
+  "ztd": 4,
+  "zpos": 0,
+  "trig": {
+   "src": "EXT",
+   "slope": "R",
+   "mode": "AUTO",
+   "cpl": "DC",
+   "level": 2.5
+  },
+  "run": true,
+  "acq": "Sample",
+  "avgN": 16,
+  "disp": {
+   "type": "Vectors",
+   "persist": 0,
+   "fmt": "YT",
+   "grid": "Dots"
+  },
+  "math": {
+   "on": false,
+   "kind": "FFT",
+   "op": "+",
+   "fftSrc": "CH1",
+   "win": "Hanning",
+   "dbdiv": 20,
+   "fpos": 0,
+   "unit": "dBVrms",
+   "vrd": 7
+  },
+  "meas": {
+   "src": "CH2",
+   "items": [
+    "Vpp",
+    "Freq",
+    null
+   ],
+   "all": false
+  },
+  "cur": {
+   "type": "Off",
+   "src": "CH1",
+   "act": "A",
+   "a": -3,
+   "b": 3
+  },
+  "menu": null
+ }
+}

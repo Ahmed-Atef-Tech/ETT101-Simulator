@@ -1,0 +1,134 @@
+{
+ "v": 2,
+ "headphones": false,
+ "title": "Term 2 Exp 8 Part B (Figure 8): PLL = MULTIPLIER (phase detector) + RC LPF (loop filter) + VCO (HI, middle); VCO (CH2) locks to the 100 kHz carrier (CH1)",
+ "leads": [
+  {
+   "a": "master.DIG8",
+   "b": "tlpf.IN",
+   "color": "yellow"
+  },
+  {
+   "a": "tlpf.OUT",
+   "b": "mult3.XDC",
+   "color": "red"
+  },
+  {
+   "a": "master.SINE100",
+   "b": "mult3.YDC",
+   "color": "blue"
+  },
+  {
+   "a": "mult3.KXY",
+   "b": "mult1.XAC",
+   "color": "green"
+  },
+  {
+   "a": "vco.SINE",
+   "b": "mult1.YAC",
+   "color": "black"
+  },
+  {
+   "a": "mult1.KXY",
+   "b": "util.RC_IN",
+   "color": "yellow"
+  },
+  {
+   "a": "util.RC",
+   "b": "vco.IN",
+   "color": "red"
+  }
+ ],
+ "probes": {
+  "CH1": "master.SINE100",
+  "CH2": "vco.SINE",
+  "EXT": null
+ },
+ "mods": {
+  "tlpf": {
+   "FC": 1,
+   "GAIN": 0.3237
+  },
+  "vco": {
+   "HI": 1,
+   "FREQ": 0.5,
+   "GAIN": 0.5
+  }
+ },
+ "scope": {
+  "ch": {
+   "CH1": {
+    "on": true,
+    "vd": 9,
+    "fine": 1,
+    "pos": 2,
+    "cpl": "DC",
+    "bw": false,
+    "finemode": false,
+    "probe": 0,
+    "inv": false
+   },
+   "CH2": {
+    "on": true,
+    "vd": 9,
+    "fine": 1,
+    "pos": -2,
+    "cpl": "DC",
+    "bw": false,
+    "finemode": false,
+    "probe": 0,
+    "inv": false
+   }
+  },
+  "sel": "CH1",
+  "td": 2,
+  "hpos": 0,
+  "zoom": false,
+  "ztd": 4,
+  "zpos": 0,
+  "trig": {
+   "src": "CH1",
+   "slope": "R",
+   "mode": "AUTO",
+   "cpl": "DC",
+   "level": 0
+  },
+  "run": true,
+  "acq": "Sample",
+  "avgN": 16,
+  "disp": {
+   "type": "Vectors",
+   "persist": 0,
+   "fmt": "YT",
+   "grid": "Dots"
+  },
+  "math": {
+   "on": false,
+   "kind": "FFT",
+   "op": "+",
+   "fftSrc": "CH1",
+   "win": "Hanning",
+   "dbdiv": 20,
+   "fpos": 0,
+   "unit": "dBVrms",
+   "vrd": 7
+  },
+  "meas": {
+   "src": "CH2",
+   "items": [
+    "Vpp",
+    "Freq",
+    null
+   ],
+   "all": false
+  },
+  "cur": {
+   "type": "Off",
+   "src": "CH1",
+   "act": "A",
+   "a": -3,
+   "b": 3
+  },
+  "menu": null
+ }
+}

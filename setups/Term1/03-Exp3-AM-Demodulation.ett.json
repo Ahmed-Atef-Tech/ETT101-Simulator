@@ -1,0 +1,127 @@
+{
+ "v": 2,
+ "headphones": false,
+ "title": "Term 1 Exp 3 AM demodulation: envelope detector (RECTIFIER then RC LPF)",
+ "leads": [
+  {
+   "a": "vdc.VDC",
+   "b": "adder.B",
+   "color": "yellow"
+  },
+  {
+   "a": "master.SINE2",
+   "b": "adder.A",
+   "color": "red"
+  },
+  {
+   "a": "adder.OUT",
+   "b": "mult2.XDC",
+   "color": "blue"
+  },
+  {
+   "a": "master.SINE100",
+   "b": "mult2.YDC",
+   "color": "green"
+  },
+  {
+   "a": "mult2.KXY",
+   "b": "util.RECT_IN",
+   "color": "black"
+  },
+  {
+   "a": "util.RECT",
+   "b": "util.RC_IN",
+   "color": "yellow"
+  }
+ ],
+ "probes": {
+  "CH1": "adder.OUT",
+  "CH2": "util.RC",
+  "EXT": null
+ },
+ "mods": {
+  "vdc": {
+   "VDC": 0.03
+  },
+  "adder": {
+   "G": 0.125,
+   "g": 0.2127659574468085
+  }
+ },
+ "scope": {
+  "ch": {
+   "CH1": {
+    "on": true,
+    "vd": 8,
+    "fine": 1,
+    "pos": 1,
+    "cpl": "DC",
+    "bw": false,
+    "finemode": false,
+    "probe": 0,
+    "inv": false
+   },
+   "CH2": {
+    "on": true,
+    "vd": 8,
+    "fine": 1,
+    "pos": -3,
+    "cpl": "DC",
+    "bw": false,
+    "finemode": false,
+    "probe": 0,
+    "inv": false
+   }
+  },
+  "sel": "CH1",
+  "td": 7,
+  "hpos": 0,
+  "zoom": false,
+  "ztd": 4,
+  "zpos": 0,
+  "trig": {
+   "src": "CH1",
+   "slope": "R",
+   "mode": "AUTO",
+   "cpl": "DC",
+   "level": 1
+  },
+  "run": true,
+  "acq": "Sample",
+  "avgN": 16,
+  "disp": {
+   "type": "Vectors",
+   "persist": 0,
+   "fmt": "YT",
+   "grid": "Dots"
+  },
+  "math": {
+   "on": false,
+   "kind": "FFT",
+   "op": "+",
+   "fftSrc": "CH1",
+   "win": "Hanning",
+   "dbdiv": 20,
+   "fpos": 0,
+   "unit": "dBVrms",
+   "vrd": 7
+  },
+  "meas": {
+   "src": "CH2",
+   "items": [
+    "Vpp",
+    "Freq",
+    null
+   ],
+   "all": false
+  },
+  "cur": {
+   "type": "Off",
+   "src": "CH1",
+   "act": "A",
+   "a": -3,
+   "b": 3
+  },
+  "menu": null
+ }
+}

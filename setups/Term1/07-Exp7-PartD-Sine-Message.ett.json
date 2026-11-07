@@ -1,0 +1,127 @@
+{
+ "v": 2,
+ "headphones": false,
+ "title": "Term 1 Exp 7 Part D: 2 kHz SINE message demodulated (CH2 AC coupled)",
+ "leads": [
+  {
+   "a": "vco.SINE",
+   "b": "util.CIN",
+   "color": "red"
+  },
+  {
+   "a": "vdc.GND",
+   "b": "util.REF",
+   "color": "blue"
+  },
+  {
+   "a": "util.COMP",
+   "b": "tpg.CLK",
+   "color": "green"
+  },
+  {
+   "a": "tpg.Q1",
+   "b": "channel.BB_IN",
+   "color": "black"
+  },
+  {
+   "a": "master.SINE2",
+   "b": "vco.IN",
+   "color": "black"
+  }
+ ],
+ "probes": {
+  "CH1": "master.SINE2",
+  "CH2": "channel.BB",
+  "EXT": null
+ },
+ "mods": {
+  "vco": {
+   "HI": 0,
+   "GAIN": 0.923,
+   "FREQ": 0.5625
+  },
+  "vdc": {
+   "VDC": 0.9
+  },
+  "tpg": {
+   "DELAY": 0,
+   "WIDTH": 0.2
+  }
+ },
+ "scope": {
+  "ch": {
+   "CH1": {
+    "on": true,
+    "vd": 9,
+    "fine": 1,
+    "pos": 1.5,
+    "cpl": "DC",
+    "bw": false,
+    "finemode": false,
+    "probe": 0,
+    "inv": false
+   },
+   "CH2": {
+    "on": true,
+    "vd": 7,
+    "fine": 1,
+    "pos": -2,
+    "cpl": "AC",
+    "bw": false,
+    "finemode": false,
+    "probe": 0,
+    "inv": false
+   }
+  },
+  "sel": "CH1",
+  "td": 8,
+  "hpos": 0,
+  "zoom": false,
+  "ztd": 4,
+  "zpos": 0,
+  "trig": {
+   "src": "CH1",
+   "slope": "R",
+   "mode": "AUTO",
+   "cpl": "DC",
+   "level": 0
+  },
+  "run": true,
+  "acq": "Sample",
+  "avgN": 16,
+  "disp": {
+   "type": "Vectors",
+   "persist": 0,
+   "fmt": "YT",
+   "grid": "Dots"
+  },
+  "math": {
+   "on": false,
+   "kind": "FFT",
+   "op": "+",
+   "fftSrc": "CH1",
+   "win": "Hanning",
+   "dbdiv": 20,
+   "fpos": 0,
+   "unit": "dBVrms",
+   "vrd": 7
+  },
+  "meas": {
+   "src": "CH2",
+   "items": [
+    "Vpp",
+    "Freq",
+    null
+   ],
+   "all": false
+  },
+  "cur": {
+   "type": "Off",
+   "src": "CH1",
+   "act": "A",
+   "a": -3,
+   "b": 3
+  },
+  "menu": null
+ }
+}

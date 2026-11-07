@@ -1,0 +1,124 @@
+{
+ "v": 2,
+ "headphones": false,
+ "title": "Term 1 Exp 4 steps 33-38: VCO (HI, middle) as the local carrier - tune it towards 100 kHz",
+ "leads": [
+  {
+   "a": "master.SINE100",
+   "b": "mult1.XAC",
+   "color": "yellow"
+  },
+  {
+   "a": "master.SINE2",
+   "b": "mult1.YAC",
+   "color": "red"
+  },
+  {
+   "a": "mult1.KXY",
+   "b": "mult2.XDC",
+   "color": "blue"
+  },
+  {
+   "a": "mult2.KXY",
+   "b": "tlpf.IN",
+   "color": "black"
+  },
+  {
+   "a": "vco.SINE",
+   "b": "mult2.YDC",
+   "color": "black"
+  }
+ ],
+ "probes": {
+  "CH1": "master.SINE2",
+  "CH2": "tlpf.OUT",
+  "EXT": null
+ },
+ "mods": {
+  "tlpf": {
+   "GAIN": 0.5,
+   "FC": 1
+  },
+  "vco": {
+   "HI": 1,
+   "FREQ": 0.5,
+   "GAIN": 0.5
+  }
+ },
+ "scope": {
+  "ch": {
+   "CH1": {
+    "on": true,
+    "vd": 9,
+    "fine": 1,
+    "pos": 2,
+    "cpl": "DC",
+    "bw": false,
+    "finemode": false,
+    "probe": 0,
+    "inv": false
+   },
+   "CH2": {
+    "on": true,
+    "vd": 10,
+    "fine": 1,
+    "pos": -1.5,
+    "cpl": "DC",
+    "bw": false,
+    "finemode": false,
+    "probe": 0,
+    "inv": false
+   }
+  },
+  "sel": "CH1",
+  "td": 7,
+  "hpos": 0,
+  "zoom": false,
+  "ztd": 4,
+  "zpos": 0,
+  "trig": {
+   "src": "CH1",
+   "slope": "R",
+   "mode": "AUTO",
+   "cpl": "DC",
+   "level": 0
+  },
+  "run": true,
+  "acq": "Sample",
+  "avgN": 16,
+  "disp": {
+   "type": "Vectors",
+   "persist": 0,
+   "fmt": "YT",
+   "grid": "Dots"
+  },
+  "math": {
+   "on": false,
+   "kind": "FFT",
+   "op": "+",
+   "fftSrc": "CH1",
+   "win": "Hanning",
+   "dbdiv": 20,
+   "fpos": 0,
+   "unit": "dBVrms",
+   "vrd": 7
+  },
+  "meas": {
+   "src": "CH2",
+   "items": [
+    "Vpp",
+    "Freq",
+    null
+   ],
+   "all": false
+  },
+  "cur": {
+   "type": "Off",
+   "src": "CH1",
+   "act": "A",
+   "a": -3,
+   "b": 3
+  },
+  "menu": null
+ }
+}

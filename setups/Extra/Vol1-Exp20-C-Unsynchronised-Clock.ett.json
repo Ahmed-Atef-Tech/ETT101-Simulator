@@ -1,0 +1,120 @@
+{
+ "v": 2,
+ "headphones": false,
+ "title": "Vol.1 Exp 20 (DATEx Exp 22) Part C: the sample clock from the VCO (LO, about 8.33 kHz) is not locked to the carrier - the recovered message beats",
+ "leads": [
+  {
+   "a": "master.SINE100",
+   "b": "mult1.XAC",
+   "color": "yellow"
+  },
+  {
+   "a": "master.SINE2",
+   "b": "mult1.YAC",
+   "color": "red"
+  },
+  {
+   "a": "mult1.KXY",
+   "b": "das.SHIN",
+   "color": "blue"
+  },
+  {
+   "a": "das.SH",
+   "b": "channel.BB_IN",
+   "color": "black"
+  },
+  {
+   "a": "vco.DIG",
+   "b": "das.C1",
+   "color": "black"
+  }
+ ],
+ "probes": {
+  "CH1": "master.SINE2",
+  "CH2": "channel.BB",
+  "EXT": null
+ },
+ "mods": {
+  "vco": {
+   "HI": 0,
+   "GAIN": 0.5,
+   "FREQ": 0.45844
+  }
+ },
+ "scope": {
+  "ch": {
+   "CH1": {
+    "on": true,
+    "vd": 9,
+    "fine": 1,
+    "pos": 2,
+    "cpl": "DC",
+    "bw": false,
+    "finemode": false,
+    "probe": 0,
+    "inv": false
+   },
+   "CH2": {
+    "on": true,
+    "vd": 8,
+    "fine": 1,
+    "pos": -2,
+    "cpl": "DC",
+    "bw": false,
+    "finemode": false,
+    "probe": 0,
+    "inv": false
+   }
+  },
+  "sel": "CH1",
+  "td": 9,
+  "hpos": 0,
+  "zoom": false,
+  "ztd": 4,
+  "zpos": 0,
+  "trig": {
+   "src": "CH1",
+   "slope": "R",
+   "mode": "AUTO",
+   "cpl": "DC",
+   "level": 0
+  },
+  "run": true,
+  "acq": "Sample",
+  "avgN": 16,
+  "disp": {
+   "type": "Vectors",
+   "persist": 0,
+   "fmt": "YT",
+   "grid": "Dots"
+  },
+  "math": {
+   "on": false,
+   "kind": "FFT",
+   "op": "+",
+   "fftSrc": "CH1",
+   "win": "Hanning",
+   "dbdiv": 20,
+   "fpos": 0,
+   "unit": "dBVrms",
+   "vrd": 7
+  },
+  "meas": {
+   "src": "CH2",
+   "items": [
+    "Vpp",
+    "Freq",
+    null
+   ],
+   "all": false
+  },
+  "cur": {
+   "type": "Off",
+   "src": "CH1",
+   "act": "A",
+   "a": -3,
+   "b": 3
+  },
+  "menu": null
+ }
+}

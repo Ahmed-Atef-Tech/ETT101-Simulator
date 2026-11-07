@@ -1,0 +1,105 @@
+{
+ "v": 2,
+ "headphones": false,
+ "title": "Vol.2 Exp 18 (DATEx Exp 7) Part D-E: DSBSC = 10 kHz (VCO) x 100 kHz; FFT shows only the two sidebands at 90 and 110 kHz",
+ "leads": [
+  {
+   "a": "master.SINE100",
+   "b": "mult1.XAC",
+   "color": "yellow"
+  },
+  {
+   "a": "vco.SINE",
+   "b": "mult1.YAC",
+   "color": "red"
+  }
+ ],
+ "probes": {
+  "CH1": "vco.SINE",
+  "CH2": "mult1.KXY",
+  "EXT": null
+ },
+ "mods": {
+  "vco": {
+   "HI": 0,
+   "FREQ": 0.5625,
+   "GAIN": 0.5
+  }
+ },
+ "scope": {
+  "ch": {
+   "CH1": {
+    "on": true,
+    "vd": 10,
+    "fine": 1,
+    "pos": 2,
+    "cpl": "DC",
+    "bw": false,
+    "finemode": false,
+    "probe": 0,
+    "inv": false
+   },
+   "CH2": {
+    "on": true,
+    "vd": 10,
+    "fine": 1,
+    "pos": -1,
+    "cpl": "DC",
+    "bw": false,
+    "finemode": false,
+    "probe": 0,
+    "inv": false
+   }
+  },
+  "sel": "CH1",
+  "td": 10,
+  "hpos": 0,
+  "zoom": false,
+  "ztd": 4,
+  "zpos": 0,
+  "trig": {
+   "src": "CH1",
+   "slope": "R",
+   "mode": "AUTO",
+   "cpl": "DC",
+   "level": 0
+  },
+  "run": true,
+  "acq": "Sample",
+  "avgN": 16,
+  "disp": {
+   "type": "Vectors",
+   "persist": 0,
+   "fmt": "YT",
+   "grid": "Dots"
+  },
+  "math": {
+   "on": true,
+   "kind": "FFT",
+   "op": "+",
+   "fftSrc": "CH2",
+   "win": "Hanning",
+   "dbdiv": 20,
+   "fpos": 0,
+   "unit": "dBVrms",
+   "vrd": 7
+  },
+  "meas": {
+   "src": "CH2",
+   "items": [
+    "Vpp",
+    "Freq",
+    null
+   ],
+   "all": false
+  },
+  "cur": {
+   "type": "Off",
+   "src": "CH1",
+   "act": "A",
+   "a": -3,
+   "b": 3
+  },
+  "menu": null
+ }
+}

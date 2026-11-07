@@ -1,0 +1,109 @@
+{
+ "v": 2,
+ "headphones": false,
+ "title": "Term 2 Exp 8 Part A (Figure 5): 8.33 kHz sine (TUNEABLE LPF, 4 Vp-p, with its DC) amplitude-modulates the 100 kHz carrier",
+ "leads": [
+  {
+   "a": "master.DIG8",
+   "b": "tlpf.IN",
+   "color": "yellow"
+  },
+  {
+   "a": "tlpf.OUT",
+   "b": "mult3.XDC",
+   "color": "red"
+  },
+  {
+   "a": "master.SINE100",
+   "b": "mult3.YDC",
+   "color": "blue"
+  }
+ ],
+ "probes": {
+  "CH1": "tlpf.OUT",
+  "CH2": "mult3.KXY",
+  "EXT": null
+ },
+ "mods": {
+  "tlpf": {
+   "FC": 1,
+   "GAIN": 0.3237
+  }
+ },
+ "scope": {
+  "ch": {
+   "CH1": {
+    "on": true,
+    "vd": 10,
+    "fine": 1,
+    "pos": 1,
+    "cpl": "DC",
+    "bw": false,
+    "finemode": false,
+    "probe": 0,
+    "inv": false
+   },
+   "CH2": {
+    "on": true,
+    "vd": 10,
+    "fine": 1,
+    "pos": -2,
+    "cpl": "DC",
+    "bw": false,
+    "finemode": false,
+    "probe": 0,
+    "inv": false
+   }
+  },
+  "sel": "CH1",
+  "td": 5,
+  "hpos": 0,
+  "zoom": false,
+  "ztd": 4,
+  "zpos": 0,
+  "trig": {
+   "src": "CH1",
+   "slope": "R",
+   "mode": "AUTO",
+   "cpl": "DC",
+   "level": 0
+  },
+  "run": true,
+  "acq": "Sample",
+  "avgN": 16,
+  "disp": {
+   "type": "Vectors",
+   "persist": 0,
+   "fmt": "YT",
+   "grid": "Dots"
+  },
+  "math": {
+   "on": false,
+   "kind": "FFT",
+   "op": "+",
+   "fftSrc": "CH1",
+   "win": "Hanning",
+   "dbdiv": 20,
+   "fpos": 0,
+   "unit": "dBVrms",
+   "vrd": 7
+  },
+  "meas": {
+   "src": "CH2",
+   "items": [
+    "Vpp",
+    "Freq",
+    null
+   ],
+   "all": false
+  },
+  "cur": {
+   "type": "Off",
+   "src": "CH1",
+   "act": "A",
+   "a": -3,
+   "b": 3
+  },
+  "menu": null
+ }
+}
