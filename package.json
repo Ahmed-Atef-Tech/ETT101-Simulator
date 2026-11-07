@@ -8,6 +8,7 @@
   "private": true,
   "type": "module",
   "main": "electron/main.cjs",
+  "homepage": "https://github.com/Ahmed-Atef-Tech/ETT101-Simulator#readme",
   "repository": { "type": "git", "url": "https://github.com/Ahmed-Atef-Tech/ETT101-Simulator.git" },
   "scripts": {
     "build:web": "node build.mjs",

@@ -29,11 +29,12 @@ An interactive simulator of the **Emona ETT-101 (Telecoms-Trainer 101)** kit and
 
 ## For maintainers: releasing an update
 
-1. Make the change and push it to `main`.
-2. Go to **Actions → Release → Run workflow**, type the new version (higher than the last, e.g. `0.27.0`) and optional notes, then **Run**.
-3. In about 10 minutes the release is published; installed Windows apps update themselves and Mac apps show a notice.
+1. Make the change.
+2. Raise `"version"` in `package.json` (for example `0.26.0` → `0.27.0`) and push to `main`.
+   You can do this on github.com: open `package.json`, press the pencil icon, edit the number, and **Commit changes**.
+3. The **Release** workflow starts by itself. In about 10–15 minutes the release is published: installed Windows apps update themselves and Mac apps show a notice.
 
-(Or push a tag: `git tag v0.27.0 && git push origin v0.27.0`.)
+Pushes that don't change the version don't make a release. You can also start one by hand: **Actions → Release → Run workflow**.
 
 ### Local development
 

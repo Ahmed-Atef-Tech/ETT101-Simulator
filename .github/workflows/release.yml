@@ -1,12 +1,18 @@
 # Builds the Windows installer and the Mac app, and publishes them as a GitHub Release.
 # The installed apps check this repo's latest release and update themselves.
 #
-# Two ways to release:
-#   1) Actions tab -> "Release" -> "Run workflow" -> type the new version (e.g. 0.27.0)
-#   2) push a tag:  git tag v0.27.0 && git push origin v0.27.0
+# Ways to release a new version:
+#   1) Change "version" in package.json (e.g. 0.26.0 -> 0.27.0) and push to main.
+#      A release starts automatically when that version has not been released yet.
+#   2) Actions tab -> "Release" -> "Run workflow" -> type the new version.
+#   3) Push a tag:  git tag v0.27.0 && git push origin v0.27.0
 name: Release
 
 on:
+  push:
+    branches: [main]
+    paths: [package.json]
+    tags: ["v*"]
   workflow_dispatch:
     inputs:
       version:
@@ -15,8 +21,6 @@ on:
       notes:
         description: "What changed (optional, shown on the release page)"
         required: false
-  push:
-    tags: ["v*"]
 
 permissions:
   contents: write
@@ -31,26 +35,38 @@ jobs:
     outputs:
       version: ${{ steps.v.outputs.version }}
       tag: ${{ steps.v.outputs.tag }}
+      skip: ${{ steps.v.outputs.skip }}
     steps:
       - uses: actions/checkout@v4
       - id: v
         name: Work out the version
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_VERSION: ${{ github.event.inputs.version }}
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then V="${{ github.event.inputs.version }}"; else V="${GITHUB_REF_NAME#v}"; fi
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then V="$INPUT_VERSION"
+          elif [ "${{ github.ref_type }}" = "tag" ]; then V="${GITHUB_REF_NAME}"
+          else V="$(node -p "require('./package.json').version")"; fi
           V="${V#v}"
           echo "$V" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$' || { echo "::error::Version must look like 1.2.3 (got '$V')"; exit 1; }
-          echo "version=$V" >> "$GITHUB_OUTPUT"; echo "tag=v$V" >> "$GITHUB_OUTPUT"
-      - name: Create a draft release (stays hidden from the apps until both builds are uploaded)
+          SKIP=false
+          if gh release view "v$V" --json isDraft -q .isDraft 2>/dev/null | grep -q false; then
+            echo "::notice::v$V is already released; nothing to do."; SKIP=true
+          fi
+          echo "version=$V" >> "$GITHUB_OUTPUT"; echo "tag=v$V" >> "$GITHUB_OUTPUT"; echo "skip=$SKIP" >> "$GITHUB_OUTPUT"
+      - name: Create a draft release (hidden from the apps until both builds are uploaded)
+        if: steps.v.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NOTES: ${{ github.event.inputs.notes }}
         run: |
           T="${{ steps.v.outputs.tag }}"
-          if gh release view "$T" >/dev/null 2>&1; then echo "Release $T already exists"; exit 0; fi
+          if gh release view "$T" >/dev/null 2>&1; then echo "Draft $T already exists"; exit 0; fi
           gh release create "$T" --draft --target "${{ github.sha }}" --title "ETT-101 Simulator $T" --notes "${NOTES:-Version ${{ steps.v.outputs.version }}}"
 
   build:
     needs: prepare
+    if: needs.prepare.outputs.skip != 'true'
     strategy:
       fail-fast: true
       matrix:
@@ -79,6 +95,7 @@ jobs:
 
   publish:
     needs: [prepare, build]
+    if: needs.prepare.outputs.skip != 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
