@@ -3,7 +3,7 @@
 What you should see in the simulator for every ready-made experiment: the block diagram, the wiring on the kit, the oscilloscope screen, and the figures the lab book expects next to what the simulator shows.
 
 > [!IMPORTANT]
-> **Preliminary (beta) version.** The simulator is still being tested and may not match the real kit 100%; when it differs, the real lab and your instructor are the reference. It is free and non-commercial, made only to help students, and must not be sold or used to make money in any way. Not affiliated with Emona Instruments or UNI-T.
+> **Preliminary (beta) version.** The simulator is still being tested and may not match the real kit 100%; when it differs, the real kit is the reference. It is free and non-commercial, made only to help students, and must not be sold or used to make money in any way. Not affiliated with Emona Instruments or UNI-T.
 
 All images come from the simulator itself (v0.31.3). The kit image is the simulator window with the wiring and switch settings of the setup file; the scope image is the oscilloscope screen about 3 seconds after the signal starts. The block diagrams are drawn from each setup's actual wiring; they are not copies of the book's figures.
 

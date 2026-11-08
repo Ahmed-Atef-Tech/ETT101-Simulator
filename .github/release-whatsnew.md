@@ -1,2 +1,2 @@
-- The preliminary-version notice is now written on every release page as well as inside the app (Beta tag next to the name, notice on first start, Settings → About this simulator).
-- التنبيه بتاع النسخة الأولية بقى مكتوب في صفحة كل release، ومعاه جوه البرنامج (علامة Beta جنب الاسم، والتنبيه أول مرة، والإعدادات ← عن البرنامج).
+- Shorter preliminary-version notice in the app and on the download page: when the simulator and the real kit differ, the real kit is the reference.
+- صياغة أقصر لتنبيه النسخة الأولية جوه البرنامج وفي صفحة التحميل: لو فيه اختلاف بين البرنامج والكيت الحقيقي، الكيت الحقيقي هو المرجع.

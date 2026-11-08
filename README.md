@@ -3,10 +3,10 @@
 An interactive simulator of the **Emona ETT-101 (Telecoms-Trainer 101)** kit and a **UNI-T UTD2102CEL-style oscilloscope**, made for the first- and second-term communications labs.
 
 > [!IMPORTANT]
-> **Preliminary (beta) version.** This simulator is still being tested and may not match the real Emona ETT-101 kit 100%. When it differs, the real lab and your instructor are the reference.
+> **Preliminary (beta) version.** This simulator is still being tested and may not match the real Emona ETT-101 kit 100%. When it differs, the real kit is the reference.
 > It was made **only to help students**. It is **free and non-commercial**: it must not be sold, rented, put behind a paywall, bundled with paid courses or used to make money in any way. Not affiliated with Emona Instruments or UNI-T.
 >
-> **نسخة أولية (تجريبية).** البرنامج لسه تحت الاختبار، وممكن متكونش مطابقة لكيت Emona ETT-101 الحقيقي 100%. لو فيه اختلاف، المعمل الحقيقي والمعيد هما المرجع.
+> **نسخة أولية (تجريبية).** البرنامج لسه تحت الاختبار، وممكن متكونش مطابقة لكيت Emona ETT-101 الحقيقي 100%. لو فيه اختلاف، الكيت الحقيقي هو المرجع.
 > البرنامج معمول **لمساعدة الطلبة بس**، وهو **مجاني وغير ربحي**: ممنوع بيعه أو تأجيره أو إنه يتحط في كورس مدفوع أو التربح منه بأي شكل من الأشكال. مش تابع لشركة Emona Instruments أو UNI-T.
 
 ## ⬇️ التحميل / Download

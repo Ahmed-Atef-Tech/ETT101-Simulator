@@ -80,12 +80,12 @@ export const MODULE_INFO = {
 // ------------------------------------------------------------------ about / disclaimer
 export const NOTICE = {
   en: `<p class="lead"><b>This is a preliminary (beta) version</b> and is still being tested.</p><ul>
-<li><b>Not an exact copy of the kit.</b> The simulator models the Emona ETT-101 and the oscilloscope from their published specifications and the lab books. Readings may not match the real kit 100%. When they differ, the real lab and your instructor are the reference.</li>
+<li><b>Not an exact copy of the kit.</b> The simulator models the Emona ETT-101 and the oscilloscope from their published specifications and the lab books. Readings may not match the real kit 100%. When they differ, the real kit is the reference.</li>
 <li><b>For students, free and non-commercial.</b> It was made to help students practise and prepare for the communications labs. It must not be sold, rented, put behind a paywall, bundled with paid courses or used to make money in any way.</li>
 <li><b>Not affiliated with Emona Instruments or UNI-T.</b> Kit and instrument names are used only to say what is being simulated.</li>
 <li>Found something that does not match the kit? Use <b>Report a bug</b> so it can be fixed.</li></ul>`,
   ar: `<p class="lead"><b>دي نسخة أولية (تجريبية)</b> ولسه تحت الاختبار.</p><ul>
-<li><b>مش نسخة طبق الأصل من الكيت.</b> البرنامج محاكاة لكيت Emona ETT-101 والأوسيلوسكوب، معمولة من المواصفات المنشورة وكتب المعمل، فممكن القراءات متكونش مطابقة للكيت الحقيقي 100%. لو فيه اختلاف، المعمل الحقيقي والمعيد هما المرجع.</li>
+<li><b>مش نسخة طبق الأصل من الكيت.</b> البرنامج محاكاة لكيت Emona ETT-101 والأوسيلوسكوب، معمولة من المواصفات المنشورة وكتب المعمل، فممكن القراءات متكونش مطابقة للكيت الحقيقي 100%. لو فيه اختلاف، الكيت الحقيقي هو المرجع.</li>
 <li><b>للطلبة، مجاني وغير ربحي.</b> معمول لمساعدة الطلبة يتدربوا ويحضّروا لمعمل الاتصالات. ممنوع بيعه أو تأجيره أو إنه يتحط في كورس مدفوع أو التربح منه بأي شكل من الأشكال.</li>
 <li><b>مش تابع لشركة Emona Instruments أو UNI-T.</b> أسامي الكيت والجهاز مستخدمة بس علشان توضّح البرنامج بيحاكي إيه.</li>
 <li>لو لقيت حاجة مش مطابقة للكيت، استخدم زرار <b>بلّغ عن مشكلة</b> علشان تتصلح.</li></ul>`,

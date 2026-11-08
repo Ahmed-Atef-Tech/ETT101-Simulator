@@ -1,7 +1,7 @@
 {
   "name": "ett101-simulator",
   "productName": "Telecoms-Trainer 101 Simulator",
-  "version": "0.32.1",
+  "version": "0.32.2",
   "description": "Interactive simulator of the Emona ETT-101 telecoms trainer kit with a UTD2000-style oscilloscope",
   "author": "Ahmed Atef",
   "license": "UNLICENSED",
