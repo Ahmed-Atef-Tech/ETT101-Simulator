@@ -1,9 +1,9 @@
-# Telecoms-Trainer 101 Simulator — model specification (v0.23)
+# Telecoms-Trainer 101 Simulator — model reference
 
 Sources, in order of precedence:
 1. **ETT-101 BiSKIT Specifications V1.1** (Emona, emona-tims.com) — the product's own spec table.
 2. **ETT-101 User Manual** (Emona sample, tecnoedu.com / emona-tims.com).
-3. **The course lab books**: Electrical Testing 4 (Emona Lab Manual Vol.1 Exp. 4–10) and Electrical Testing 7 (Vol.1 Exp. 11–20 + Vol.2: sampling, PCM, ASK, FSK, BPSK, QPSK, DSSS, PWM, PLL, SNR, delta and delta-sigma) — procedures, scope settings and expected results.
+3. **The course lab books**: Electrical Testing (6), ELC414 (Term 1: AM, DSBSC, AM and DSBSC demodulation, SSB, FM, FM demodulation) and Electrical Testing (7), ELC424 (Term 2: Emona Vol.1 Exp. 11–19 + Vol.2: sampling, PCM, ASK, FSK, BPSK, QPSK, DSSS, PWM, PLL, SNR, delta and delta-sigma) — procedures, scope settings and expected results.
 4. **Emona ETT-202 DATEx specifications** (NI, archived) — same module family as the ETT-101; numbers identical to Spec 1.1 for every shared module.
 5. **Emona DATEx lab manual sample** (NI, download.ni.com) and the DATEx user manual — used only where 1–3 are silent.
 6. **TIMS-301 user manual** (Emona, NJIT copy) — the parent product; used only to confirm the VCO's "G·Vin, 1 < G < 2" control.
@@ -30,7 +30,7 @@ Simulation: 4.8 MHz (100 kHz carrier = 48 samples/cycle; all Master Signals sync
 | Adder | OUT = −(G·A + g·B) | 0 < G, g < 2; one pole at 600 kHz | Spec 1.1, User manual ("gains are negative"), lab manual Exp.3 ("gain … −1") |
 | Adder (channel) | OUT = NOISE + SIGNAL | gain 1; pole 600 kHz | Spec 1.1 |
 | Multiplier ×3 | OUT = k·X·Y | **k = 1**; pole 600 kHz; AC inputs: 1st-order HPF (16 Hz, assumed) | Spec 1.1 table "k approx 1"; lab book: DSBSC viewed at 2 V/div, overload at ½ BUFFER travel |
-| Buffer | OUT = −Gain·IN | 0–10, audio taper (volume control); pole 600 kHz; **inverting** | User manual; inversion: ET7 Exp.12 & 13 ("used to invert the message"); taper matches ET4 DSBSC Part C |
+| Buffer | OUT = −Gain·IN | 0–10, audio taper (volume control); pole 600 kHz; **inverting** | User manual; inversion: ET7 Exp.12 & 13 ("used to invert the message"); taper matches ET6 Exp.2 Part C |
 | Noise | white 10 Hz–240 kHz | 0 dB 4.8 Vrms, −6 dB 2.4, −20 dB 0.48 | Spec 1.1 |
 | Channel BPF | 6th-order Chebyshev I, 0.1 dB | 88–112 kHz, gain 1 | Spec 1.1 |
 | Baseband LPF | 4th-order Butterworth | 1.6 kHz, gain 0.9 | Spec 1.1 |
@@ -41,7 +41,7 @@ Simulation: 4.8 MHz (100 kHz carrier = 48 samples/cycle; all Master Signals sync
 | RC LPF | 1 pole | 2.6 kHz | Spec 1.1 |
 | Tuneable LPF | 8th-order elliptic, 0.3 dB ripple, 60 dB stop-band (meets "< 0.5 dB, > 50 dB at 1.4 fc"; 60 dB reached at 1.13 fc) | fc 300 Hz–15 kHz, linear control; gain 0–2; fc×100 square output | Spec 1.1, user manual, lab manuals (see the disagreement table) |
 | Variable DCV | | −2.5…+2.5 V (linear), +5 V, GND | Spec 1.1 |
-| VCO | f = f0 + K0·G·Vin, **1 < G < 2** | LO 1–17 kHz, HI 60–140 kHz (linear FREQUENCY control; middle of HI = 100 kHz); input range ±3 V; K0 = 1.3 kHz/V LO, 13 kHz/V HI (**K0 bounded by the books**: FM demod needs K0·G = 2.5 kHz/V with G ≤ 2 → K0 ≥ 1.25; FSK Part A at half GAIN and a quarter FREQ keeps both tones above 0 Hz → K0 < 1.67; HI ×10 assumed) | Spec 1.1 ("GAIN G.Vin : 1 < G < 2", "−3 V < VCO INPUT < 3 V"); TIMS-301 manual (same); ET4 FM demod steps 14–17 |
+| VCO | f = f0 + K0·G·Vin, **1 < G < 2** | LO 1–17 kHz, HI 60–140 kHz (linear FREQUENCY control; middle of HI = 100 kHz); input range ±3 V; K0 = 1.3 kHz/V LO, 13 kHz/V HI (**K0 bounded by the books**: FM demod needs K0·G = 2.5 kHz/V with G ≤ 2 → K0 ≥ 1.25; FSK Part A at half GAIN and a quarter FREQ keeps both tones above 0 Hz → K0 < 1.67; HI ×10 assumed) | Spec 1.1 ("GAIN G.Vin : 1 < G < 2", "−3 V < VCO INPUT < 3 V"); TIMS-301 manual (same); ET6 Exp.7 steps 14–17 |
 | Twin Pulse | non-retriggerable, rising-edge | width 5–40 µs, delay 50–300 µs, clock < 8 kHz | Spec 1.1 |
 | Dual Analog Switch & S/H | OUT = IN1·[C1] + IN2·[C2]; S/H samples on C1 rising edge | analog input bandwidth 50 kHz (one pole); CONTROL digital only | Spec 1.1 |
 | Sequence Generator / Line Code | X 31-bit, Y 255-bit m-sequences (5- and 8-bit shift registers), SYNC at start of X; NRZ-L, Bi-φ, RZ-AMI, NRZ-M at **±2 V** (spec "+/-2Vp-p"; DATEx user manual: "bipolar, +2V and -2V, or tri-level, +2V, 0V and -2V") | clock 1 Hz–100 kHz | Spec 1.1; DATEx lab manual Vol.2 Exp.14 (shift register lengths) |
@@ -54,8 +54,8 @@ Simulation: 4.8 MHz (100 kHz carrier = 48 samples/cycle; all Master Signals sync
 ## Still to confirm on the real kit
 1. Multiplier k: 2kHz SINE → Y AC, 100kHz SINE → X AC, measure kXY. 8 Vp-p means k = 1 (current model), 4 Vp-p means k = 0.5.
 2. VCO sensitivity on LO with GAIN fully anticlockwise and fully clockwise (kHz per volt) — gives K0 directly.
-4. Tuneable LPF fc×100 output with the knob fully anticlockwise and fully clockwise — settles 300/600 Hz and 12/15 kHz.
-3. VCO HI range low end: spec says 60 kHz, ET7 Exp.2 step 38 says ~50 kHz fully anticlockwise (model uses the spec).
+3. Tuneable LPF fc×100 output with the knob fully anticlockwise and fully clockwise — settles 300/600 Hz and 12/15 kHz.
+4. VCO HI range low end: spec says 60 kHz, ET7 Exp.2 step 38 says ~50 kHz fully anticlockwise (model uses the spec).
 
 ## Verification (tools/verify_book.mjs, tools/verify_more.mjs) — all pass
 - Exp 1: ADDER out 1.000 V DC + 1.000 Vp-p; envelope correlates 0.999 with CH1; P 5.92, Q 1.97, m = 0.500; G max → over-modulation.
@@ -80,5 +80,5 @@ Simulation: 4.8 MHz (100 kHz carrier = 48 samples/cycle; all Master Signals sync
 - All biquad filters use direct form I, so turning the TUNEABLE LPF knob changes the filter without a burst (DF-II state reached the rails when fc was swept down).
 - Feedback loops (delta, delta-sigma, PLL) are evaluated in 8-sample sub-blocks (1.7 µs loop delay); a loop broken at the 256-sample block (53 µs) latched the delta modulator.
 
-## Setup files (tools/make_setups.mjs, checked by tools/check_setups.mjs) — 70 files, all pass
-Extra (Emona Vol.1 Exp 3 from the official SAMPLE manual; Vol.1 Exp 14, Vol.1 Exp 20, Vol.2 Exp 18 adapted from the DATEx Lab Manual Vol.1, VCO in place of the NI ELVIS function generator): 12 files. Term 1: Exp 1–7 (12 files). Term 2: Exp 11, 12, 13, 15, 16, 17, 18, 19 and Vol.2 Exp 6, 8, 9, 16, 17 (46 files), one per part, wired from the book's figures.
+## Setup files (tools/make_setups.mjs, checked by tools/check_setups.mjs) — 68 files, all pass
+Extra (Emona Vol.1 Exp 3 from the official SAMPLE manual; Vol.1 Exp 14, Vol.1 Exp 20, Vol.2 Exp 18 adapted from the DATEx Lab Manual Vol.1, VCO in place of the NI ELVIS function generator): 10 files. Term 1: Exp 1–7 (12 files). Term 2: Exp 11, 12, 13, 15, 16, 17, 18, 19 and Vol.2 Exp 6, 8, 9, 16, 17 (46 files), one per part, wired from the book's figures.

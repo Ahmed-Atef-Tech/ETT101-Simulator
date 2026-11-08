@@ -1,7 +1,7 @@
 {
   "name": "ett101-simulator",
   "productName": "Telecoms-Trainer 101 Simulator",
-  "version": "0.26.0",
+  "version": "0.27.0",
   "description": "Interactive simulator of the Emona ETT-101 telecoms trainer kit with a UTD2000-style oscilloscope",
   "author": "Ahmed Atef",
   "license": "UNLICENSED",
@@ -9,7 +9,10 @@
   "type": "module",
   "main": "electron/main.cjs",
   "homepage": "https://github.com/Ahmed-Atef-Tech/ETT101-Simulator#readme",
-  "repository": { "type": "git", "url": "https://github.com/Ahmed-Atef-Tech/ETT101-Simulator.git" },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ahmed-Atef-Tech/ETT101-Simulator.git"
+  },
   "scripts": {
     "build:web": "node build.mjs",
     "start": "node build.mjs && electron .",
@@ -26,20 +29,45 @@
     "electron": "33.4.11",
     "electron-builder": "^25.1.8",
     "esbuild": "^0.24.2",
+    "marked": "15.0.12",
     "resedit": "^2.0.3"
   },
   "build": {
     "appId": "edu.ece.telecomstrainer101.sim",
     "productName": "Telecoms-Trainer 101 Simulator",
-    "directories": { "output": "release" },
-    "files": ["electron/**/*", "package.json"],
-    "extraFiles": [{ "from": "electron/help-links.json", "to": "help-links.json" }],
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "electron/**/*",
+      "package.json"
+    ],
+    "extraFiles": [
+      {
+        "from": "electron/help-links.json",
+        "to": "help-links.json"
+      }
+    ],
     "asar": true,
     "afterPack": "./scripts/afterPack.cjs",
-    "publish": [{ "provider": "github", "owner": "Ahmed-Atef-Tech", "repo": "ETT101-Simulator", "releaseType": "draft" }],
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "Ahmed-Atef-Tech",
+        "repo": "ETT101-Simulator",
+        "releaseType": "draft"
+      }
+    ],
     "win": {
       "icon": "electron/icon.ico",
-      "target": [{ "target": "nsis", "arch": ["x64"] }],
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
       "signAndEditExecutable": false
     },
     "nsis": {
@@ -57,12 +85,27 @@
     "mac": {
       "icon": "electron/icon.png",
       "category": "public.app-category.education",
-      "target": [{ "target": "dmg", "arch": ["universal"] }, { "target": "zip", "arch": ["universal"] }],
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "universal"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "universal"
+          ]
+        }
+      ],
       "identity": "-",
       "hardenedRuntime": false,
       "gatekeeperAssess": false,
       "artifactName": "ETT101-Simulator-${version}-mac.${ext}"
     },
-    "dmg": { "artifactName": "ETT101-Simulator-${version}-mac.dmg" }
+    "dmg": {
+      "artifactName": "ETT101-Simulator-${version}-mac.dmg"
+    }
   }
 }

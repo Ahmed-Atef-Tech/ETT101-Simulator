@@ -9,6 +9,7 @@ import { Audio } from './ui/audio.js';
 import { SOCKET_NAME, SOCKET_POS, BLOCKS } from './ui/layout.js';
 import { MODULE_INFO, HELP_LINKS, HELP, EXPERIMENTS } from './ui/content.js';
 import { t, tr, getLang, setLang } from './ui/i18n.js';
+import { initLibrary } from './ui/library.js';
 
 const $ = s => document.querySelector(s);
 const sim = new Sim();
@@ -265,6 +266,7 @@ function applyTexts() {
   colorsEl.querySelectorAll('.plugsw').forEach(b => b.title = t('colors')[b.dataset.c]);
   $('#tGuide .state').textContent = training ? t('on') : t('off');
   drawHeadphones(); if ($('#guide').classList.contains('open')) renderGuide();
+  if (typeof library !== 'undefined') library.relabel();
 }
 function setTraining(on) {
   training = on; document.body.classList.toggle('training', on);
@@ -301,6 +303,10 @@ function restore(s) {
   if (s.scope) { const d = scope.st; for (const k in s.scope) d[k] = (d[k] && typeof d[k] === 'object' && !Array.isArray(d[k])) ? Object.assign(d[k], s.scope[k]) : s.scope[k]; d.run = true; }
   sim.headphones = !!s.headphones; sim.rebuild(); wires.render(); panel.refreshAll(); drawHeadphones();
 }
+function openGuideFor(id) { exp = EXPERIMENTS.find(x => x.id === id) || null; stepI = 0; if (!training) setTraining(true); $('#guide').classList.add('open'); renderGuide(); }
+const library = initLibrary({ restore, toast, hasWork: () => sim.leads.length > 0 || !!(sim.probes.CH1 || sim.probes.CH2), openGuide: openGuideFor });
+$('#btnLib').onclick = () => library.toggleLib();
+$('#btnRef').onclick = () => library.toggleRef();
 $('#btnSave').onclick = () => { $('#settings').classList.remove('open'); download(new Blob([JSON.stringify(snapshot(), null, 1)], { type: 'application/json' }), `setup-${stamp()}.ett.json`); toast(t('savedSetup')); };
 $('#btnLoad').onclick = () => { $('#settings').classList.remove('open'); $('#fileIn').click(); };
 $('#fileIn').onchange = async e => { const f = e.target.files[0]; if (!f) return; try { const s = JSON.parse(await f.text()); if (!s.leads) throw 0; restore(s); toast(s.title ? s.title : f.name); } catch (err) { alert(t('badFile')); } e.target.value = ''; };
@@ -312,7 +318,7 @@ setInterval(() => { try { localStorage.setItem('ett.autosave', JSON.stringify(sn
 try { const a = localStorage.getItem('ett.autosave'); if (a) restore(JSON.parse(a)); } catch (e) { }
 
 window.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { closeModal(); closeMenus(); $('#settings').classList.remove('open'); }
+  if (e.key === 'Escape') { closeModal(); closeMenus(); $('#settings').classList.remove('open'); library.close(); }
   if (e.target.tagName === 'INPUT' || e.ctrlKey || e.altKey || e.metaKey) return;
   if (e.key === '1') setView('kit'); if (e.key === '2') setView('both'); if (e.key === '3') setView('scope');
   if (e.key === 'f' || e.key === 'F') toggleFull();

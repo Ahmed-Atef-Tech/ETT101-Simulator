@@ -13,6 +13,8 @@ An interactive simulator of the **Emona ETT-101 (Telecoms-Trainer 101)** kit and
 | ملفات التجارب (OPEN SETUP) | `ETT101-Experiments-Setups.zip` |
 | مرجع الموديل والمعادلات | `ETT101-Model-Reference.md` |
 
+جوه البرنامج: زرار **تحميل تجربة** فيه كل التجارب دي جاهزة ومعاها رقم الصفحة في الكتاب، وزرار **المرجع** بيعرض مرجع الموديل.
+
 ملفات التجارب: فك الـ zip، وجوه البرنامج دوس **OPEN SETUP** واختار التجربة. الفولدرات: `Term1` و `Term2` و `Extra`.
 
 ### Windows
