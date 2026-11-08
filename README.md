@@ -21,7 +21,7 @@ An interactive simulator of the **Emona ETT-101 (Telecoms-Trainer 101)** kit and
 
 **[Expected results for every experiment](docs/results/README.md)**: the block diagram, the wiring on the kit, the oscilloscope screen, and what the lab book expects next to what the simulator shows, for all 69 experiments.
 
-Reference books: Electrical Testing (6) lab manual, ELC414 (Term 1); Electrical Testing (7) lab manual, ELC424 (Term 2); Emona 101 Trainer SAMPLE Lab Manual (Vol. 1 & 2) and Emona DATEx Lab Manual, Vol. 1 (Extra).
+Reference: the course lab books Electrical Testing (6), ELC414 (Term 1) and Electrical Testing (7), ELC424 (Term 2) are adapted from Barry Duncan, *Experiments in Modern Analog and Digital Telecommunications* (Emona Telecoms-Trainer 101 Lab Manual, Volume 1) and *Further Experiments in Modern Analog and Digital Telecommunications* (Volume 2), Emona Instruments Pty Ltd. Term 1 Exp 1–7 = Emona Vol. 1 Exp 4–10; Term 2 = Emona Vol. 1 Exp 11–13 and 15–19, and Vol. 2 Exp 6, 8, 9, 16 and 17.
 
 ### Windows
 1. نزّل ملف الـ Setup وافتحه.

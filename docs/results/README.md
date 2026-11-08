@@ -6,13 +6,15 @@ All images come from the simulator itself (v0.31.3). The kit image is the simula
 
 ## Reference books
 
-The experiments, procedures, scope settings and expected values follow these lab books:
+The course lab books are adapted from the Emona lab manual written for this kit:
 
-- **Term 1:** Electrical Testing (6) lab manual, ELC414 — 12 experiments (Exp 1–7: AM, DSBSC, AM and DSBSC demodulation, SSB, FM, FM demodulation), plus Exp 7 Part C (inside the zero-crossing detector).
-- **Term 2:** Electrical Testing (7) lab manual, ELC424 — 46 experiments, from Emona Vol.1 Exp 11–19 and Vol.2 Exp 6, 8, 9, 16 and 17 (sampling, PCM, ASK, FSK, BPSK, QPSK, DSSS, PWM, PLL, SNR, delta and delta-sigma).
-- **Extra:** Emona 101 Trainer SAMPLE Lab Manual (Vol. 1 & 2) for Vol.1 Exp 3, and the Emona DATEx Lab Manual, Vol. 1 for Vol.1 Exp 14, Vol.1 Exp 20 and Vol.2 Exp 18 (adapted, with the VCO in place of the NI ELVIS function generator).
+**Barry Duncan, *Experiments in Modern Analog and Digital Telecommunications*, Emona Telecoms-Trainer 101 (ETT-101) Lab Manual, Volume 1, and *Further Experiments in Modern Analog and Digital Telecommunications*, Volume 2. Emona Instruments Pty Ltd, Sydney, Australia.**
 
-Page and figure numbers under each experiment are those printed in the matching book. The books themselves are not included in this repository.
+- **Term 1:** Electrical Testing (6) lab manual, ELC414. Its Exp 1–7 (AM, DSBSC, AM demodulation, DSBSC demodulation, SSB, FM, FM demodulation) come from Emona Volume 1 Exp 4–10. Also included: Exp 7 Part C (inside the zero-crossing detector).
+- **Term 2:** Electrical Testing (7) lab manual, ELC424. Its 13 experiments come from Emona Volume 1 Exp 11, 12, 13, 15, 16, 17, 18 and 19 (sampling, PCM encoding and decoding, ASK, FSK, BPSK, QPSK, DSSS) and Volume 2 Exp 6, 8, 9, 16 and 17 (PWM, PLL carrier acquisition, signal-to-noise ratio, delta and delta-sigma).
+- **Extra:** Emona Volume 1 Exp 3 from the Emona 101 Trainer SAMPLE Lab Manual, and Volume 1 Exp 14, Volume 1 Exp 20 and Volume 2 Exp 18 adapted from the Emona DATEx Lab Manual, Vol. 1 (with the VCO in place of the NI ELVIS function generator).
+
+Under each experiment, the page and figure numbers are those printed in the course book, followed by the matching Emona experiment. The books themselves are not included in this repository.
 
 ## How to reproduce
 
@@ -36,7 +38,7 @@ Open the simulator, click **Load experiment** and pick it from the Term 1, Term 
 
 ### Exp 1 · AM Modulation — generating AM with a simple message
 
-*Electrical Testing (6) lab manual, ELC414 (Term 1) · p. 5 · Figs. 3–5*
+*Electrical Testing (6) lab manual, ELC414 (Term 1) · p. 5 · Figs. 3–5 · adapted from Emona Vol. 1 Exp 4*
 
 Setup file: [`setups/Term1/01-Exp1-AM-Modulation.ett.json`](../../setups/Term1/01-Exp1-AM-Modulation.ett.json)
 
@@ -53,7 +55,7 @@ Scope: CH1: ADDER OUT, 0.5 V/div · CH2: MULTIPLIER kXY, 1 V/div · 100 µs/div
 
 ### Exp 2 · DSBSC Modulation — generating DSBSC with a simple message
 
-*Electrical Testing (6) lab manual, ELC414 (Term 1) · p. 19 · Fig. 4*
+*Electrical Testing (6) lab manual, ELC414 (Term 1) · p. 19 · Fig. 4 · adapted from Emona Vol. 1 Exp 5*
 
 Setup file: [`setups/Term1/02-Exp2-DSBSC-Modulation.ett.json`](../../setups/Term1/02-Exp2-DSBSC-Modulation.ett.json)
 
@@ -70,7 +72,7 @@ Scope: CH1: MASTER 2 kHz SINE, 1 V/div · CH2: MULTIPLIER kXY, 2 V/div · 100 µ
 
 ### Exp 3 · AM Demodulation — recovering the message with an envelope detector
 
-*Electrical Testing (6) lab manual, ELC414 (Term 1) · p. 31 · Fig. 4*
+*Electrical Testing (6) lab manual, ELC414 (Term 1) · p. 31 · Fig. 4 · adapted from Emona Vol. 1 Exp 6*
 
 Setup file: [`setups/Term1/03-Exp3-AM-Demodulation.ett.json`](../../setups/Term1/03-Exp3-AM-Demodulation.ett.json)
 
@@ -87,7 +89,7 @@ Scope: CH1: ADDER OUT, 0.5 V/div · CH2: RC LPF, 0.5 V/div · 100 µs/div
 
 ### Exp 4 · DSBSC Demodulation — recovering the message with a product detector
 
-*Electrical Testing (6) lab manual, ELC414 (Term 1) · p. 44 · Fig. 4*
+*Electrical Testing (6) lab manual, ELC414 (Term 1) · p. 44 · Fig. 4 · adapted from Emona Vol. 1 Exp 7*
 
 Setup file: [`setups/Term1/04-Exp4-DSBSC-Demodulation.ett.json`](../../setups/Term1/04-Exp4-DSBSC-Demodulation.ett.json)
 
@@ -104,7 +106,7 @@ Scope: CH1: MASTER 2 kHz SINE, 1 V/div · CH2: TUNEABLE LPF OUT, 2 V/div · 100 
 
 ### Exp 4 · Part C — effect of message amplitude on the output (BUFFER)
 
-*Electrical Testing (6) lab manual, ELC414 (Term 1) · p. 46 · Fig. 7*
+*Electrical Testing (6) lab manual, ELC414 (Term 1) · p. 46 · Fig. 7 · adapted from Emona Vol. 1 Exp 7*
 
 Setup file: [`setups/Term1/04-Exp4-PartC-Buffer.ett.json`](../../setups/Term1/04-Exp4-PartC-Buffer.ett.json)
 
@@ -121,7 +123,7 @@ Scope: CH1: BUFFER OUT, 1 V/div · CH2: TUNEABLE LPF OUT, 2 V/div · 100 µs/div
 
 ### Exp 4 · VCO carrier — the VCO as the receiver's local carrier
 
-*Electrical Testing (6) lab manual, ELC414 (Term 1) · p. 48 · Steps 33–38*
+*Electrical Testing (6) lab manual, ELC414 (Term 1) · p. 48 · Steps 33–38 · adapted from Emona Vol. 1 Exp 7*
 
 Setup file: [`setups/Term1/04-Exp4-VCO-Carrier.ett.json`](../../setups/Term1/04-Exp4-VCO-Carrier.ett.json)
 
@@ -139,7 +141,7 @@ Scope: CH1: MASTER 2 kHz SINE, 1 V/div · CH2: TUNEABLE LPF OUT, 2 V/div · 100 
 
 ### Exp 5 · SSB Modulation — generating SSB by the phasing method
 
-*Electrical Testing (6) lab manual, ELC414 (Term 1) · p. 55 · Fig. 3*
+*Electrical Testing (6) lab manual, ELC414 (Term 1) · p. 55 · Fig. 3 · adapted from Emona Vol. 1 Exp 8*
 
 Setup file: [`setups/Term1/05-Exp5-SSB-Modulation.ett.json`](../../setups/Term1/05-Exp5-SSB-Modulation.ett.json)
 
@@ -156,7 +158,7 @@ Scope: CH1: MASTER 2 kHz SINE, 1 V/div · CH2: ADDER OUT (SSB), 1 V/div · 100 �
 
 ### Exp 5 · SSB Demodulation — recovering the message with a product detector
 
-*Electrical Testing (6) lab manual, ELC414 (Term 1) · p. 62 · Fig. 9*
+*Electrical Testing (6) lab manual, ELC414 (Term 1) · p. 62 · Fig. 9 · adapted from Emona Vol. 1 Exp 8*
 
 Setup file: [`setups/Term1/05-Exp5-SSB-Demodulation.ett.json`](../../setups/Term1/05-Exp5-SSB-Demodulation.ett.json)
 
@@ -173,7 +175,7 @@ Scope: CH1: MASTER 2 kHz SINE, 1 V/div · CH2: TUNEABLE LPF OUT, 1 V/div · 100 
 
 ### Exp 6 · FM Modulation — FM with a square-wave message
 
-*Electrical Testing (6) lab manual, ELC414 (Term 1) · p. 67 · Fig. 2*
+*Electrical Testing (6) lab manual, ELC414 (Term 1) · p. 67 · Fig. 2 · adapted from Emona Vol. 1 Exp 9*
 
 Setup file: [`setups/Term1/06-Exp6-FM-Modulation.ett.json`](../../setups/Term1/06-Exp6-FM-Modulation.ett.json)
 
@@ -190,7 +192,7 @@ Scope: CH1: MASTER 2 kHz DIGITAL, 2 V/div · CH2: VCO SINE, 2 V/div · 100 µs/d
 
 ### Exp 6 · Part C — FM with a sine message
 
-*Electrical Testing (6) lab manual, ELC414 (Term 1) · p. 71 · Fig. 6*
+*Electrical Testing (6) lab manual, ELC414 (Term 1) · p. 71 · Fig. 6 · adapted from Emona Vol. 1 Exp 9*
 
 Setup file: [`setups/Term1/06-Exp6-PartC-Sine-Message.ett.json`](../../setups/Term1/06-Exp6-PartC-Sine-Message.ett.json)
 
@@ -207,7 +209,7 @@ Scope: CH1: MASTER 2 kHz SINE, 2 V/div · CH2: VCO SINE, 2 V/div · 100 µs/div
 
 ### Exp 7 · FM Demodulation — the zero-crossing detector
 
-*Electrical Testing (6) lab manual, ELC414 (Term 1) · p. 79 · Fig. 6*
+*Electrical Testing (6) lab manual, ELC414 (Term 1) · p. 79 · Fig. 6 · adapted from Emona Vol. 1 Exp 10*
 
 Setup file: [`setups/Term1/07-Exp7-FM-Demodulation.ett.json`](../../setups/Term1/07-Exp7-FM-Demodulation.ett.json)
 
@@ -224,7 +226,7 @@ Scope: CH1: VARIABLE DCV, 1 V/div · CH2: BASEBAND LPF, 0.5 V/div · 50 µs/div
 
 ### Exp 7 · Part C — inside the zero-crossing detector
 
-*Electrical Testing (6) lab manual, ELC414 (Term 1) · p. 84 · Figs. 2, 10–15*
+*Electrical Testing (6) lab manual, ELC414 (Term 1) · p. 84 · Figs. 2, 10–15 · adapted from Emona Vol. 1 Exp 10*
 
 Setup file: none (see the note below)
 
@@ -242,7 +244,7 @@ Scope: CH1: COMPARATOR OUT, 2 V/div · CH2: TWIN PULSE Q1 (ZCD), 2 V/div · 50 �
 
 ### Exp 7 · Part D — sending and recovering a sine by FM
 
-*Electrical Testing (6) lab manual, ELC414 (Term 1) · p. 87 · Fig. 16*
+*Electrical Testing (6) lab manual, ELC414 (Term 1) · p. 87 · Fig. 16 · adapted from Emona Vol. 1 Exp 10*
 
 Setup file: [`setups/Term1/07-Exp7-PartD-Sine-Message.ett.json`](../../setups/Term1/07-Exp7-PartD-Sine-Message.ett.json)
 
@@ -309,7 +311,7 @@ Scope: CH1: MASTER 2 kHz SINE, 1 V/div · CH2: BASEBAND LPF (AC), 0.2 V/div · 2
 
 ### Exp 11 · Part A — natural sampling
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 4 · Fig. 2*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 4 · Fig. 2 · adapted from Emona Vol. 1 Exp 11*
 
 Setup file: [`setups/Term2/01-Exp11-A-Natural-Sampling.ett.json`](../../setups/Term2/01-Exp11-A-Natural-Sampling.ett.json)
 
@@ -324,7 +326,7 @@ Setup file: [`setups/Term2/01-Exp11-A-Natural-Sampling.ett.json`](../../setups/T
 
 ### Exp 11 · Part A — sample-and-hold
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 7 · Fig. 4*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 7 · Fig. 4 · adapted from Emona Vol. 1 Exp 11*
 
 Setup file: [`setups/Term2/01-Exp11-A-Sample-and-Hold.ett.json`](../../setups/Term2/01-Exp11-A-Sample-and-Hold.ett.json)
 
@@ -339,7 +341,7 @@ Setup file: [`setups/Term2/01-Exp11-A-Sample-and-Hold.ett.json`](../../setups/Te
 
 ### Exp 11 · Part C — reconstructing the message with the LPF
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 10 · Fig. 7*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 10 · Fig. 7 · adapted from Emona Vol. 1 Exp 11*
 
 Setup file: [`setups/Term2/01-Exp11-C-Reconstruction.ett.json`](../../setups/Term2/01-Exp11-C-Reconstruction.ett.json)
 
@@ -354,7 +356,7 @@ Setup file: [`setups/Term2/01-Exp11-C-Reconstruction.ett.json`](../../setups/Ter
 
 ### Exp 11 · Part D — aliasing
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 13 · Fig. 9*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 13 · Fig. 9 · adapted from Emona Vol. 1 Exp 11*
 
 Setup file: [`setups/Term2/01-Exp11-D-Aliasing.ett.json`](../../setups/Term2/01-Exp11-D-Aliasing.ett.json)
 
@@ -369,7 +371,7 @@ Setup file: [`setups/Term2/01-Exp11-D-Aliasing.ett.json`](../../setups/Term2/01-
 
 ### Exp 12 · Part A — PCM code for 0 V
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 22 · Fig. 5*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 22 · Fig. 5 · adapted from Emona Vol. 1 Exp 12*
 
 Setup file: [`setups/Term2/02-Exp12-A-PCM-0V.ett.json`](../../setups/Term2/02-Exp12-A-PCM-0V.ett.json)
 
@@ -384,7 +386,7 @@ Setup file: [`setups/Term2/02-Exp12-A-PCM-0V.ett.json`](../../setups/Term2/02-Ex
 
 ### Exp 12 · Part B — encoding a variable DC voltage
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 24 · Fig. 7*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 24 · Fig. 7 · adapted from Emona Vol. 1 Exp 12*
 
 Setup file: [`setups/Term2/02-Exp12-B-PCM-Variable-DC.ett.json`](../../setups/Term2/02-Exp12-B-PCM-Variable-DC.ett.json)
 
@@ -399,7 +401,7 @@ Setup file: [`setups/Term2/02-Exp12-B-PCM-Variable-DC.ett.json`](../../setups/Te
 
 ### Exp 12 · Part D — encoding a sine wave
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 29 · Fig. 9*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 29 · Fig. 9 · adapted from Emona Vol. 1 Exp 12*
 
 Setup file: [`setups/Term2/02-Exp12-D-PCM-Sinewave.ett.json`](../../setups/Term2/02-Exp12-D-PCM-Sinewave.ett.json)
 
@@ -415,7 +417,7 @@ Setup file: [`setups/Term2/02-Exp12-D-PCM-Sinewave.ett.json`](../../setups/Term2
 
 ### Exp 13 · Part B — decoding PCM data
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 36 · Fig. 5*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 36 · Fig. 5 · adapted from Emona Vol. 1 Exp 13*
 
 Setup file: [`setups/Term2/03-Exp13-B-PCM-Decoding.ett.json`](../../setups/Term2/03-Exp13-B-PCM-Decoding.ett.json)
 
@@ -430,7 +432,7 @@ Setup file: [`setups/Term2/03-Exp13-B-PCM-Decoding.ett.json`](../../setups/Term2
 
 ### Exp 13 · Part D — recovering the message
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 40 · Fig. 10*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 40 · Fig. 10 · adapted from Emona Vol. 1 Exp 13*
 
 Setup file: [`setups/Term2/03-Exp13-D-Recovering-Message.ett.json`](../../setups/Term2/03-Exp13-D-Recovering-Message.ett.json)
 
@@ -445,7 +447,7 @@ Setup file: [`setups/Term2/03-Exp13-D-Recovering-Message.ett.json`](../../setups
 
 ### Exp 15 · Part A — generating ASK
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 46 · Fig. 2*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 46 · Fig. 2 · adapted from Emona Vol. 1 Exp 15*
 
 Setup file: [`setups/Term2/04-Exp15-A-ASK-Generation.ett.json`](../../setups/Term2/04-Exp15-A-ASK-Generation.ett.json)
 
@@ -460,7 +462,7 @@ Setup file: [`setups/Term2/04-Exp15-A-ASK-Generation.ett.json`](../../setups/Ter
 
 ### Exp 15 · Part A — ASK on a 100 kHz VCO carrier
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 49 · Fig. 4*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 49 · Fig. 4 · adapted from Emona Vol. 1 Exp 15*
 
 Setup file: [`setups/Term2/04-Exp15-A-ASK-100kHz-Carrier.ett.json`](../../setups/Term2/04-Exp15-A-ASK-100kHz-Carrier.ett.json)
 
@@ -476,7 +478,7 @@ Setup file: [`setups/Term2/04-Exp15-A-ASK-100kHz-Carrier.ett.json`](../../setups
 
 ### Exp 15 · Part B — demodulation with an envelope detector
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 51 · Fig. 6*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 51 · Fig. 6 · adapted from Emona Vol. 1 Exp 15*
 
 Setup file: [`setups/Term2/04-Exp15-B-ASK-Envelope-Detection.ett.json`](../../setups/Term2/04-Exp15-B-ASK-Envelope-Detection.ett.json)
 
@@ -491,7 +493,7 @@ Setup file: [`setups/Term2/04-Exp15-B-ASK-Envelope-Detection.ett.json`](../../se
 
 ### Exp 15 · Part C — recovering the data with the comparator
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 53 · Fig. 8*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 53 · Fig. 8 · adapted from Emona Vol. 1 Exp 15*
 
 Setup file: [`setups/Term2/04-Exp15-C-ASK-Comparator.ett.json`](../../setups/Term2/04-Exp15-C-ASK-Comparator.ett.json)
 
@@ -506,7 +508,7 @@ Setup file: [`setups/Term2/04-Exp15-C-ASK-Comparator.ett.json`](../../setups/Ter
 
 ### Exp 16 · Part A — generating FSK
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 60 · Fig. 2*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 60 · Fig. 2 · adapted from Emona Vol. 1 Exp 16*
 
 Setup file: [`setups/Term2/05-Exp16-A-FSK-Generation.ett.json`](../../setups/Term2/05-Exp16-A-FSK-Generation.ett.json)
 
@@ -521,7 +523,7 @@ Setup file: [`setups/Term2/05-Exp16-A-FSK-Generation.ett.json`](../../setups/Ter
 
 ### Exp 16 · Part B — separating one tone with a filter
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 63 · Fig. 4*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 63 · Fig. 4 · adapted from Emona Vol. 1 Exp 16*
 
 Setup file: [`setups/Term2/05-Exp16-B-FSK-Filtering.ett.json`](../../setups/Term2/05-Exp16-B-FSK-Filtering.ett.json)
 
@@ -536,7 +538,7 @@ Setup file: [`setups/Term2/05-Exp16-B-FSK-Filtering.ett.json`](../../setups/Term
 
 ### Exp 16 · Part B — envelope detector followed by a comparator
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 64 · Figs. 6–8*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 64 · Figs. 6–8 · adapted from Emona Vol. 1 Exp 16*
 
 Setup file: [`setups/Term2/05-Exp16-C-FSK-Envelope-and-Comparator.ett.json`](../../setups/Term2/05-Exp16-C-FSK-Envelope-and-Comparator.ett.json)
 
@@ -551,7 +553,7 @@ Setup file: [`setups/Term2/05-Exp16-C-FSK-Envelope-and-Comparator.ett.json`](../
 
 ### Exp 17 · Part A — generating BPSK
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 71 · Fig. 2*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 71 · Fig. 2 · adapted from Emona Vol. 1 Exp 17*
 
 Setup file: [`setups/Term2/06-Exp17-A-BPSK-Generation.ett.json`](../../setups/Term2/06-Exp17-A-BPSK-Generation.ett.json)
 
@@ -566,7 +568,7 @@ Setup file: [`setups/Term2/06-Exp17-A-BPSK-Generation.ett.json`](../../setups/Te
 
 ### Exp 17 · Part B — demodulation with a product detector
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 73 · Fig. 4*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 73 · Fig. 4 · adapted from Emona Vol. 1 Exp 17*
 
 Setup file: [`setups/Term2/06-Exp17-B-BPSK-Product-Detector.ett.json`](../../setups/Term2/06-Exp17-B-BPSK-Product-Detector.ett.json)
 
@@ -581,7 +583,7 @@ Setup file: [`setups/Term2/06-Exp17-B-BPSK-Product-Detector.ett.json`](../../set
 
 ### Exp 17 · Part C — recovering the data with the comparator
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 75 · Fig. 6*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 75 · Fig. 6 · adapted from Emona Vol. 1 Exp 17*
 
 Setup file: [`setups/Term2/06-Exp17-C-BPSK-Comparator.ett.json`](../../setups/Term2/06-Exp17-C-BPSK-Comparator.ett.json)
 
@@ -596,7 +598,7 @@ Setup file: [`setups/Term2/06-Exp17-C-BPSK-Comparator.ett.json`](../../setups/Te
 
 ### Exp 18 · Part A — splitting the data into X1 and X2
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 80 · Fig. 3*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 80 · Fig. 3 · adapted from Emona Vol. 1 Exp 18*
 
 Setup file: [`setups/Term2/07-Exp18-A-QPSK-Serial-to-Parallel.ett.json`](../../setups/Term2/07-Exp18-A-QPSK-Serial-to-Parallel.ett.json)
 
@@ -611,7 +613,7 @@ Setup file: [`setups/Term2/07-Exp18-A-QPSK-Serial-to-Parallel.ett.json`](../../s
 
 ### Exp 18 · Part A — generating QPSK
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 82 · Figs. 5–9*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 82 · Figs. 5–9 · adapted from Emona Vol. 1 Exp 18*
 
 Setup file: [`setups/Term2/07-Exp18-A-QPSK-Generation.ett.json`](../../setups/Term2/07-Exp18-A-QPSK-Generation.ett.json)
 
@@ -626,7 +628,7 @@ Setup file: [`setups/Term2/07-Exp18-A-QPSK-Generation.ett.json`](../../setups/Te
 
 ### Exp 18 · Part B — recovering X1 by phase discrimination
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 88 · Fig. 11*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 88 · Fig. 11 · adapted from Emona Vol. 1 Exp 18*
 
 Setup file: [`setups/Term2/07-Exp18-B-QPSK-Recover-X1.ett.json`](../../setups/Term2/07-Exp18-B-QPSK-Recover-X1.ett.json)
 
@@ -641,7 +643,7 @@ Setup file: [`setups/Term2/07-Exp18-B-QPSK-Recover-X1.ett.json`](../../setups/Te
 
 ### Exp 18 · Part B — recovering X1 with the comparator
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 90 · Fig. 13*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 90 · Fig. 13 · adapted from Emona Vol. 1 Exp 18*
 
 Setup file: [`setups/Term2/07-Exp18-B-QPSK-Comparator.ett.json`](../../setups/Term2/07-Exp18-B-QPSK-Comparator.ett.json)
 
@@ -656,7 +658,7 @@ Setup file: [`setups/Term2/07-Exp18-B-QPSK-Comparator.ett.json`](../../setups/Te
 
 ### Exp 18 · Part B — recovering X2
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 91 · Steps 46–47*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 91 · Steps 46–47 · adapted from Emona Vol. 1 Exp 18*
 
 Setup file: [`setups/Term2/07-Exp18-B-QPSK-Recover-X2.ett.json`](../../setups/Term2/07-Exp18-B-QPSK-Recover-X2.ett.json)
 
@@ -671,7 +673,7 @@ Setup file: [`setups/Term2/07-Exp18-B-QPSK-Recover-X2.ett.json`](../../setups/Te
 
 ### Exp 19 · Part A — generating a DSSS signal
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 95 · Fig. 1*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 95 · Fig. 1 · adapted from Emona Vol. 1 Exp 19*
 
 Setup file: [`setups/Term2/08-Exp19-A-DSSS-Generation.ett.json`](../../setups/Term2/08-Exp19-A-DSSS-Generation.ett.json)
 
@@ -686,7 +688,7 @@ Setup file: [`setups/Term2/08-Exp19-A-DSSS-Generation.ett.json`](../../setups/Te
 
 ### Exp 19 · Part C — despreading with the correct code
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 98 · Fig. 4*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 98 · Fig. 4 · adapted from Emona Vol. 1 Exp 19*
 
 Setup file: [`setups/Term2/08-Exp19-C-DSSS-Demodulation.ett.json`](../../setups/Term2/08-Exp19-C-DSSS-Demodulation.ett.json)
 
@@ -701,7 +703,7 @@ Setup file: [`setups/Term2/08-Exp19-C-DSSS-Demodulation.ett.json`](../../setups/
 
 ### Exp 19 · Part C — despreading with the wrong code
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 100 · Fig. 7*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 100 · Fig. 7 · adapted from Emona Vol. 1 Exp 19*
 
 Setup file: [`setups/Term2/08-Exp19-C-DSSS-Wrong-Code.ett.json`](../../setups/Term2/08-Exp19-C-DSSS-Wrong-Code.ett.json)
 
@@ -716,7 +718,7 @@ Setup file: [`setups/Term2/08-Exp19-C-DSSS-Wrong-Code.ett.json`](../../setups/Te
 
 ### Exp 19 · Part D — a jamming signal in the channel
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 101 · Fig. 8*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 101 · Fig. 8 · adapted from Emona Vol. 1 Exp 19*
 
 Setup file: [`setups/Term2/08-Exp19-D-DSSS-Jamming.ett.json`](../../setups/Term2/08-Exp19-D-DSSS-Jamming.ett.json)
 
@@ -731,7 +733,7 @@ Setup file: [`setups/Term2/08-Exp19-D-DSSS-Jamming.ett.json`](../../setups/Term2
 
 ### Exp 19 · Part D — swept-frequency jamming
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 103 · Fig. 10*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 103 · Fig. 10 · adapted from Emona Vol. 1 Exp 19*
 
 Setup file: [`setups/Term2/08-Exp19-D-DSSS-Swept-Jamming.ett.json`](../../setups/Term2/08-Exp19-D-DSSS-Swept-Jamming.ett.json)
 
@@ -746,7 +748,7 @@ Setup file: [`setups/Term2/08-Exp19-D-DSSS-Swept-Jamming.ett.json`](../../setups
 
 ### Exp 19 · Part D — noise in the channel
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 104 · Fig. 11*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 104 · Fig. 11 · adapted from Emona Vol. 1 Exp 19*
 
 Setup file: [`setups/Term2/08-Exp19-D-DSSS-Noise.ett.json`](../../setups/Term2/08-Exp19-D-DSSS-Noise.ett.json)
 
@@ -761,7 +763,7 @@ Setup file: [`setups/Term2/08-Exp19-D-DSSS-Noise.ett.json`](../../setups/Term2/0
 
 ### Vol.2 Exp 6 · Part A — generating the sawtooth
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 110 · Fig. 4*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 110 · Fig. 4 · adapted from Emona Vol. 2 Exp 6*
 
 Setup file: [`setups/Term2/09-Exp6-Vol2-A-PWM-Sawtooth.ett.json`](../../setups/Term2/09-Exp6-Vol2-A-PWM-Sawtooth.ett.json)
 
@@ -776,7 +778,7 @@ Setup file: [`setups/Term2/09-Exp6-Vol2-A-PWM-Sawtooth.ett.json`](../../setups/T
 
 ### Vol.2 Exp 6 · Part B — PWM of a DC voltage
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 112 · Figs. 6–8*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 112 · Figs. 6–8 · adapted from Emona Vol. 2 Exp 6*
 
 Setup file: [`setups/Term2/09-Exp6-Vol2-B-PWM-DC-Input.ett.json`](../../setups/Term2/09-Exp6-Vol2-B-PWM-DC-Input.ett.json)
 
@@ -791,7 +793,7 @@ Setup file: [`setups/Term2/09-Exp6-Vol2-B-PWM-DC-Input.ett.json`](../../setups/T
 
 ### Vol.2 Exp 6 · Part C — PWM of a sine message
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 117 · Fig. 10*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 117 · Fig. 10 · adapted from Emona Vol. 2 Exp 6*
 
 Setup file: [`setups/Term2/09-Exp6-Vol2-C-PWM-Sine-Message.ett.json`](../../setups/Term2/09-Exp6-Vol2-C-PWM-Sine-Message.ett.json)
 
@@ -806,7 +808,7 @@ Setup file: [`setups/Term2/09-Exp6-Vol2-C-PWM-Sine-Message.ett.json`](../../setu
 
 ### Vol.2 Exp 6 · Part D — recovering the message
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 122 · Fig. 14*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 122 · Fig. 14 · adapted from Emona Vol. 2 Exp 6*
 
 Setup file: [`setups/Term2/09-Exp6-Vol2-D-PWM-Demodulation.ett.json`](../../setups/Term2/09-Exp6-Vol2-D-PWM-Demodulation.ett.json)
 
@@ -821,7 +823,7 @@ Setup file: [`setups/Term2/09-Exp6-Vol2-D-PWM-Demodulation.ett.json`](../../setu
 
 ### Vol.2 Exp 6 · Part E — when Nyquist is not respected
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 126*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 126 · adapted from Emona Vol. 2 Exp 6*
 
 Setup file: [`setups/Term2/09-Exp6-Vol2-E-PWM-Nyquist.ett.json`](../../setups/Term2/09-Exp6-Vol2-E-PWM-Nyquist.ett.json)
 
@@ -836,7 +838,7 @@ Setup file: [`setups/Term2/09-Exp6-Vol2-E-PWM-Nyquist.ett.json`](../../setups/Te
 
 ### Vol.2 Exp 8 · Part A — a 100 % modulated AM signal
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 137 · Fig. 5*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 137 · Fig. 5 · adapted from Emona Vol. 2 Exp 8*
 
 Setup file: [`setups/Term2/10-Exp8-Vol2-A-PLL-AM-Signal.ett.json`](../../setups/Term2/10-Exp8-Vol2-A-PLL-AM-Signal.ett.json)
 
@@ -852,7 +854,7 @@ Setup file: [`setups/Term2/10-Exp8-Vol2-A-PLL-AM-Signal.ett.json`](../../setups/
 
 ### Vol.2 Exp 8 · Part B — the PLL locks to the carrier
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 141 · Fig. 8*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 141 · Fig. 8 · adapted from Emona Vol. 2 Exp 8*
 
 Setup file: [`setups/Term2/10-Exp8-Vol2-B-PLL-Lock.ett.json`](../../setups/Term2/10-Exp8-Vol2-B-PLL-Lock.ett.json)
 
@@ -867,7 +869,7 @@ Setup file: [`setups/Term2/10-Exp8-Vol2-B-PLL-Lock.ett.json`](../../setups/Term2
 
 ### Vol.2 Exp 9 · Part A — adding noise to the data
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 146 · Fig. 1*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 146 · Fig. 1 · adapted from Emona Vol. 2 Exp 9*
 
 Setup file: [`setups/Term2/11-Exp9-Vol2-A-Noisy-Data.ett.json`](../../setups/Term2/11-Exp9-Vol2-A-Noisy-Data.ett.json)
 
@@ -882,7 +884,7 @@ Setup file: [`setups/Term2/11-Exp9-Vol2-A-Noisy-Data.ett.json`](../../setups/Ter
 
 ### Vol.2 Exp 9 · Part B — band-limiting the noisy signal
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 149 · Fig. 3*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 149 · Fig. 3 · adapted from Emona Vol. 2 Exp 9*
 
 Setup file: [`setups/Term2/11-Exp9-Vol2-B-Band-Limited.ett.json`](../../setups/Term2/11-Exp9-Vol2-B-Band-Limited.ett.json)
 
@@ -897,7 +899,7 @@ Setup file: [`setups/Term2/11-Exp9-Vol2-B-Band-Limited.ett.json`](../../setups/T
 
 ### Vol.2 Exp 16 · Part A — setting up the delta modulator
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 160 · Figs. 3–7*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 160 · Figs. 3–7 · adapted from Emona Vol. 2 Exp 16*
 
 Setup file: [`setups/Term2/12-Exp16-Vol2-A-Delta-Modulator.ett.json`](../../setups/Term2/12-Exp16-Vol2-A-Delta-Modulator.ett.json)
 
@@ -912,7 +914,7 @@ Setup file: [`setups/Term2/12-Exp16-Vol2-A-Delta-Modulator.ett.json`](../../setu
 
 ### Vol.2 Exp 16 — the delta signal (larger step)
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 166 · Fig. 9*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 166 · Fig. 9 · adapted from Emona Vol. 2 Exp 16*
 
 Setup file: [`setups/Term2/12-Exp16-Vol2-B-Delta-Signal.ett.json`](../../setups/Term2/12-Exp16-Vol2-B-Delta-Signal.ett.json)
 
@@ -927,7 +929,7 @@ Setup file: [`setups/Term2/12-Exp16-Vol2-B-Delta-Signal.ett.json`](../../setups/
 
 ### Vol.2 Exp 16 · Part C — delta demodulation
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 172 · Fig. 14*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 172 · Fig. 14 · adapted from Emona Vol. 2 Exp 16*
 
 Setup file: [`setups/Term2/12-Exp16-Vol2-C-Delta-Demodulation.ett.json`](../../setups/Term2/12-Exp16-Vol2-C-Delta-Demodulation.ett.json)
 
@@ -942,7 +944,7 @@ Setup file: [`setups/Term2/12-Exp16-Vol2-C-Delta-Demodulation.ett.json`](../../s
 
 ### Vol.2 Exp 16 · Part D — signal to noise and distortion ratio (SNDR)
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 180 · Fig. 20*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 180 · Fig. 20 · adapted from Emona Vol. 2 Exp 16*
 
 Setup file: [`setups/Term2/12-Exp16-Vol2-D-Delta-SNDR.ett.json`](../../setups/Term2/12-Exp16-Vol2-D-Delta-SNDR.ett.json)
 
@@ -957,7 +959,7 @@ Setup file: [`setups/Term2/12-Exp16-Vol2-D-Delta-SNDR.ett.json`](../../setups/Te
 
 ### Vol.2 Exp 17 · Part A — setting up the delta-sigma modulator
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 186 · Figs. 3–7*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 186 · Figs. 3–7 · adapted from Emona Vol. 2 Exp 17*
 
 Setup file: [`setups/Term2/13-Exp17-Vol2-A-Delta-Sigma-Modulator.ett.json`](../../setups/Term2/13-Exp17-Vol2-A-Delta-Sigma-Modulator.ett.json)
 
@@ -972,7 +974,7 @@ Setup file: [`setups/Term2/13-Exp17-Vol2-A-Delta-Sigma-Modulator.ett.json`](../.
 
 ### Vol.2 Exp 17 · Part A — delta-sigma pulses
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 192 · Step 18*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 192 · Step 18 · adapted from Emona Vol. 2 Exp 17*
 
 Setup file: [`setups/Term2/13-Exp17-Vol2-A-Delta-Sigma-Signal.ett.json`](../../setups/Term2/13-Exp17-Vol2-A-Delta-Sigma-Signal.ett.json)
 
@@ -987,7 +989,7 @@ Setup file: [`setups/Term2/13-Exp17-Vol2-A-Delta-Sigma-Signal.ett.json`](../../s
 
 ### Vol.2 Exp 17 · Part B — delta-sigma demodulation
 
-*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 193 · Fig. 11*
+*Electrical Testing (7) lab manual, ELC424 (Term 2) · p. 193 · Fig. 11 · adapted from Emona Vol. 2 Exp 17*
 
 Setup file: [`setups/Term2/13-Exp17-Vol2-B-Delta-Sigma-Demodulation.ett.json`](../../setups/Term2/13-Exp17-Vol2-B-Delta-Sigma-Demodulation.ett.json)
 
