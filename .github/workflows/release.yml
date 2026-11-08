@@ -6,6 +6,7 @@
 #      A release starts automatically when that version has not been released yet.
 #   2) Actions tab -> "Release" -> "Run workflow" -> type the new version.
 #   3) Push a tag:  git tag v0.27.0 && git push origin v0.27.0
+# Downloads of build tools come from GitHub Releases; if GitHub is having an outage, re-run later.
 name: Release
 
 on:
