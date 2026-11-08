@@ -325,7 +325,7 @@ function restore(s) {
   sim.leads = []; for (const l of s.leads || []) if (SOCKETS[l.a] && SOCKETS[l.b]) { const n = { id: 'L' + Math.random().toString(36).slice(2, 9), a: l.a, b: l.b, color: LEAD_COLORS[l.color] ? l.color : 'red' }; if (okPt(l.bend)) n.bend = l.bend; sim.leads.push(n); }
   wires.probeBend = {}; wires.probeColor = {}; for (const k of ['CH1', 'CH2', 'EXT']) { const p = (s.probeBend || {})[k]; if (okPt(p)) wires.probeBend[k] = p; const c = (s.probeColor || {})[k]; if (typeof c === 'string' && LEAD_COLORS.hasOwnProperty(c)) wires.probeColor[k] = c; }
   for (const k of ['CH1', 'CH2', 'EXT']) { const v = (s.probes || {})[k]; sim.probes[k] = v && SOCKETS[v] ? v : null; }
-  for (const id in MOD_DEFAULT) for (const p in MOD_DEFAULT[id]) sim.mods[id].set(p, MOD_DEFAULT[id][p]);
+  sim.resetState(); for (const id in MOD_DEFAULT) for (const p in MOD_DEFAULT[id]) sim.mods[id].set(p, MOD_DEFAULT[id][p]);
   { const d = JSON.parse(SCOPE_DEFAULT); for (const k in d) scope.st[k] = d[k]; }
   // knobs and switches are 0..1; a file can only set parameters the module really has
   for (const id in s.mods || {}) if (sim.mods[id]) for (const p in s.mods[id]) { const v = +s.mods[id][p]; if (p in sim.mods[id].p && Number.isFinite(v)) sim.mods[id].set(p, Math.max(0, Math.min(1, v))); }

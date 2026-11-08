@@ -423,6 +423,14 @@ T('PS06', 'Saving', 'A setup never inherits settings from the one loaded before 
   await app(p, () => __app.restore({ leads: [{ a: 'master.SINE2', b: 'adder.A', color: 'red' }], probes: {}, mods: {}, scope: { ch: { CH1: { vd: 9 } } }, v: 2 }));
   eq(await app(p, () => [__app.scope.st.math.on, __app.scope.st.td, __app.sim.mods.vco.p.FREQ]), [false, 7, 0.5], 'leftover settings');
 });
+T('PS08', 'Saving', 'A setup starts from power-on module state (hidden latches and filters do not carry over)', async p => {
+  // the SERIAL TO PARALLEL bit-pair phase left by QPSK used to spoil the delta-modulator SNDR null (62 mV -> 904 mV)
+  const resid = () => app(p, () => { const s = __app.sim, N = 48000, y = s.read('CH2', s.t, N, new Float64Array(N)); let a = 1e9, b = -1e9; for (const v of y) { a = Math.min(a, v); b = Math.max(b, v); } return b - a; });
+  await loadSetup(p, 'Term2/12-Exp16-Vol2-D-Delta-SNDR'); await p.waitForTimeout(1500); const fresh = await resid();
+  await loadSetup(p, 'Term2/07-Exp18-A-QPSK-Serial-to-Parallel'); await p.waitForTimeout(900);
+  await loadSetup(p, 'Term2/12-Exp16-Vol2-D-Delta-SNDR'); await p.waitForTimeout(1500); const after = await resid();
+  ok(fresh < 0.1 && Math.abs(after - fresh) < 0.01, `SNDR residual fresh ${fresh.toFixed(3)} V, after QPSK ${after.toFixed(3)} V`);
+});
 T('PS07', 'Saving', 'A saved scope reference does not break the next start', async p => {
   await loadSetup(p, 'Term1/01-Exp1-AM-Modulation'); await p.waitForTimeout(300); await app(p, () => { const s = __app.scope; s.press('STORAGE'); s.press('F2'); });
   await p.waitForTimeout(3300); await p.reload(); await p.waitForFunction(() => window.__app); await p.waitForTimeout(500);

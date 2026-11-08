@@ -84,7 +84,7 @@
    "vrd": 7
   },
   "meas": {
-   "src": "CH2",
+   "src": "CH1",
    "items": [
     "Vpp",
     "Freq",

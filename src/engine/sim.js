@@ -36,6 +36,10 @@ export class Sim {
     this.rebuild();
   }
 
+  // a fresh set of modules: knobs at their defaults and every hidden state (filters, latches, loop and bit-pair phases)
+  // as at power-on, so a loaded setup never depends on what was on the kit before it
+  resetState() { this.mods = createModules(this); this.rebuild(); }
+
   // ---------------- topology ----------------
   netOf(socket) { return this._net.get(socket); }
   rebuild() {

@@ -8,7 +8,8 @@ import { FS } from '../src/engine/dsp.js';
 import { TLPF_MIN, TLPF_MAX } from '../src/engine/modules.js';
 
 const fcK = f => (f - TLPF_MIN) / (TLPF_MAX - TLPF_MIN);
-const V = { 0.1: 6, 0.2: 7, 0.5: 8, 1: 9, 2: 10, 5: 11 };               // V/div -> scope index (list starts at 1 mV/div)
+const V = { 0.1: 6, 0.2: 7, 0.5: 8, 1: 9, 2: 10, 5: 11 };
+const VD = [0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20]; // scope V/div list (src/ui/scope.js VDIV)               // V/div -> scope index (list starts at 1 mV/div)
 const T = { '2u': 2, '5u': 3, '10u': 4, '20u': 5, '50u': 6, '100u': 7, '200u': 8, '500u': 9, '1m': 10, '2m': 11, '5m': 12, '10m': 13, '20m': 14, '50m': 15 };
 const ch = o => ({ on: true, vd: 9, fine: 1, pos: 0, cpl: 'DC', bw: false, finemode: false, probe: 0, inv: false, ...o });
 const scope = (c1, c2, td, extra = {}) => ({ ch: { CH1: ch(c1), CH2: ch(c2) }, sel: 'CH1', td: (() => { if (!(td in T)) throw new Error('unknown Time/div ' + td); return T[td]; })(), hpos: 0, zoom: false, ztd: 4, zpos: 0,
@@ -149,8 +150,10 @@ const T2 = 'Term2';
     { remove: [['master.SINE2', 'das.IN2']], add: [['vco.SINE', 'das.IN2']], mods: { vco: { HI: 1, FREQ: 0.5, GAIN: 0.5 } } }));
   const askB = add(T2, 'Exp15-B-ASK-Envelope-Detection', derive(ask100, 'Term 2 Exp 15 Part B (Figure 6): RECTIFIER + TUNEABLE LPF (gain and fc fully clockwise) recover the data',
     { add: [['das.OUT', 'util.RECT_IN'], ['util.RECT', 'tlpf.IN']], probes: { CH2: 'tlpf.OUT' }, mods: { tlpf: { GAIN: 1, FC: 1 } } }));
+  askB.scope.ch.CH2.vd = V[0.5]; // the envelope is under 1 Vp-p (the 100 kHz carrier is 1.8 Vp-p after the switch's 50 kHz bandwidth)
   const askC = derive(askB, 'Term 2 Exp 15 Part C (Figure 8): COMPARATOR restores the data (VDC set so the outputs match)',
     { add: [['tlpf.OUT', 'util.CIN'], ['vdc.VDC', 'util.REF']], probes: { CH2: 'util.COMP' } });
+  askC.scope.ch.CH2.vd = V[2]; // back to 2 V/div for the 0/5 V comparator output
   { const s = build(askB); const [, y] = grab(s, 'seq.X', 'tlpf.OUT', 0.04); const mid = (Math.max(...y) + Math.min(...y)) / 2; askC.mods.vdc = { VDC: +((mid + 2.5) / 5).toFixed(3) }; }
   add(T2, 'Exp15-C-ASK-Comparator', askC);
 }
@@ -358,6 +361,21 @@ if (process.argv[1].endsWith('make_setups.mjs')) {
     const sim = build(st); sim.setProbe('CH1', src); sim.run(FS * 0.03); const M = 48000, y = sim.read('CH1', sim.t, M, new Float64Array(M));
     let mx = -1e9, mn = 1e9; for (const v of y) { if (v > mx) mx = v; if (v < mn) mn = v; }
     const r = mx - mn; if (r > 0.05 && (tr.level < mn + 0.1 * r || tr.level > mx - 0.1 * r)) tr.level = +((mx + mn) / 2).toFixed(2);
+  }
+  // every trace opens on the screen: a channel that would run off the top or bottom gets its POSITION moved (and, if it
+  // is taller than the screen, the next V/div up) - what "adjust the Vertical Attenuation and Position controls" does
+  for (const st of Object.values(SETUPS)) {
+    const on = ['CH1', 'CH2'].filter(k => st.probes[k] && st.scope.ch[k].on); if (!on.length) continue;
+    const sim = build(st); on.forEach(k => sim.setProbe(k, st.probes[k])); sim.run(FS * 0.3); const M = Math.round(FS * 0.04);
+    for (const k of on) {
+      const c = st.scope.ch[k], y = sim.read(k, sim.t, M, new Float64Array(M)); let mx = -1e9, mn = 1e9, sum = 0;
+      for (const v of y) { if (v > mx) mx = v; if (v < mn) mn = v; sum += v; }
+      if (c.cpl === 'AC') { mx -= sum / M; mn -= sum / M; }
+      const fits = () => mn / VD[c.vd] + c.pos >= -4.02 && mx / VD[c.vd] + c.pos <= 4.02; if (fits()) continue; // the top and bottom grid lines are on the screen
+      while ((mx - mn) / VD[c.vd] > 7.6 && c.vd < VD.length - 1) c.vd++;
+      c.pos = Math.round(Math.max(-3.8 - mn / VD[c.vd], Math.min(3.8 - mx / VD[c.vd], c.pos)) * 10) / 10;
+    }
+    if (!st.probes.CH2 && st.probes.CH1 && st.scope.meas.src === 'CH2') st.scope.meas.src = 'CH1'; // one-channel set-ups measure CH1
   }
   for (const [name, s] of Object.entries(SETUPS)) { const f = fileName(name); fs.mkdirSync(`setups/${f.split('/')[0]}`, { recursive: true }); fs.writeFileSync(`setups/${f}.ett.json`, JSON.stringify({ v: 2, headphones: false, ...s }, null, 1)); }
   console.log(Object.keys(SETUPS).length, 'setups written');

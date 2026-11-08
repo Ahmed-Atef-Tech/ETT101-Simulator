@@ -72,9 +72,9 @@
   "ch": {
    "CH1": {
     "on": true,
-    "vd": 9,
+    "vd": 10,
     "fine": 1,
-    "pos": 2,
+    "pos": 0.8,
     "cpl": "DC",
     "bw": false,
     "finemode": false,
@@ -83,7 +83,7 @@
    },
    "CH2": {
     "on": true,
-    "vd": 10,
+    "vd": 11,
     "fine": 1,
     "pos": -2,
     "cpl": "DC",
