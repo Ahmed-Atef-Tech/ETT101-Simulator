@@ -17,6 +17,12 @@ An interactive simulator of the **Emona ETT-101 (Telecoms-Trainer 101)** kit and
 
 ملفات التجارب: فك الـ zip، وجوه البرنامج دوس **OPEN SETUP** واختار التجربة. الفولدرات: `Term1` و `Term2` و `Extra`.
 
+## Expected results
+
+**[Expected results for every experiment](docs/results/README.md)**: the block diagram, the wiring on the kit, the oscilloscope screen, and what the lab book expects next to what the simulator shows, for all 69 experiments.
+
+Reference books: Electrical Testing (6) lab manual, ELC414 (Term 1); Electrical Testing (7) lab manual, ELC424 (Term 2); Emona 101 Trainer SAMPLE Lab Manual (Vol. 1 & 2) and Emona DATEx Lab Manual, Vol. 1 (Extra).
+
 ### Windows
 1. نزّل ملف الـ Setup وافتحه.
 2. لو ظهرت رسالة زرقاء **"Windows protected your PC"**: دوس **More info** ثم **Run anyway**. ده عادي لأن البرنامج مش موقّع بشهادة مدفوعة.
