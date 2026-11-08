@@ -57,7 +57,7 @@ const hooks = {
   scopeHelp: () => showModal(t('scopeHelp'), HELP[getLang()].scope, links.scope),
   plugged: () => audio.ensure(),
   hoverTarget: () => { },
-  hoverLead: (l, e) => { if (l && training) showTip(`<bdi>${SOCKET_NAME[l.a]}</bdi> ⟷ <bdi>${SOCKET_NAME[l.b]}</bdi><br><span class="dim">${t('leadTip')}</span>`, e); else hideTip(); },
+  hoverLead: (l, e) => { if (l && training) showTip(l.probe ? `<bdi>${l.probe}</bdi> ⟷ <bdi>${SOCKET_NAME[sim.probes[l.probe]] || ''}</bdi><br><span class="dim">${t('probeTip')}</span>` : `<bdi>${SOCKET_NAME[l.a]}</bdi> ⟷ <bdi>${SOCKET_NAME[l.b]}</bdi><br><span class="dim">${t('leadTip')}</span>`, e); else hideTip(); },
   leadMenu: (l, e) => leadMenu(l, e),
 };
 const panel = new Panel(benchG, sim, hooks);
@@ -185,8 +185,15 @@ function showSockTip(e) {
 function leadMenu(l, e) {
   closeMenus();
   const m = document.createElement('div'); m.className = 'ctx'; m.style.left = e.clientX + 'px'; m.style.top = e.clientY + 'px';
-  m.innerHTML = Object.keys(LEAD_COLORS).map(c => `<button class="plugsw ${c === l.color ? 'sel' : ''}" data-c="${c}" title="${t('colors')[c]}" style="background:${LEAD_COLORS[c]}"></button>`).join('') + `<button class="rm">${t('removeLead')}</button>`;
-  m.addEventListener('click', ev => { const c = ev.target.dataset.c; if (c) { l.color = c; wires.render(); } if (ev.target.classList.contains('rm')) wires.removeLead(l.id); closeMenus(); });
+  const bent = l.probe ? !!wires.probeBend[l.probe] : !!l.bend;
+  m.innerHTML = (l.probe ? '' : Object.keys(LEAD_COLORS).map(c => `<button class="plugsw ${c === l.color ? 'sel' : ''}" data-c="${c}" title="${t('colors')[c]}" style="background:${LEAD_COLORS[c]}"></button>`).join(''))
+    + (bent ? `<button class="rs">${t('resetShape')}</button>` : '') + `<button class="rm">${l.probe ? t('removeProbe') : t('removeLead')}</button>`;
+  m.addEventListener('click', ev => {
+    const c = ev.target.dataset.c; if (c) { l.color = c; wires.render(); }
+    if (ev.target.classList.contains('rs')) wires.resetShape(l);
+    if (ev.target.classList.contains('rm')) { if (l.probe) wires.setProbe(l.probe, null); else wires.removeLead(l.id); }
+    closeMenus();
+  });
   document.body.appendChild(m);
 }
 function closeMenus() { document.querySelectorAll('.ctx').forEach(x => x.remove()); }
@@ -306,10 +313,13 @@ colorsEl.onclick = e => { const c = e.target.dataset.c; if (!c) return; wires.co
 // save / open setups
 function snapshot() {
   const mods = {}; for (const id in sim.mods) mods[id] = { ...sim.mods[id].p };
-  return { v: 2, leads: sim.leads.map(({ a, b, color }) => ({ a, b, color })), probes: { CH1: sim.probes.CH1, CH2: sim.probes.CH2, EXT: sim.probes.EXT }, mods, scope: scope.st, headphones: sim.headphones };
+  const pb = {}; for (const k of ['CH1', 'CH2', 'EXT']) if (wires.probeBend[k] && sim.probes[k]) pb[k] = wires.probeBend[k];
+  return { v: 2, leads: sim.leads.map(({ a, b, color, bend }) => (bend ? { a, b, color, bend } : { a, b, color })), probes: { CH1: sim.probes.CH1, CH2: sim.probes.CH2, EXT: sim.probes.EXT }, probeBend: pb, mods, scope: scope.st, headphones: sim.headphones };
 }
 function restore(s) {
-  sim.leads = []; for (const l of s.leads || []) if (SOCKETS[l.a] && SOCKETS[l.b]) sim.leads.push({ id: 'L' + Math.random().toString(36).slice(2, 9), ...l });
+  const okPt = p => Array.isArray(p) && p.length === 2 && p.every(Number.isFinite);
+  sim.leads = []; for (const l of s.leads || []) if (SOCKETS[l.a] && SOCKETS[l.b]) { const n = { id: 'L' + Math.random().toString(36).slice(2, 9), a: l.a, b: l.b, color: LEAD_COLORS[l.color] ? l.color : 'red' }; if (okPt(l.bend)) n.bend = l.bend; sim.leads.push(n); }
+  wires.probeBend = {}; for (const k of ['CH1', 'CH2', 'EXT']) { const p = (s.probeBend || {})[k]; if (okPt(p)) wires.probeBend[k] = p; }
   for (const k of ['CH1', 'CH2', 'EXT']) { const v = (s.probes || {})[k]; sim.probes[k] = v && SOCKETS[v] ? v : null; }
   for (const id in s.mods || {}) if (sim.mods[id]) for (const p in s.mods[id]) sim.mods[id].set(p, s.mods[id][p]);
   // v1 files: the V/div list started at 2 mV; v2 adds 1 mV/div in front (UTD2000: 1 mV .. 20 V/div)

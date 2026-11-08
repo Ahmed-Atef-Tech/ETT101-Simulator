@@ -61,7 +61,9 @@ button { font: inherit; color: inherit; }
 .sock { cursor: crosshair; }
 .sock:hover .sockHit { fill: rgba(242,194,27,.35); }
 #bench.dragging .sock:hover .sockHit { fill: rgba(242,194,27,.6); }
-.lead { cursor: pointer; } .lead:hover .leadOut { stroke: #fff; }
+.lead { cursor: grab; } .lead:hover .leadOut { stroke: #fff; }
+#bench.bending, #bench.bending .lead { cursor: grabbing; }
+.ctx button.rs { border: 1px solid #9aa3a7; color: var(--ink); background: #fff; border-radius: 4px; padding: 3px 9px; cursor: pointer; font-size: 13.5px; }
 /* one click highlights a lead: soft glow, its plugs ringed, every other lead dimmed */
 .leadGlow { stroke: transparent; pointer-events: none; }
 .lead.sel .leadGlow { stroke: rgba(255, 244, 196, .55); filter: blur(3px); animation: leadPulse 1.4s ease-in-out infinite alternate; }
