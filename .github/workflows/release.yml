@@ -82,6 +82,16 @@ jobs:
         with:
           node-version: 22
           cache: npm
+      - name: Cache the Electron and electron-builder downloads
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/AppData/Local/electron/Cache
+            ~/AppData/Local/electron-builder/Cache
+            ~/Library/Caches/electron
+            ~/Library/Caches/electron-builder
+          key: eb-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: eb-${{ runner.os }}-
       - name: Install
         shell: bash
         env:
