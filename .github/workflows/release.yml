@@ -11,7 +11,7 @@ name: Release
 on:
   push:
     branches: [main]
-    paths: [package.json]
+    paths: [package.json, .github/workflows/release.yml]
     tags: ["v*"]
   workflow_dispatch:
     inputs:
@@ -37,7 +37,7 @@ jobs:
       tag: ${{ steps.v.outputs.tag }}
       skip: ${{ steps.v.outputs.skip }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - id: v
         name: Work out the version
         env:
@@ -77,8 +77,8 @@ jobs:
             target: --mac
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
@@ -88,17 +88,24 @@ jobs:
       - name: Build the simulator page
         run: node build.mjs
       - name: Build and upload the app
+        shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_IDENTITY_AUTO_DISCOVERY: "false"
-        run: npx electron-builder ${{ matrix.target }} --publish always
+        run: |
+          # electron-builder downloads its tools (NSIS, etc.) from GitHub; retry if a download times out
+          for i in 1 2 3; do
+            npx electron-builder ${{ matrix.target }} --publish always && exit 0
+            echo "::warning::Build attempt $i failed; retrying in 30 s"; sleep 30
+          done
+          exit 1
 
   publish:
     needs: [prepare, build]
     if: needs.prepare.outputs.skip != 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Attach the experiment setup files and the model reference
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
