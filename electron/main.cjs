@@ -58,7 +58,7 @@ function setupUpdates() {
       detail: `النسخة اللي عندك: ${app.getVersion()}\nدوس "تنزيل" وهتفتح صفحة التحميل. نزّل ملف الـ dmg واسحب البرنامج لـ Applications مكان القديم.`,
       buttons: ['تنزيل / Download', 'لاحقاً / Later'],
     });
-    if (r.response === 0) shell.openExternal(`https://github.com/${REPO}/releases/latest`);
+    if (r.response === 0) shell.openExternal('https://ahmed-atef-tech.github.io/ETT101-Simulator/'); // the download page; it always links the latest release
   });
 
   autoUpdater.on('update-downloaded', async info => {
