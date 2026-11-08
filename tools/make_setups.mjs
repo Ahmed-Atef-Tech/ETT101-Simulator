@@ -9,9 +9,9 @@ import { TLPF_MIN, TLPF_MAX } from '../src/engine/modules.js';
 
 const fcK = f => (f - TLPF_MIN) / (TLPF_MAX - TLPF_MIN);
 const V = { 0.1: 6, 0.2: 7, 0.5: 8, 1: 9, 2: 10, 5: 11 };               // V/div -> scope index (list starts at 1 mV/div)
-const T = { '2u': 2, '5u': 3, '10u': 4, '20u': 5, '50u': 6, '100u': 7, '200u': 8, '500u': 9, '1m': 10, '2m': 11 };
+const T = { '2u': 2, '5u': 3, '10u': 4, '20u': 5, '50u': 6, '100u': 7, '200u': 8, '500u': 9, '1m': 10, '2m': 11, '5m': 12, '10m': 13, '20m': 14, '50m': 15 };
 const ch = o => ({ on: true, vd: 9, fine: 1, pos: 0, cpl: 'DC', bw: false, finemode: false, probe: 0, inv: false, ...o });
-const scope = (c1, c2, td, extra = {}) => ({ ch: { CH1: ch(c1), CH2: ch(c2) }, sel: 'CH1', td: T[td], hpos: 0, zoom: false, ztd: 4, zpos: 0,
+const scope = (c1, c2, td, extra = {}) => ({ ch: { CH1: ch(c1), CH2: ch(c2) }, sel: 'CH1', td: (() => { if (!(td in T)) throw new Error('unknown Time/div ' + td); return T[td]; })(), hpos: 0, zoom: false, ztd: 4, zpos: 0,
   trig: { src: 'CH1', slope: 'R', mode: 'AUTO', cpl: 'DC', level: 0 }, run: true, acq: 'Sample', avgN: 16,
   disp: { type: 'Vectors', persist: 0, fmt: 'YT', grid: 'Dots' }, math: { on: false, kind: 'FFT', op: '+', fftSrc: 'CH1', win: 'Hanning', dbdiv: 20, fpos: 0, unit: 'dBVrms', vrd: 7 },
   meas: { src: 'CH2', items: ['Vpp', 'Freq', null], all: false }, cur: { type: 'Off', src: 'CH1', act: 'A', a: -3, b: 3 }, menu: null, ...extra });

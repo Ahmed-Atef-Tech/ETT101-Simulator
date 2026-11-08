@@ -1,7 +1,7 @@
 {
   "name": "ett101-simulator",
   "productName": "Telecoms-Trainer 101 Simulator",
-  "version": "0.30.0",
+  "version": "0.31.0",
   "description": "Interactive simulator of the Emona ETT-101 telecoms trainer kit with a UTD2000-style oscilloscope",
   "author": "Ahmed Atef",
   "license": "UNLICENSED",
@@ -18,7 +18,9 @@
     "start": "node build.mjs && electron .",
     "dist:win": "node build.mjs && electron-builder --win --publish never",
     "dist:mac": "node build.mjs && electron-builder --mac --publish never",
-    "test": "node tools/check_setups.mjs && node tools/verify_book.mjs && node tools/verify_more.mjs && node tools/verify_vol2.mjs"
+    "test": "node tools/check_setups.mjs && node tools/verify_book.mjs && node tools/verify_more.mjs && node tools/verify_vol2.mjs",
+    "test:e2e": "node build.mjs && node tests/e2e/suite.cjs && node tests/e2e/download.cjs",
+    "test:monkey": "node build.mjs && node tests/e2e/suite.cjs --only=MK --monkey=3000"
   },
   "dependencies": {
     "electron-updater": "^6.3.9"

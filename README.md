@@ -44,7 +44,9 @@ Pushes that don't change the version don't make a release. You can also start on
 npm install
 npm start            # build the page and open the app
 node build.mjs       # just build dist/index.html (open it in a browser)
-npm test             # setup and book checks
+npm test             # setup and book checks (the simulation against the lab books)
+npm run test:e2e     # interface tests in Chromium (needs Playwright)
+npm run test:monkey  # 3000 random actions looking for errors
 ```
 
 ## Repository layout

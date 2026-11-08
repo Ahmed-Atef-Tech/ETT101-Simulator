@@ -65,6 +65,8 @@ const scope = new Scope(benchG, sim, hooks);
 const wireLayer = el('g', { id: 'wires' }, world);
 const ghostLayer = el('g', { id: 'ghost' }, world);
 const wires = new Wires(svg, wireLayer, sim, scope, hooks);
+// factory settings: every setup is applied on top of these, so nothing is left over from the previous one
+const SCOPE_DEFAULT = JSON.stringify(scope.st), MOD_DEFAULT = Object.fromEntries(Object.entries(sim.mods).map(([id, m]) => [id, { ...m.p }]));
 
 function drawHeadphones() {
   hpG.innerHTML = '';
@@ -151,10 +153,10 @@ function showKnobTip(mod, p, e, wheel) {
   if (!mod) { dragKnob = false; if (!hoverKnobOn) hideTip(); return; } // mouse released: keep the readout only while still over the knob
   if (!training) return; if (!wheel) dragKnob = true; showTip(`<b dir="ltr">${knobReadout(sim, mod, p)}</b>`, e || lastMouse);
 }
-let hoverSock = null, hoverT = 0;
+let hoverSock = null, hoverT = 0, sockTimer = 0; // the readings appear even if the mouse stays still
 svg.addEventListener('pointerover', e => {
   const s = e.target.closest && e.target.closest('[data-socket]');
-  if (s && training && !wires.tmp && !pan) { const id = s.getAttribute('data-socket'); if (id !== hoverSock) { hoverSock = id; sim.setProbe('HOV', id); hoverT = performance.now(); } showSockTip(e); }
+  if (s && training && !wires.tmp && !pan) { const id = s.getAttribute('data-socket'); if (id !== hoverSock) { hoverSock = id; sim.setProbe('HOV', id); hoverT = performance.now(); clearTimeout(sockTimer); sockTimer = setTimeout(() => { if (hoverSock === id) showSockTip(lastMouse); }, 160); } showSockTip(e); }
   else if (!s && hoverSock) { hoverSock = null; sim.setProbe('HOV', null); if (!dragKnob) hideTip(); }
 });
 svg.addEventListener('pointermove', e => { if (hoverSock) showSockTip(e); });
@@ -172,8 +174,9 @@ function showSockTip(e) {
     if (st === 'float') meas = `<span class="dim">${t('notConnected')}</span>`;
     else {
       const n = 24000, b = sim.read('HOV', sim.t, n, new Float32Array(n)); let mx = -1e9, mn = 1e9, s = 0; for (const v of b) { if (v > mx) mx = v; if (v < mn) mn = v; s += v; }
-      const avg = s / n; let f = 0;
-      if (mx - mn > 0.02) { const mid = (mx + mn) / 2, h = (mx - mn) * 0.1; let stt = 0, c = 0, a0 = -1, a1 = -1; for (let i = 0; i < n; i++) { if (!stt && b[i] > mid + h) { stt = 1; if (a0 < 0) a0 = i; else { c++; a1 = i; } } else if (stt && b[i] < mid - h) stt = 0; } if (c) f = c / ((a1 - a0) / FS); }
+      let avg = s / n, f = 0;
+      if (mx - mn > 0.02) { const mid = (mx + mn) / 2, h = (mx - mn) * 0.1; let stt = b[0] > mid ? 1 : 0, c = 0, a0 = -1, a1 = -1; /* start in the state the window opens in, or a false edge at i = 0 skews f and DC */ for (let i = 0; i < n; i++) { if (!stt && b[i] > mid + h) { stt = 1; if (a0 < 0) a0 = i; else { c++; a1 = i; } } else if (stt && b[i] < mid - h) stt = 0; }
+        if (c) { f = c / ((a1 - a0) / FS); let w = 0; for (let i = a0; i < a1; i++) w += b[i]; avg = w / (a1 - a0); } } // DC over whole cycles: a pure sine reads 0 V
       meas = `<span dir="ltr">Vp-p <b>${fmtV(mx - mn)}</b>&nbsp;&nbsp; DC <b>${fmtV(avg)}</b>${f ? `&nbsp;&nbsp; f <b>${fmtF(f)}</b>` : ''}</span>`;
       if (st === 'short') meas += `<br><span class="warn">${t('shorted')}</span>`;
     }
@@ -308,24 +311,38 @@ $('#btnHelp').onclick = () => { $('#settings').classList.remove('open'); showMod
 $('#btnScopeHelp').onclick = () => { $('#settings').classList.remove('open'); hooks.scopeHelp(); };
 const colorsEl = $('#colors');
 colorsEl.innerHTML = Object.keys(LEAD_COLORS).map(c => `<button class="plugsw ${c === wires.color ? 'sel' : ''}" data-c="${c}" style="background:${LEAD_COLORS[c]}"></button>`).join('');
-colorsEl.onclick = e => { const c = e.target.dataset.c; if (!c) return; wires.color = c; colorsEl.querySelectorAll('.plugsw').forEach(s => s.classList.toggle('sel', s.dataset.c === c)); };
+colorsEl.onclick = e => { const c = e.target.dataset.c; if (!c) return; wires.color = c; if (wires.sel) wires.select(null); colorsEl.querySelectorAll('.plugsw').forEach(s => s.classList.toggle('sel', s.dataset.c === c)); };
 
 // save / open setups
 function snapshot() {
   const mods = {}; for (const id in sim.mods) mods[id] = { ...sim.mods[id].p };
   const pb = {}; for (const k of ['CH1', 'CH2', 'EXT']) if (wires.probeBend[k] && sim.probes[k]) pb[k] = wires.probeBend[k];
-  return { v: 2, leads: sim.leads.map(({ a, b, color, bend }) => (bend ? { a, b, color, bend } : { a, b, color })), probes: { CH1: sim.probes.CH1, CH2: sim.probes.CH2, EXT: sim.probes.EXT }, probeBend: pb, mods, scope: scope.st, headphones: sim.headphones };
+  return { v: 2, leads: sim.leads.map(({ a, b, color, bend }) => (bend ? { a, b, color, bend } : { a, b, color })), probes: { CH1: sim.probes.CH1, CH2: sim.probes.CH2, EXT: sim.probes.EXT }, probeBend: pb, mods, scope: { ...scope.st, ref: { ...scope.st.ref, data: null, on: false } }, headphones: sim.headphones }; // the stored reference wave is not saved
 }
 function restore(s) {
   const okPt = p => Array.isArray(p) && p.length === 2 && p.every(Number.isFinite);
   sim.leads = []; for (const l of s.leads || []) if (SOCKETS[l.a] && SOCKETS[l.b]) { const n = { id: 'L' + Math.random().toString(36).slice(2, 9), a: l.a, b: l.b, color: LEAD_COLORS[l.color] ? l.color : 'red' }; if (okPt(l.bend)) n.bend = l.bend; sim.leads.push(n); }
   wires.probeBend = {}; for (const k of ['CH1', 'CH2', 'EXT']) { const p = (s.probeBend || {})[k]; if (okPt(p)) wires.probeBend[k] = p; }
   for (const k of ['CH1', 'CH2', 'EXT']) { const v = (s.probes || {})[k]; sim.probes[k] = v && SOCKETS[v] ? v : null; }
-  for (const id in s.mods || {}) if (sim.mods[id]) for (const p in s.mods[id]) sim.mods[id].set(p, s.mods[id][p]);
+  for (const id in MOD_DEFAULT) for (const p in MOD_DEFAULT[id]) sim.mods[id].set(p, MOD_DEFAULT[id][p]);
+  { const d = JSON.parse(SCOPE_DEFAULT); for (const k in d) scope.st[k] = d[k]; }
+  // knobs and switches are 0..1; a file can only set parameters the module really has
+  for (const id in s.mods || {}) if (sim.mods[id]) for (const p in s.mods[id]) { const v = +s.mods[id][p]; if (p in sim.mods[id].p && Number.isFinite(v)) sim.mods[id].set(p, Math.max(0, Math.min(1, v))); }
   // v1 files: the V/div list started at 2 mV; v2 adds 1 mV/div in front (UTD2000: 1 mV .. 20 V/div)
   if (s.scope && !(s.v >= 2)) { s = JSON.parse(JSON.stringify(s)); for (const k of ['CH1', 'CH2']) if (s.scope.ch && s.scope.ch[k] && typeof s.scope.ch[k].vd === 'number') s.scope.ch[k].vd += 1; }
   if (s.scope && s.scope.math) delete s.scope.math.fz;
-  if (s.scope) { const d = scope.st; for (const k in s.scope) d[k] = (d[k] && typeof d[k] === 'object' && !Array.isArray(d[k])) ? Object.assign(d[k], s.scope[k]) : s.scope[k]; d.run = true; }
+  if (s.scope && typeof s.scope === 'object') {
+    // take only known settings of the right type, then keep every list index inside its list
+    const merge = (dst, src) => { for (const k in src) { if (!(k in dst)) continue; const a = dst[k], v = src[k];
+      if (a && typeof a === 'object' && !Array.isArray(a) && !(a instanceof Float32Array)) { if (v && typeof v === 'object') merge(a, v); }
+      else if (a === null || typeof a === typeof v) { if (typeof v !== 'number' || Number.isFinite(v)) dst[k] = v; } } };
+    const d = scope.st; merge(d, s.scope);
+    const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.round(v)));
+    for (const c of ['CH1', 'CH2']) { const ch = d.ch[c]; ch.vd = clamp(ch.vd, 0, VDIV.length - 1); ch.pos = Math.max(-10, Math.min(10, ch.pos)); ch.fine = Math.max(0.4, Math.min(2.5, ch.fine)); ch.probe = clamp(ch.probe, 0, 3); }
+    d.td = clamp(d.td, 0, TDIV.length - 1); d.ztd = clamp(d.ztd, 0, d.td);
+    d.ref.data = null; d.ref.on = false; // an older autosave may hold the reference as plain numbers
+    d.run = true;
+  }
   sim.headphones = !!s.headphones; sim.rebuild(); wires.render(); panel.refreshAll(); drawHeadphones();
 }
 function openGuideFor(id) { exp = EXPERIMENTS.find(x => x.id === id) || null; stepI = 0; if (!training) setTraining(true); $('#guide').classList.add('open'); renderGuide(); }

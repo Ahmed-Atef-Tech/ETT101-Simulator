@@ -41,6 +41,8 @@ export class Wires {
     }
     e.preventDefault();
     const pl = e.target.closest && e.target.closest('[data-lead-of]');
+    // a new lead must not be born dimmed under another lead's highlight
+    if (this.sel && !(pl && pl.getAttribute('data-lead-of') === this.sel)) { this.sel = null; this.layer.classList.remove('hasSel'); this.layer.querySelectorAll('.sel').forEach(x => x.classList.remove('sel')); }
     this.downAt = { x: e.clientX, y: e.clientY, lead: pl ? pl.getAttribute('data-lead-of') : null };
     const p0 = hit.sock ? this.pos(hit.sock) : this.scope.bncPos(hit.bnc);
     this.tmp = { from: hit, p0, path: el('path', { class: 'leadTmp', 'pointer-events': 'none', fill: 'none', stroke: hit.bnc ? '#222' : LEAD_COLORS[this.color], 'stroke-width': hit.bnc ? 8 : 6.5, 'stroke-linecap': 'round', opacity: .85 }, this.dragG) };
@@ -75,11 +77,19 @@ export class Wires {
     else if (from.sock && hit.bnc) { this.setProbe(hit.bnc, from.sock); this.hooks.plugged(); }
   }
 
-  select(id) { this.sel = id; this.render(); }
+  select(id) {
+    this.sel = id;
+    this.layer.classList.toggle('hasSel', !!id);
+    this.layer.querySelectorAll('.sel').forEach(x => x.classList.remove('sel'));
+    if (!id) return;
+    const g = id.startsWith('probe:') ? this.layer.querySelector(`.lead.probe[data-probe="${id.slice(6)}"]`) : this.layer.querySelector(`.lead[data-lead="${id}"]`);
+    if (g) { g.classList.add('sel'); g.parentNode.appendChild(g); }
+    this.layer.querySelectorAll(`[data-lead-of="${id}"]`).forEach(x => x.classList.add('sel'));
+  }
   resetShape(target) { if (target && target.probe) delete this.probeBend[target.probe]; else if (target) delete target.bend; this.render(); this.hooks.changed(); }
   // a smooth cable from a to b that passes through m (both control points at (8m - a - b) / 6 put B(0.5) on m)
   through(a, b, m) { const px = (8 * m[0] - a[0] - b[0]) / 6, py = (8 * m[1] - a[1] - b[1]) / 6; return `M${a[0]},${a[1]} C${px},${py} ${px},${py} ${b[0]},${b[1]}`; }
-  addLead(a, b, color) { const id = this.sim.addLead(a, b, color); this.render(); this.hooks.changed(); return id; }
+  addLead(a, b, color) { this.sel = null; const id = this.sim.addLead(a, b, color); this.render(); this.hooks.changed(); return id; }
   removeLead(id) { this.sim.removeLead(id); this.render(); this.hooks.changed(); }
   setProbe(ch, sock) { if (this.sim.probes[ch] !== sock) delete this.probeBend[ch]; this.sim.setProbe(ch, sock); this.render(); this.hooks.changed(); }
   clearAll() { this.probeBend = {}; this.sim.leads = []; for (const k in this.sim.probes) this.sim.probes[k] = null; this.sim.rebuild(); this.render(); this.hooks.changed(); }
@@ -135,7 +145,7 @@ export class Wires {
       g.addEventListener('dblclick', e => { e.stopPropagation(); this.setProbe(ch, null); });
       const p = plug(s, '#2b2b2b', '#000', PROBE_TAG[ch], pid); p.addEventListener('dblclick', e => { e.stopPropagation(); this.setProbe(ch, null); });
       // BNC plug at scope
-      const g2 = el('g', { transform: `translate(${a[0]},${a[1]})` }, this.probeG);
+      const g2 = el('g', { transform: `translate(${a[0]},${a[1]})`, 'data-bnc': ch, class: 'bncPlug' }, this.probeG);
       el('circle', { r: 17, fill: 'url(#bncGrad)', stroke: '#555', 'stroke-width': 1.5 }, g2);
       el('circle', { r: 9, fill: '#1c1c1c' }, g2);
       el('circle', { r: 19, fill: 'none', stroke: PROBE_TAG[ch], 'stroke-width': 2 }, g2);
