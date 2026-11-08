@@ -25,7 +25,8 @@ async function open(opts = {}) {
   p.on('dialog', d => { p.dialogs.push(d.message()); (p.dialogAnswer === false ? d.dismiss() : d.accept()).catch(() => { }); });
   if (opts.init) await p.addInitScript(opts.init);
   await p.goto(URL); await p.waitForFunction(() => window.__app && window.__app.sim);
-  if (!opts.keep) { await p.evaluate(() => { localStorage.clear(); }); await p.reload(); await p.waitForFunction(() => window.__app); }
+  if (!opts.keep) { await p.evaluate(() => { localStorage.clear(); localStorage.setItem('ett.notice', '1'); }); await p.reload(); await p.waitForFunction(() => window.__app); }
+  else await p.evaluate(() => document.getElementById('modal').classList.remove('open'));
   await p.waitForTimeout(250);
   return p;
 }
@@ -50,6 +51,19 @@ const lead0Mid = (p, id) => app(p, id => { const g = id ? document.querySelector
 const svgToScreen = (p, pt) => app(p, pt => { const svg = document.querySelector('#bench'); const q = svg.createSVGPoint(); q.x = pt[0]; q.y = pt[1]; const r = q.matrixTransform(svg.getScreenCTM()); return { x: r.x, y: r.y }; }, pt);
 
 // ================================================================== 1. workspace
+T('WS00', 'Workspace', 'Preliminary-version notice shows once on first start, then from the Beta tag and Settings, in both languages', async p => {
+  await p.evaluate(() => localStorage.removeItem('ett.notice')); await p.reload(); await p.waitForFunction(() => window.__app); await p.waitForTimeout(200);
+  const st = () => p.evaluate(() => ({ open: document.getElementById('modal').classList.contains('open'), body: document.getElementById('modalBody').textContent, yt: getComputedStyle(document.getElementById('modalYT')).display }));
+  let s = await st(); ok(s.open, 'notice opens on first start'); ok(/preliminary/i.test(s.body) && /100%/.test(s.body) && /sold/.test(s.body), 'notice says beta, not 100% exact, non-commercial'); eq(s.yt, 'none', 'no video button on the notice');
+  await p.click('#modalClose'); await p.reload(); await p.waitForFunction(() => window.__app); await p.waitForTimeout(200);
+  ok(!(await st()).open, 'not shown again on the next start');
+  await p.click('#btnBeta'); s = await st(); ok(s.open && /preliminary/i.test(s.body), 'Beta tag opens it'); await p.click('#modalClose');
+  await p.click('#btnSettings'); await p.click('#btnAbout'); ok((await st()).open, 'Settings → About opens it'); await p.click('#modalClose');
+  await p.evaluate(() => window.__app.setLang('ar')); await p.click('#btnBeta'); s = await st(); ok(/نسخة أولية/.test(s.body) && /التربح/.test(s.body), 'Arabic notice'); await p.click('#modalClose');
+  await p.evaluate(() => window.__app.setLang('en'));
+  await p.click('#btnSettings'); await p.click('#btnHelp'); // help modal still has its video button
+  const yt = await p.evaluate(() => { const b = document.getElementById('modalYT'); document.getElementById('modal').classList.remove('open'); return getComputedStyle(b).display; }); ok(yt !== 'none', 'other dialogs keep the video button');
+});
 T('WS01', 'Workspace', 'View buttons Kit / Both / Scope switch the view', async p => {
   for (const v of ['vKit', 'vScope', 'vBoth']) { const vb0 = await app(p, () => document.querySelector('#bench').getAttribute('viewBox')); await p.click('#' + v); await p.waitForTimeout(80);
     ok(await app(p, v => document.querySelector('#' + v).classList.contains('on'), v), v + ' not lit'); if (v !== 'vBoth') ok(vb0 !== await app(p, () => document.querySelector('#bench').getAttribute('viewBox')), v + ' did not move the view'); }

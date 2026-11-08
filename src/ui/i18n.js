@@ -1,7 +1,7 @@
 // UI strings. English is the default; Arabic switches the whole interface to right-to-left.
 const STR = {
   en: {
-    appName: 'Telecoms-Trainer 101', appSub: 'simulator',
+    appName: 'Telecoms-Trainer 101', appSub: 'simulator', beta: 'Beta', betaHint: 'Preliminary version: may not match the real kit 100%. Free, for students only.', about: 'About this simulator',
     guidance: 'Guidance', modeHint: 'Guidance shows the info buttons, socket names with live readings, and knob values. Turn it off to practise like the real lab exam.',
     library: 'Load experiment', libHint: 'Ready-made experiments from the lab books, with the page of each one. One click wires the kit and sets the scope.',
     reference: 'Reference', refHint: 'The model reference: every module’s equation and numbers, and where each number comes from.',
@@ -29,7 +29,7 @@ const STR = {
     colors: { red: 'Red', black: 'Black', yellow: 'Yellow', blue: 'Blue', green: 'Green' },
   },
   ar: {
-    appName: 'Telecoms-Trainer 101', appSub: 'محاكي',
+    appName: 'Telecoms-Trainer 101', appSub: 'محاكي', beta: 'نسخة أولية', betaHint: 'نسخة أولية: ممكن متكونش مطابقة للكيت الحقيقي 100%. مجانية وللطلبة بس.', about: 'عن البرنامج',
     guidance: 'الإرشادات', modeHint: 'الإرشادات بتظهر زرار i وأسماء المقابس وقراءتها اللحظية وقيم المقابض. اقفلها علشان تتدرب زي امتحان المعمل.',
     library: 'تحميل تجربة', libHint: 'تجارب جاهزة من كتب المعمل، ومعاها رقم الصفحة. ضغطة واحدة بتوصّل الكيت وتظبط الأوسيلوسكوب.',
     reference: 'المرجع', refHint: 'مرجع الموديل: معادلة وأرقام كل بلوك، ومصدر كل رقم.',

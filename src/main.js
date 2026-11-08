@@ -7,7 +7,7 @@ import { Scope, fmtV, fmtF, VDIV, TDIV } from './ui/scope.js';
 import { Wires, LEAD_COLORS } from './ui/wires.js';
 import { Audio } from './ui/audio.js';
 import { SOCKET_NAME, SOCKET_POS, BLOCKS } from './ui/layout.js';
-import { MODULE_INFO, HELP_LINKS, HELP, EXPERIMENTS } from './ui/content.js';
+import { MODULE_INFO, HELP_LINKS, HELP, EXPERIMENTS, NOTICE } from './ui/content.js';
 import { t, tr, getLang, setLang } from './ui/i18n.js';
 import { initLibrary } from './ui/library.js';
 
@@ -217,7 +217,7 @@ function openLink(url) {
 }
 function showModal(title, html, link) {
   $('#modalTitle').textContent = title; $('#modalBody').innerHTML = html;
-  const yt = $('#modalYT'); yt.disabled = !link; yt.querySelector('span').textContent = link ? t('watch') : t('videoSoon'); yt.onclick = link ? () => openLink(link) : null;
+  const yt = $('#modalYT'); yt.style.display = link === false ? 'none' : ''; yt.disabled = !link; yt.querySelector('span').textContent = link ? t('watch') : t('videoSoon'); yt.onclick = link ? () => openLink(link) : null;
   $('#modal').classList.add('open');
 }
 const closeModal = () => $('#modal').classList.remove('open');
@@ -310,6 +310,10 @@ document.querySelectorAll('[data-snd]').forEach(b => b.onclick = () => { audio.e
 $('#btnClear').onclick = () => { $('#settings').classList.remove('open'); if (confirm(t('confirmClear'))) wires.clearAll(); };
 $('#btnHelp').onclick = () => { $('#settings').classList.remove('open'); showModal(t('help'), HELP[getLang()].app, links._channel); };
 $('#btnScopeHelp').onclick = () => { $('#settings').classList.remove('open'); hooks.scopeHelp(); };
+// preliminary-version notice: shown once on first start, and any time from the Beta tag or Settings
+function showAbout() { showModal(t('about'), NOTICE[getLang()] + `<p class="small">v${APP_VERSION}</p>`, false); }
+$('#btnBeta').onclick = showAbout;
+$('#btnAbout').onclick = () => { $('#settings').classList.remove('open'); showAbout(); };
 const colorsEl = $('#colors');
 colorsEl.innerHTML = Object.keys(LEAD_COLORS).map(c => `<button class="plugsw ${c === wires.color ? 'sel' : ''}" data-c="${c}" style="background:${LEAD_COLORS[c]}"></button>`).join('');
 colorsEl.onclick = e => { const c = e.target.dataset.c; if (!c) return; wires.color = c; if (wires.sel) wires.select(null); colorsEl.querySelectorAll('.plugsw').forEach(s => s.classList.toggle('sel', s.dataset.c === c)); };
@@ -415,6 +419,7 @@ window.addEventListener('keydown', e => { if (e.ctrlKey && ['+', '=', '-', '0'].
 document.addEventListener('pointerdown', () => audio.ensure(), { once: true });
 
 setLang(getLang()); applyTexts(); setTraining(training); wires.render();
+{ let seen = false; try { seen = localStorage.getItem('ett.notice') === '1'; localStorage.setItem('ett.notice', '1'); } catch (e) { } if (!seen) showAbout(); }
 requestAnimationFrame(() => setView(viewMode));
 
 // =============================================== main loop ===============================================

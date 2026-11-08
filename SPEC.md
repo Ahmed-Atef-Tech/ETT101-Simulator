@@ -1,5 +1,7 @@
 # Telecoms-Trainer 101 Simulator — model reference
 
+> Preliminary (beta) version: the model follows the sources below but may not match the real kit 100%. Free and non-commercial, made only to help students; it must not be sold or used to make money in any way.
+
 Sources, in order of precedence:
 1. **ETT-101 BiSKIT Specifications V1.1** (Emona, emona-tims.com) — the product's own spec table.
 2. **ETT-101 User Manual** (Emona sample, tecnoedu.com / emona-tims.com).
