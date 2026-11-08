@@ -12,6 +12,7 @@ export class Wires {
     this.color = 'red'; this.paths = new Map(); this.probeEls = {};
     this.tmp = null; this.sel = null; // sel: the highlighted lead id, or 'probe:CH1'
     this.probeBend = {}; // probe cable shapes, like lead.bend: the point the cable is pulled through
+    this.probeColor = {}; // probe cable colour per channel; none = black (old files and the 68 ready-made setups)
     this.bendDrag = null; this.justBent = false;
     this.wireG = el('g', {}, layer); this.probeG = el('g', {}, layer); this.plugG = el('g', {}, layer); this.dragG = el('g', {}, layer);
     svg.addEventListener('pointerdown', e => this.down(e));
@@ -45,7 +46,7 @@ export class Wires {
     if (this.sel && !(pl && pl.getAttribute('data-lead-of') === this.sel)) { this.sel = null; this.layer.classList.remove('hasSel'); this.layer.querySelectorAll('.sel').forEach(x => x.classList.remove('sel')); }
     this.downAt = { x: e.clientX, y: e.clientY, lead: pl ? pl.getAttribute('data-lead-of') : null };
     const p0 = hit.sock ? this.pos(hit.sock) : this.scope.bncPos(hit.bnc);
-    this.tmp = { from: hit, p0, path: el('path', { class: 'leadTmp', 'pointer-events': 'none', fill: 'none', stroke: hit.bnc ? '#222' : LEAD_COLORS[this.color], 'stroke-width': hit.bnc ? 8 : 6.5, 'stroke-linecap': 'round', opacity: .85 }, this.dragG) };
+    this.tmp = { from: hit, p0, path: el('path', { class: 'leadTmp', 'pointer-events': 'none', fill: 'none', stroke: LEAD_COLORS[this.color], 'stroke-width': hit.bnc ? 8 : 6.5, 'stroke-linecap': 'round', opacity: .85 }, this.dragG) };
     this.svg.classList.add('dragging');
   }
   move(e) {
@@ -73,8 +74,8 @@ export class Wires {
     if (!hit) return;
     const d = this.downAt; if (d && d.lead && from.sock && hit.sock === from.sock && Math.hypot(e.clientX - d.x, e.clientY - d.y) < 4) { this.select(this.sel === d.lead ? null : d.lead); return; }
     if (from.sock && hit.sock && from.sock !== hit.sock) { this.addLead(from.sock, hit.sock, this.color); this.hooks.plugged(); }
-    else if (from.bnc && hit.sock) { this.setProbe(from.bnc, hit.sock); this.hooks.plugged(); }
-    else if (from.sock && hit.bnc) { this.setProbe(hit.bnc, from.sock); this.hooks.plugged(); }
+    else if (from.bnc && hit.sock) { this.probeColor[from.bnc] = this.color; this.setProbe(from.bnc, hit.sock); this.hooks.plugged(); }
+    else if (from.sock && hit.bnc) { this.probeColor[hit.bnc] = this.color; this.setProbe(hit.bnc, from.sock); this.hooks.plugged(); }
   }
 
   select(id) {
@@ -92,7 +93,7 @@ export class Wires {
   addLead(a, b, color) { this.sel = null; const id = this.sim.addLead(a, b, color); this.render(); this.hooks.changed(); return id; }
   removeLead(id) { this.sim.removeLead(id); this.render(); this.hooks.changed(); }
   setProbe(ch, sock) { if (this.sim.probes[ch] !== sock) delete this.probeBend[ch]; this.sim.setProbe(ch, sock); this.render(); this.hooks.changed(); }
-  clearAll() { this.probeBend = {}; this.sim.leads = []; for (const k in this.sim.probes) this.sim.probes[k] = null; this.sim.rebuild(); this.render(); this.hooks.changed(); }
+  clearAll() { this.probeBend = {}; this.probeColor = {}; this.sim.leads = []; for (const k in this.sim.probes) this.sim.probes[k] = null; this.sim.rebuild(); this.render(); this.hooks.changed(); }
 
   curve(a, b, heavy) {
     const dx = b[0] - a[0], dy = b[1] - a[1], d = Math.hypot(dx, dy);
@@ -130,20 +131,20 @@ export class Wires {
     }
     for (const ch in this.sim.probes) {
       const s = this.sim.probes[ch]; if (!s || !PROBE_TAG[ch]) continue; // HOV is the socket tooltip's hidden probe, not a lead
-      const a = this.scope.bncPos(ch), b = this.pos(s);
+      const a = this.scope.bncPos(ch), b = this.pos(s), pc = LEAD_COLORS[this.probeColor[ch]] ? this.probeColor[ch] : 'black', c = LEAD_COLORS[pc], dk = DARK[pc];
       const pid = 'probe:' + ch;
       const g = el('g', { class: 'lead probe' + (pid === this.sel ? ' sel' : ''), 'data-probe': ch }, this.probeG);
       const d = this.probeBend[ch] ? this.through(a, b, this.probeBend[ch]) : this.curve(a, b, true);
       el('path', { d, fill: 'none', 'stroke-width': 22, 'stroke-linecap': 'round', class: 'leadGlow' }, g);
-      el('path', { d, fill: 'none', stroke: '#050505', 'stroke-width': 10, 'stroke-linecap': 'round' }, g);
-      el('path', { d, fill: 'none', stroke: '#2a2a2a', 'stroke-width': 7, 'stroke-linecap': 'round' }, g);
+      el('path', { d, fill: 'none', stroke: pc === 'black' ? '#050505' : dk, 'stroke-width': 10, 'stroke-linecap': 'round', class: 'leadOut' }, g);
+      el('path', { d, fill: 'none', stroke: pc === 'black' ? '#2a2a2a' : c, 'stroke-width': 7, 'stroke-linecap': 'round' }, g);
       el('path', { d, fill: 'none', stroke: 'rgba(255,255,255,.18)', 'stroke-width': 2, transform: 'translate(-1,-2)' }, g);
       el('path', { d, fill: 'none', stroke: 'transparent', 'stroke-width': 16, class: 'leadHit' }, g);
       g.addEventListener('click', e => { if (e.detail > 1 || this.justBent) return; e.stopPropagation(); this.select(this.sel === pid ? null : pid); });
       g.addEventListener('contextmenu', e => { e.preventDefault(); this.hooks.leadMenu({ probe: ch }, e); });
       g.addEventListener('pointerenter', e => this.hooks.hoverLead({ probe: ch }, e)); g.addEventListener('pointerleave', () => this.hooks.hoverLead(null));
       g.addEventListener('dblclick', e => { e.stopPropagation(); this.setProbe(ch, null); });
-      const p = plug(s, '#2b2b2b', '#000', PROBE_TAG[ch], pid); p.addEventListener('dblclick', e => { e.stopPropagation(); this.setProbe(ch, null); });
+      const p = plug(s, pc === 'black' ? '#2b2b2b' : c, dk, PROBE_TAG[ch], pid); p.addEventListener('dblclick', e => { e.stopPropagation(); this.setProbe(ch, null); });
       // BNC plug at scope
       const g2 = el('g', { transform: `translate(${a[0]},${a[1]})`, 'data-bnc': ch, class: 'bncPlug' }, this.probeG);
       el('circle', { r: 17, fill: 'url(#bncGrad)', stroke: '#555', 'stroke-width': 1.5 }, g2);

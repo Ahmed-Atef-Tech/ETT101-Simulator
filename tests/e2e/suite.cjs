@@ -148,6 +148,32 @@ T('LD09', 'Leads', 'Scope probes: connect both ways, move, remove, reshape, rese
   const pm2 = await app(p, () => { const g = document.querySelector('.lead.probe[data-probe="CH2"] .leadHit'); const q = g.getPointAtLength(g.getTotalLength() * .5), m = g.getScreenCTM(); return { x: q.x * m.a + m.e, y: q.y * m.d + m.f }; });
   await p.mouse.dblclick(pm2.x, pm2.y); await p.waitForTimeout(60); eq(await app(p, () => __app.sim.probes.CH2), null, 'dblclick removes probe');
 });
+T('LD14', 'Leads', 'Scope probe cables take the colour picked in the rail (reported bug), recolour, save, old files stay black', async p => {
+  const bnc = ch => center(p, `[data-bnc="${ch}"]`);
+  const drawn = ch => app(p, ch => { const g = document.querySelector(`.lead.probe[data-probe="${ch}"]`); const ps = g.querySelectorAll('path'); return [ps[2].getAttribute('stroke'), document.querySelector(`.plug[data-lead-of="probe:${ch}"] circle:nth-child(3)`).getAttribute('fill')]; }, ch);
+  const HEX = { red: '#d3261f', yellow: '#f2c21b', blue: '#1f5fd1', green: '#1f9a45' };
+  for (const c of ['red', 'yellow', 'blue', 'green']) {
+    await p.click(`#colors .plugsw[data-c="${c}"]`);
+    // the cable follows the mouse in the picked colour while dragging
+    const a = await bnc('CH1'), s = await sock(p, 'master.SINE2'); await p.mouse.move(a.x, a.y); await p.mouse.down(); await p.mouse.move((a.x + s.x) / 2, (a.y + s.y) / 2, { steps: 4 });
+    const tmp = await app(p, () => document.querySelector('.leadTmp').getAttribute('stroke')); await p.mouse.move(s.x, s.y, { steps: 4 }); await p.mouse.up(); await p.waitForTimeout(60);
+    eq(tmp, HEX[c], `drag preview ${c}`); eq(await drawn('CH1'), [HEX[c], HEX[c]], `BNC → socket ${c}`);
+  }
+  await p.click('#colors .plugsw[data-c="blue"]'); await drag(p, await sock(p, 'master.SINE100'), await bnc('CH2')); eq((await drawn('CH2'))[0], HEX.blue, 'socket → BNC blue');
+  await p.click('#colors .plugsw[data-c="black"]'); await drag(p, await bnc('EXT'), await sock(p, 'adder.OUT')); eq((await drawn('EXT'))[0], '#2a2a2a', 'black probe looks like a coax');
+  // right-click menu recolours a probe and marks its colour
+  const pm = await app(p, () => { const g = document.querySelector('.lead.probe[data-probe="CH2"] .leadHit'); const q = g.getPointAtLength(g.getTotalLength() * .5), m = g.getScreenCTM(); return { x: q.x * m.a + m.e, y: q.y * m.d + m.f }; });
+  await p.mouse.click(pm.x, pm.y, { button: 'right' }); eq(await app(p, () => document.querySelector('.ctx .plugsw.sel').dataset.c), 'blue', 'menu marks current colour');
+  await p.click('.ctx .plugsw[data-c="red"]'); eq((await drawn('CH2'))[0], HEX.red, 'menu recolour');
+  // saved and restored; black is the default and is not written
+  const snap = await app(p, () => __app.snapshot()); eq(snap.probeColor, { CH1: 'green', CH2: 'red' }, 'snapshot colours');
+  await app(p, s => __app.restore(s), snap); eq([(await drawn('CH1'))[0], (await drawn('CH2'))[0], (await drawn('EXT'))[0]], [HEX.green, HEX.red, '#2a2a2a'], 'restored colours');
+  await p.waitForTimeout(3200); await p.reload(); await p.waitForTimeout(700); eq((await drawn('CH1'))[0], HEX.green, 'colour after reload');
+  // a file without colours (old saves and the ready-made setups) keeps black probes; junk colours are ignored
+  await app(p, () => __app.restore({ v: 2, leads: [], probes: { CH1: 'master.SINE2', CH2: 'adder.OUT' }, probeColor: { CH2: 'purple', CH1: '__proto__' }, mods: {}, scope: {} }));
+  eq([(await drawn('CH1'))[0], (await drawn('CH2'))[0]], ['#2a2a2a', '#2a2a2a'], 'old/bad files → black');
+  await p.click('#colors .plugsw[data-c="yellow"]'); await drag(p, await bnc('CH1'), await sock(p, 'adder.A')); eq((await drawn('CH1'))[0], HEX.yellow, 'moving a probe takes the picked colour');
+});
 T('LD10', 'Leads', 'Socket tooltip: live readings when connected, "Nothing connected" when not', async p => {
   const s = await sock(p, 'adder.A'); await p.mouse.move(s.x, s.y); await p.waitForTimeout(250);
   ok(/Nothing connected/.test(await app(p, () => document.querySelector('#tip').textContent)), 'float text');

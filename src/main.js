@@ -189,10 +189,11 @@ function leadMenu(l, e) {
   closeMenus();
   const m = document.createElement('div'); m.className = 'ctx'; m.style.left = e.clientX + 'px'; m.style.top = e.clientY + 'px';
   const bent = l.probe ? !!wires.probeBend[l.probe] : !!l.bend;
-  m.innerHTML = (l.probe ? '' : Object.keys(LEAD_COLORS).map(c => `<button class="plugsw ${c === l.color ? 'sel' : ''}" data-c="${c}" title="${t('colors')[c]}" style="background:${LEAD_COLORS[c]}"></button>`).join(''))
+  const cur = l.probe ? (wires.probeColor[l.probe] || 'black') : l.color;
+  m.innerHTML = (Object.keys(LEAD_COLORS).map(c => `<button class="plugsw ${c === cur ? 'sel' : ''}" data-c="${c}" title="${t('colors')[c]}" style="background:${LEAD_COLORS[c]}"></button>`).join(''))
     + (bent ? `<button class="rs">${t('resetShape')}</button>` : '') + `<button class="rm">${l.probe ? t('removeProbe') : t('removeLead')}</button>`;
   m.addEventListener('click', ev => {
-    const c = ev.target.dataset.c; if (c) { l.color = c; wires.render(); }
+    const c = ev.target.dataset.c; if (c) { if (l.probe) wires.probeColor[l.probe] = c; else l.color = c; wires.render(); }
     if (ev.target.classList.contains('rs')) wires.resetShape(l);
     if (ev.target.classList.contains('rm')) { if (l.probe) wires.setProbe(l.probe, null); else wires.removeLead(l.id); }
     closeMenus();
@@ -316,13 +317,13 @@ colorsEl.onclick = e => { const c = e.target.dataset.c; if (!c) return; wires.co
 // save / open setups
 function snapshot() {
   const mods = {}; for (const id in sim.mods) mods[id] = { ...sim.mods[id].p };
-  const pb = {}; for (const k of ['CH1', 'CH2', 'EXT']) if (wires.probeBend[k] && sim.probes[k]) pb[k] = wires.probeBend[k];
-  return { v: 2, leads: sim.leads.map(({ a, b, color, bend }) => (bend ? { a, b, color, bend } : { a, b, color })), probes: { CH1: sim.probes.CH1, CH2: sim.probes.CH2, EXT: sim.probes.EXT }, probeBend: pb, mods, scope: { ...scope.st, ref: { ...scope.st.ref, data: null, on: false } }, headphones: sim.headphones }; // the stored reference wave is not saved
+  const pb = {}, pc = {}; for (const k of ['CH1', 'CH2', 'EXT']) { if (wires.probeBend[k] && sim.probes[k]) pb[k] = wires.probeBend[k]; if (wires.probeColor[k] && wires.probeColor[k] !== 'black' && sim.probes[k]) pc[k] = wires.probeColor[k]; }
+  return { v: 2, leads: sim.leads.map(({ a, b, color, bend }) => (bend ? { a, b, color, bend } : { a, b, color })), probes: { CH1: sim.probes.CH1, CH2: sim.probes.CH2, EXT: sim.probes.EXT }, probeBend: pb, probeColor: pc, mods, scope: { ...scope.st, ref: { ...scope.st.ref, data: null, on: false } }, headphones: sim.headphones }; // the stored reference wave is not saved
 }
 function restore(s) {
   const okPt = p => Array.isArray(p) && p.length === 2 && p.every(Number.isFinite);
   sim.leads = []; for (const l of s.leads || []) if (SOCKETS[l.a] && SOCKETS[l.b]) { const n = { id: 'L' + Math.random().toString(36).slice(2, 9), a: l.a, b: l.b, color: LEAD_COLORS[l.color] ? l.color : 'red' }; if (okPt(l.bend)) n.bend = l.bend; sim.leads.push(n); }
-  wires.probeBend = {}; for (const k of ['CH1', 'CH2', 'EXT']) { const p = (s.probeBend || {})[k]; if (okPt(p)) wires.probeBend[k] = p; }
+  wires.probeBend = {}; wires.probeColor = {}; for (const k of ['CH1', 'CH2', 'EXT']) { const p = (s.probeBend || {})[k]; if (okPt(p)) wires.probeBend[k] = p; const c = (s.probeColor || {})[k]; if (typeof c === 'string' && LEAD_COLORS.hasOwnProperty(c)) wires.probeColor[k] = c; }
   for (const k of ['CH1', 'CH2', 'EXT']) { const v = (s.probes || {})[k]; sim.probes[k] = v && SOCKETS[v] ? v : null; }
   for (const id in MOD_DEFAULT) for (const p in MOD_DEFAULT[id]) sim.mods[id].set(p, MOD_DEFAULT[id][p]);
   { const d = JSON.parse(SCOPE_DEFAULT); for (const k in d) scope.st[k] = d[k]; }
