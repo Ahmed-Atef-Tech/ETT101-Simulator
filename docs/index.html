@@ -143,6 +143,17 @@ html[lang="ar"] .step-card h3 { text-align: right; }
 .shot img { border-radius: 16px; width: 100%; height: auto; }
 .shot figcaption { padding: 14px 8px 4px; color: var(--ink-2); font-size: .95rem; }
 
+/* about me: the main site's contact panel, photo behind */
+.about { margin: clamp(80px, 10vw, 140px) 10px 0; padding: clamp(40px, 7vw, 96px) clamp(20px, 5vw, 72px); min-height: 460px; display: flex; flex-direction: column; justify-content: flex-end; gap: 22px; }
+.panel-bg { position: absolute; inset: 0; z-index: -1; }
+.panel-bg img { width: 100%; height: 100%; object-fit: cover; object-position: 62% 25%; }
+.panel-bg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(5,7,8,.62) 0%, rgba(5,7,8,.18) 45%, rgba(5,7,8,0) 70%), linear-gradient(180deg, rgba(5,7,8,.1) 0%, rgba(5,7,8,0) 40%, rgba(5,7,8,.75) 100%); }
+html[dir="rtl"] .panel-bg::after { background: linear-gradient(270deg, rgba(5,7,8,.62) 0%, rgba(5,7,8,.18) 45%, rgba(5,7,8,0) 70%), linear-gradient(180deg, rgba(5,7,8,.1) 0%, rgba(5,7,8,0) 40%, rgba(5,7,8,.75) 100%); }
+.about h2 { font-weight: 700; font-size: clamp(2.2rem, 5.6vw, 4.8rem); line-height: .95; letter-spacing: -.05em; max-width: 14ch; }
+html[lang="ar"] .about h2 { line-height: 1.2; }
+.about .sub { color: rgba(243, 244, 241, .82); max-width: 48ch; }
+.about .row-b { display: flex; flex-wrap: wrap; gap: 10px; }
+@media (max-width: 760px) { .panel-bg img { object-position: 50% 22%; } }
 footer { padding-block: 64px 40px; color: var(--ink-2); font-size: .92rem; }
 footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; }
 .foot-mark { display: flex; align-items: center; gap: 16px; }
@@ -258,6 +269,13 @@ html[lang="en"] [data-ar] { display: none !important; }
       </figure>
     </section>
   </div>
+  <section class="panel about" aria-labelledby="about-title">
+    <div class="panel-bg" aria-hidden="true"><picture><source media="(max-width: 760px)" srcset="https://ahmed-atef-tech.github.io/assets/m/contact.jpg"><img src="https://ahmed-atef-tech.github.io/assets/photo/contact.jpg" alt="" loading="lazy" width="2200" height="1228"></picture></div>
+    <h2 id="about-title"><span data-ar>اتعمل بواسطة أحمد عاطف</span><span data-en>Made by Ahmed Atef</span></h2>
+    <p class="sub" data-ar>مهندس تصميم هاردوير: تصميم PCB، إلكترونيات مدمجة، والجزء الميكانيكي اللي حواليها. شوف شغلي التاني على البورتفوليو.</p>
+    <p class="sub" data-en>Hardware design engineer: PCB design, embedded electronics, and the mechanical side around them. See my other work on my portfolio.</p>
+    <div class="row-b"><a class="btn btn-light" href="https://ahmed-atef-tech.github.io/"><span data-ar>اعرف المزيد عني</span><span data-en>Learn more about me</span></a></div>
+  </section>
 </main>
 
 <footer><div class="wrap">
