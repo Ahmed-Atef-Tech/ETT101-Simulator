@@ -62,6 +62,15 @@ button { font: inherit; color: inherit; }
 .sock:hover .sockHit { fill: rgba(242,194,27,.35); }
 #bench.dragging .sock:hover .sockHit { fill: rgba(242,194,27,.6); }
 .lead { cursor: pointer; } .lead:hover .leadOut { stroke: #fff; }
+/* one click highlights a lead: soft glow, its plugs ringed, every other lead dimmed */
+.leadGlow { stroke: transparent; pointer-events: none; }
+.lead.sel .leadGlow { stroke: rgba(255, 244, 196, .55); filter: blur(3px); animation: leadPulse 1.4s ease-in-out infinite alternate; }
+.lead.sel .leadOut { stroke: #fff; }
+.plugGlow { fill: transparent; pointer-events: none; }
+.plug.sel .plugGlow { fill: rgba(255, 244, 196, .5); filter: blur(2px); animation: leadPulse 1.4s ease-in-out infinite alternate; }
+#wires.hasSel .lead:not(.sel), #wires.hasSel .plug:not(.sel) { opacity: .32; transition: opacity .15s; }
+@keyframes leadPulse { from { opacity: .55; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .lead.sel .leadGlow, .plug.sel .plugGlow { animation: none; } }
 .infoLayer { display: none; } body.training .infoLayer { display: inline; }
 .infoBtn:hover circle { fill: #ffd84d; }
 #hint { position: fixed; bottom: 10px; inset-inline-start: 14px; font-size: 13px; color: var(--mat-ink); pointer-events: none; z-index: 2; }

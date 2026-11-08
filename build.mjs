@@ -10,7 +10,7 @@ const setupsPlugin = { name: 'setups', setup(b) {
   });
 } };
 const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-const r = await esbuild.build({ entryPoints: ['src/main.js'], bundle: true, minify: true, format: 'iife', write: false, target: 'chrome100', plugins: [setupsPlugin], loader: { '.md': 'text' }, define: { __APP_VERSION__: JSON.stringify(pkg.version) } });
+const r = await esbuild.build({ entryPoints: ['src/main.js'], bundle: true, minify: process.env.NOMIN ? false : true, format: 'iife', write: false, target: 'chrome100', plugins: [setupsPlugin], loader: { '.md': 'text' }, define: { __APP_VERSION__: JSON.stringify(pkg.version) } });
 const js = r.outputFiles[0].text;
 // embed fonts so the app looks the same offline
 const font = (fam, file, w) => `@font-face{font-family:'${fam}';font-style:normal;font-weight:${w};font-display:block;src:url(data:font/woff2;base64,${fs.readFileSync(file).toString('base64')}) format('woff2');}`;

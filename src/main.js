@@ -124,14 +124,14 @@ svg.addEventListener('wheel', e => {
 let pan = null, suppressCtx = false;
 svg.addEventListener('pointerdown', e => {
   const onMat = e.target.classList.contains('mat') || e.target === svg;
-  if ((e.button === 0 && onMat) || e.button === 1 || e.button === 2) { pan = { x: e.clientX, y: e.clientY, vx: view.x, vy: view.y, moved: false }; if (e.button !== 2) e.preventDefault(); }
+  if ((e.button === 0 && onMat) || e.button === 1 || e.button === 2) { pan = { x: e.clientX, y: e.clientY, vx: view.x, vy: view.y, moved: false, mat: e.button === 0 && onMat }; if (e.button !== 2) e.preventDefault(); }
 });
 window.addEventListener('pointermove', e => {
   if (!pan) return; const dx = e.clientX - pan.x, dy = e.clientY - pan.y; if (!pan.moved && Math.hypot(dx, dy) < 4) return;
   if (!pan.moved) { pan.moved = true; svg.classList.add('panning'); if (viewMode !== 'free') setView('free'); }
   const r = svg.getBoundingClientRect(), s = view.w / r.width; view.x = pan.vx - dx * s; view.y = pan.vy - dy * s; applyView();
 });
-window.addEventListener('pointerup', () => { if (pan && pan.moved) suppressCtx = true; pan = null; svg.classList.remove('panning'); });
+window.addEventListener('pointerup', () => { if (pan && pan.moved) suppressCtx = true; if (pan && pan.mat && !pan.moved && wires.sel) wires.select(null); pan = null; svg.classList.remove('panning'); });
 svg.addEventListener('dblclick', e => { if (e.target.classList.contains('mat')) setView('both'); });
 svg.addEventListener('contextmenu', e => { if (suppressCtx) { e.preventDefault(); suppressCtx = false; return; } if (!e.target.closest('.lead')) e.preventDefault(); });
 // full screen
@@ -377,7 +377,7 @@ setInterval(() => { try { localStorage.setItem('ett.autosave', JSON.stringify(sn
 try { const a = localStorage.getItem('ett.autosave'); if (a) restore(JSON.parse(a)); } catch (e) { }
 
 window.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { closeModal(); closeMenus(); $('#settings').classList.remove('open'); library.close(); closeBug(); }
+  if (e.key === 'Escape') { closeModal(); closeMenus(); $('#settings').classList.remove('open'); library.close(); closeBug(); if (wires.sel) wires.select(null); }
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.ctrlKey || e.altKey || e.metaKey) return;
   if (e.key === '1') setView('kit'); if (e.key === '2') setView('both'); if (e.key === '3') setView('scope');
   if (e.key === 'f' || e.key === 'F') toggleFull();
