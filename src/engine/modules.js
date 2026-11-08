@@ -253,11 +253,21 @@ class Exor extends Mod {
 //   Vol.1 FSK steps 6-8: GAIN at half travel (G = 1.5), FREQ at a quarter (5 kHz), LINE CODE +-2 V in -> both tones must stay
 //   above 0 Hz -> 5 kHz - 2 V * 1.5 * K0 > 0 -> K0 < 1.67 kHz/V.   Model: K0 = 1.3 kHz/V (LO), 13 kHz/V (HI, 10x, ASSUMED).
 export const VCO_K0_LO = 1.3e3, VCO_K0_HI = 13e3;
+export const VCO_DRIFT = 1e-4; // rms relative frequency wander (ASSUMED, see VCO)
 class VCO extends Mod {
-  constructor(id, sim) { super(id, sim); this.outputs('SINE', 'DIG'); this.knob('GAIN', 0.5); this.knob('FREQ', 0.5); this.p.HI = 0; this.ph = 0; }
-  f0() { return this.p.HI ? 60e3 + 80e3 * this.p.FREQ : 1e3 + 16e3 * this.p.FREQ; } // spec: LO 1..17 kHz, HI 60..140 kHz, linear control
+  constructor(id, sim) { super(id, sim); this.outputs('SINE', 'DIG'); this.knob('GAIN', 0.5); this.knob('FREQ', 0.5); this.p.HI = 0; this.ph = 0; this.drift = 0; this.seed = 0x2f6b1d; }
+  // spec: LO 1..17 kHz, HI 60..140 kHz, linear control. A free-running oscillator is never exactly on frequency: its rest
+  // frequency wanders slowly (ASSUMED 1e-4 rms, ~1.5 s), so a VCO used as a local carrier is never phase-locked to the
+  // MASTER SIGNALS 100 kHz (Term 1 Exp 4 steps 33-38; the reason for carrier acquisition with a PLL, Term 2 Exp 8).
+  f0() { return (this.p.HI ? 60e3 + 80e3 * this.p.FREQ : 1e3 + 16e3 * this.p.FREQ) * (1 + this.drift); }
+  wander(n) { // Ornstein-Uhlenbeck step, seeded so every run of a setup is the same
+    const rnd = () => { this.seed = (Math.imul(this.seed, 1664525) + 1013904223) >>> 0; return (this.seed + 0.5) / 4294967296; };
+    const g = Math.sqrt(-2 * Math.log(rnd())) * Math.cos(2 * Math.PI * rnd()), dt = n / FS, tau = 1.5, sd = VCO_DRIFT;
+    this.drift += -this.drift * dt / tau + sd * Math.sqrt(2 * dt / tau) * g;
+  }
   sens() { return (this.p.HI ? VCO_K0_HI : VCO_K0_LO) * (1 + this.p.GAIN); }
   process(n) {
+    this.wander(n);
     const x = this.in.IN, f0 = this.f0(), k = this.sens(), s = this.out.SINE, d = this.out.DIG;
     const fmin = this.p.HI ? 1e3 : 50, fmax = this.p.HI ? 300e3 : 60e3; let ph = this.ph;
     for (let i = 0; i < n; i++) {

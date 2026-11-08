@@ -37,7 +37,7 @@
  "mods": {
   "vco": {
    "HI": 0,
-   "GAIN": 0.923,
+   "GAIN": 0.9226,
    "FREQ": 0.5625
   },
   "vdc": {
@@ -109,8 +109,8 @@
   "meas": {
    "src": "CH2",
    "items": [
-    "Vpp",
-    "Freq",
+    "Vavg",
+    null,
     null
    ],
    "all": false

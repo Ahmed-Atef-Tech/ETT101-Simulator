@@ -101,7 +101,7 @@ const T1 = 'Term1';
   const f7 = S('Term 1 Exp 7 Part B: zero-crossing detector; VDC (CH1) shifts the VCO, BASEBAND LPF DC (CH2) follows it',
     [['vdc.VDC', 'vco.IN'], ['vco.SINE', 'util.CIN'], ['vdc.GND', 'util.REF'], ['util.COMP', 'tpg.CLK'], ['tpg.Q1', 'channel.BB_IN']],
     { CH1: 'vdc.VDC', CH2: 'channel.BB' }, { vco: { HI: 0, GAIN: 1, FREQ: +((10e3 - 1e3) / 16e3).toFixed(4) }, vdc: { VDC: 0.9 }, tpg: { DELAY: 0, WIDTH: +((12 - 5) / 35).toFixed(4) } },
-    scope({ vd: V[1], pos: 1 }, { vd: V[0.5], pos: -2 }, '50u', TRIG('CH2', 0))); // step 9: trigger source CH2 (CH1 is DC)
+    scope({ vd: V[1], pos: 1 }, { vd: V[0.5], pos: -2 }, '50u', { ...TRIG('CH2', 0), meas: { src: 'CH2', items: ['Vavg', null, null], all: false } })); // step 9: trigger source CH2 (CH1 is DC); step 26 watches a DC level, so the readout is its average
   const s = build(f7); const fr = () => { const [y] = grab(s, 'vco.SINE', null, 0.02); let c = 0, f = -1, l = -1; for (let i = 1; i < y.length; i++) if (y[i - 1] < 0 && y[i] >= 0) { if (f < 0) f = i; else { c++; l = i; } } return c / ((l - f) / FS); };
   f7.mods.vco.GAIN = solve(k => { s.mods.vco.set('GAIN', k); return fr(); }, 15e3);
   add(T1, 'Exp7-FM-Demodulation', f7);
