@@ -3,7 +3,7 @@ import { FS } from './engine/dsp.js';
 import { SOCKETS } from './engine/modules.js';
 import { el } from './ui/svg.js';
 import { Panel, knobReadout } from './ui/panel.js';
-import { Scope, fmtV, fmtF } from './ui/scope.js';
+import { Scope, fmtV, fmtF, VDIV, TDIV } from './ui/scope.js';
 import { Wires, LEAD_COLORS } from './ui/wires.js';
 import { Audio } from './ui/audio.js';
 import { SOCKET_NAME, SOCKET_POS, BLOCKS } from './ui/layout.js';
@@ -304,7 +304,44 @@ function restore(s) {
   sim.headphones = !!s.headphones; sim.rebuild(); wires.render(); panel.refreshAll(); drawHeadphones();
 }
 function openGuideFor(id) { exp = EXPERIMENTS.find(x => x.id === id) || null; stepI = 0; if (!training) setTraining(true); $('#guide').classList.add('open'); renderGuide(); }
-const library = initLibrary({ restore, toast, hasWork: () => sim.leads.length > 0 || !!(sim.probes.CH1 || sim.probes.CH2), openGuide: openGuideFor });
+let lastLoaded = null; // the ready-made experiment on the kit, until the wiring changes
+const library = initLibrary({ restore, toast, hasWork: () => sim.leads.length > 0 || !!(sim.probes.CH1 || sim.probes.CH2), openGuide: openGuideFor, onLoaded: x => { lastLoaded = { ...x, leads: JSON.stringify(sim.leads.map(l => [l.a, l.b])) }; } });
+
+// ---------- bug report: opens WhatsApp with the report written out ----------
+const BUG_PHONE = '201019876314';
+const APP_VERSION = (window.ett && window.ett.version) || (typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '?');
+function deviceText() {
+  const ua = navigator.userAgent, os = /Windows/i.test(ua) ? 'Windows' : /Mac OS X/i.test(ua) ? 'Mac' : /Android/i.test(ua) ? 'Android' : /Linux/i.test(ua) ? 'Linux' : 'other';
+  return `${os}, ${window.ett ? 'desktop app' : 'browser'}, screen ${screen.width}x${screen.height}`;
+}
+function setupText() {
+  const s = scope.st, v = ch => { const c = s.ch[ch]; return `${c.on ? '' : 'off '}${VDIV[c.vd] >= 1 ? VDIV[c.vd] + ' V' : VDIV[c.vd] * 1000 + ' mV'}/div ${c.cpl}`; };
+  const td = TDIV[s.td], tdTxt = td >= 1e-3 ? td * 1e3 + ' ms' : td >= 1e-6 ? +(td * 1e6).toFixed(1) + ' µs' : td * 1e9 + ' ns';
+  const same = lastLoaded && lastLoaded.leads === JSON.stringify(sim.leads.map(l => [l.a, l.b]));
+  const lines = [
+    `Experiment: ${same ? `${lastLoaded.en} (${lastLoaded.f}, ${lastLoaded.page})` : lastLoaded ? `changed from ${lastLoaded.en}` : 'own wiring'}`,
+    `Leads (${sim.leads.length}): ${sim.leads.map(l => `${l.a}-${l.b}`).join(', ') || 'none'}`,
+    `Probes: CH1 ${sim.probes.CH1 || '-'}, CH2 ${sim.probes.CH2 || '-'}, EXT ${sim.probes.EXT || '-'}`,
+    `Scope: CH1 ${v('CH1')}, CH2 ${v('CH2')}, ${tdTxt}/div, trigger ${s.trig.src} ${s.trig.mode} ${s.trig.level.toFixed(2)} V, ${s.run ? 'running' : 'stopped'}${s.math.on ? ', ' + s.math.kind : ''}`,
+  ];
+  return lines.join('\n');
+}
+function openBug() { closeMenus(); $('#settings').classList.remove('open'); $('#bugErr').textContent = ''; $('#bugWhat').removeAttribute('aria-invalid'); $('#bugDlg').classList.add('open'); setTimeout(() => $('#bugWhat').focus(), 30); }
+function closeBug() { $('#bugDlg').classList.remove('open'); }
+$('#btnBug').onclick = openBug; $('#bugX').onclick = closeBug;
+$('#bugDlg').addEventListener('pointerdown', e => { if (e.target.id === 'bugDlg') closeBug(); });
+$('#bugWhat').addEventListener('input', () => { if ($('#bugWhat').value.trim()) { $('#bugErr').textContent = ''; $('#bugWhat').removeAttribute('aria-invalid'); } });
+$('#bugForm').onsubmit = e => {
+  e.preventDefault();
+  const what = $('#bugWhat').value.trim(), steps = $('#bugSteps').value.trim();
+  if (!what) { $('#bugErr').textContent = t('bugEmpty'); $('#bugWhat').setAttribute('aria-invalid', 'true'); $('#bugWhat').focus(); return; }
+  let msg = `🐞 Bug report — ETT-101 Simulator v${APP_VERSION}\n\n${what}`;
+  if (steps) msg += `\n\nBefore it: ${steps}`;
+  if ($('#bugAttach').checked) msg += `\n\n— Details —\nDevice: ${deviceText()}\nLanguage: ${getLang()}\n${setupText()}`;
+  if (msg.length > 3500) msg = msg.slice(0, 3500) + '…';
+  openLink(`https://wa.me/${BUG_PHONE}?text=${encodeURIComponent(msg)}`);
+  $('#bugWhat').value = ''; $('#bugSteps').value = ''; closeBug(); toast(t('bugOpened'));
+};
 $('#btnLib').onclick = () => library.toggleLib();
 $('#btnRef').onclick = () => library.toggleRef();
 $('#btnSave').onclick = () => { $('#settings').classList.remove('open'); download(new Blob([JSON.stringify(snapshot(), null, 1)], { type: 'application/json' }), `setup-${stamp()}.ett.json`); toast(t('savedSetup')); };
@@ -318,8 +355,8 @@ setInterval(() => { try { localStorage.setItem('ett.autosave', JSON.stringify(sn
 try { const a = localStorage.getItem('ett.autosave'); if (a) restore(JSON.parse(a)); } catch (e) { }
 
 window.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { closeModal(); closeMenus(); $('#settings').classList.remove('open'); library.close(); }
-  if (e.target.tagName === 'INPUT' || e.ctrlKey || e.altKey || e.metaKey) return;
+  if (e.key === 'Escape') { closeModal(); closeMenus(); $('#settings').classList.remove('open'); library.close(); closeBug(); }
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.ctrlKey || e.altKey || e.metaKey) return;
   if (e.key === '1') setView('kit'); if (e.key === '2') setView('both'); if (e.key === '3') setView('scope');
   if (e.key === 'f' || e.key === 'F') toggleFull();
 });

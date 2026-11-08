@@ -3,8 +3,8 @@ import { el } from './svg.js';
 import { FS } from '../engine/dsp.js';
 import { RING, RMASK } from '../engine/sim.js';
 
-const VDIV = [0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20]; // 1 mV/div .. 20 V/div (UTD2000 manual)
-const TDIV = [0.5e-6, 1e-6, 2e-6, 5e-6, 10e-6, 20e-6, 50e-6, 100e-6, 200e-6, 500e-6, 1e-3, 2e-3, 5e-3, 10e-3, 20e-3, 50e-3];
+export const VDIV = [0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20]; // 1 mV/div .. 20 V/div (UTD2000 manual)
+export const TDIV = [0.5e-6, 1e-6, 2e-6, 5e-6, 10e-6, 20e-6, 50e-6, 100e-6, 200e-6, 500e-6, 1e-3, 2e-3, 5e-3, 10e-3, 20e-3, 50e-3];
 const PROBES = [1, 10, 100, 1000];
 const COL = { CH1: '#f6e51d', CH2: '#3fd6f7', MATH: '#e070f5', REF: '#ffffff' };
 const HDIV = 12, VDIVS = 8;

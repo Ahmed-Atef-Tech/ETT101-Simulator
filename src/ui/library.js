@@ -19,7 +19,7 @@ export function pageText(book, pg) {
   return { word: pg.label ? (ar ? 'ص' : 'p.') : '', n: pg.label || '', pdf: pg.pdf };
 }
 
-export function initLibrary({ restore, toast, hasWork, openGuide }) {
+export function initLibrary({ restore, toast, hasWork, openGuide, onLoaded }) {
   const lib = $('#lib'), ref = $('#refp');
   let tab = TABS.includes(store.get('ett.libTab')) ? store.get('ett.libTab') : 't1', query = '';
 
@@ -72,6 +72,7 @@ export function initLibrary({ restore, toast, hasWork, openGuide }) {
     if (hasWork() && !confirm(t('libReplace'))) return;
     const g = GROUPS.find(g => g.items.some(it => it.f === f)), it = g.items.find(it => it.f === f), p = pageText(g.book, it.pg);
     restore(JSON.parse(JSON.stringify(setup)));
+    if (onLoaded) onLoaded({ f, en: it.en, page: p.n ? `p. ${p.n}` : `PDF ${p.pdf}` });
     closeLib();
     toast(`${getLang() === 'ar' ? it.ar : it.en}  ·  ${p.n ? `${p.word} ${p.n}` : `PDF ${p.pdf}`}`);
   });

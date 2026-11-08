@@ -193,6 +193,20 @@ html[lang="ar"] .rintro, html[lang="ar"] .lnote { line-height: 1.85; }
 .rdoc th { background: #eef0ee; font-weight: 600; position: sticky; top: 0; }
 .rdoc td:first-child { font-weight: 600; white-space: nowrap; }
 @media (max-width: 1400px) { .key.iconable span[data-t] { display: none; } .key.iconable { padding: 0 9px; } }
+/* ---------- bug report ---------- */
+.dlgWrap { position: fixed; inset: 0; background: rgba(16, 24, 28, .5); display: none; z-index: 32; }
+.dlgWrap.open { display: grid; place-items: center; }
+.dlg { width: min(520px, calc(100vw - 32px)); padding: 16px 22px 18px; user-select: text; }
+.fl { display: block; font-size: 15px; font-weight: 600; margin: 10px 0 5px; }
+.dlg textarea { width: 100%; resize: vertical; border: 1px solid #9aa3a7; border-radius: 4px; padding: 8px 10px; font: inherit; font-size: 15px; line-height: 1.5; color: var(--ink); background: #fff; }
+.dlg textarea:focus-visible { outline: 2px solid var(--probe); outline-offset: 0; border-color: var(--ink); }
+.dlg textarea[aria-invalid="true"] { border-color: var(--warn); }
+.ferr { color: var(--warn); font-size: 13.5px; min-height: 1.2em; margin: 3px 0 0; }
+.fchk { display: flex; gap: 8px; align-items: flex-start; font-size: 14px; margin: 12px 0 0; cursor: pointer; line-height: 1.45; }
+.fchk input { margin-top: 3px; }
+.send { display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 14px; border: 0; border-radius: 4px; background: #1f8f4e; color: #fff; font-weight: 600; font-size: 14.5px; cursor: pointer; }
+.send:hover { background: #18773f; }
+.send svg { width: 17px; height: 17px; }
 @media (max-width: 760px) { .rbody { grid-template-columns: 1fr; } .rtoc { display: none; } .lrow { grid-template-columns: 1fr auto; } .lpart, .lgo { display: none; } }
 @media (max-width: 1150px) { .leads .lbl, .brand .sub { display: none; } }
 </style>
@@ -212,6 +226,7 @@ html[lang="ar"] .rintro, html[lang="ar"] .lnote { line-height: 1.85; }
   </div>
   <button class="key" id="btnFull" title=""><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4"/></svg></button>
   <div class="leads"><span class="lbl" data-t="leads"></span><span id="colors" class="leads"></span></div>
+  <button class="key iconable" id="btnBug" data-hint="bugHint"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="4.5" y="4.5" width="7" height="9" rx="3.5"/><path d="M6 4.6V4a2 2 0 0 1 4 0v.6M8 7.5V13M1.8 8.5h2.7M11.5 8.5h2.7M2.5 4.8l2.2 1.6M13.5 4.8l-2.2 1.6M2.5 13l2.3-1.4M13.5 13l-2.3-1.4"/></svg><span data-t="bug"></span></button>
   <button class="key" id="btnSettings"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 4h7M12 4h2M2 8h2M7 8h7M2 12h9M14 12h0"/><circle cx="10.5" cy="4" r="1.6"/><circle cx="5.5" cy="8" r="1.6"/><circle cx="12.5" cy="12" r="1.6"/></svg><span data-t="settings"></span></button>
   <input type="file" id="fileIn" accept=".json" hidden>
 </header>
@@ -234,6 +249,14 @@ html[lang="ar"] .rintro, html[lang="ar"] .lnote { line-height: 1.85; }
 </div>
 <div id="modal"><article id="modalBox" class="sheet"><div class="sheetHead"><h2 id="modalTitle" dir="ltr"></h2><button class="x" id="modalX" aria-label="Close">✕</button></div><div id="modalBody"></div>
   <div class="mfoot"><button class="video" id="modalYT"><svg viewBox="0 0 16 16"><path d="M5 3.5v9l7.5-4.5z" fill="currentColor"/></svg><span></span></button><button class="video" id="modalClose" data-t="close"></button></div></article></div>
+<div id="bugDlg" class="dlgWrap" role="dialog" aria-modal="true" aria-labelledby="bugTitle"><form class="sheet dlg" id="bugForm">
+  <div class="sheetHead"><h2 id="bugTitle" data-t="bugTitle"></h2><button class="x" type="button" id="bugX" aria-label="Close">✕</button></div>
+  <label class="fl" for="bugWhat" data-t="bugWhat"></label><textarea id="bugWhat" rows="4" maxlength="1200"></textarea><p class="ferr" id="bugErr" aria-live="polite"></p>
+  <label class="fl" for="bugSteps" data-t="bugSteps"></label><textarea id="bugSteps" rows="2" maxlength="600"></textarea>
+  <label class="fchk"><input type="checkbox" id="bugAttach" checked> <span data-t="bugAttach"></span></label>
+  <p class="small" data-t="bugNote"></p>
+  <div class="mfoot"><span></span><button class="send" type="submit"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17.5 14.4c-.3-.1-1.8-.9-2-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.4-.5c.2-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.1-.3-.2-.6-.3zM12 21.8a9.9 9.9 0 0 1-5-1.4l-.4-.2-3.7 1 1-3.6-.2-.4A9.9 9.9 0 1 1 12 21.8zm8.4-18.3A11.8 11.8 0 0 0 .2 11.9c0 2.1.5 4.1 1.6 5.9L.1 24l6.3-1.7a11.9 11.9 0 0 0 5.7 1.4A11.9 11.9 0 0 0 20.4 3.5z"/></svg><span data-t="bugSend"></span></button></div>
+</form></div>
 <div id="tip"></div><div id="toast"></div>
 <script type="module" src="./main.js"></script>
 </body>
