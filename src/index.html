@@ -192,7 +192,16 @@ html[lang="ar"] .rintro, html[lang="ar"] .lnote { line-height: 1.85; }
 .rdoc th, .rdoc td { border-bottom: 1px solid #dde1e3; padding: 6px 8px; vertical-align: top; text-align: left; }
 .rdoc th { background: #eef0ee; font-weight: 600; position: sticky; top: 0; }
 .rdoc td:first-child { font-weight: 600; white-space: nowrap; }
-@media (max-width: 1400px) { .key.iconable span[data-t] { display: none; } .key.iconable { padding: 0 9px; } }
+/* the rail fits itself to the window (main.js fitRail): c1 hides the labels of the new buttons, c2 more labels, c3 the brand */
+#rail.c1 .key.iconable span[data-t] { display: none; } #rail.c1 .key.iconable { padding: 0 9px; }
+#rail.c2 .leads .lbl, #rail.c2 .brand .sub, #rail.c2 #btnGuide span[data-t], #rail.c2 #btnSettings span[data-t] { display: none; }
+#rail.c2 #btnGuide, #rail.c2 #btnSettings { padding: 0 9px; }
+#rail.c3 .brand, #rail.c3 .toggle span[data-t] { display: none; } #rail.c3 { gap: 8px; padding: 0 8px; }
+.bugFallback { display: none; margin-top: 12px; padding: 10px 12px; border: 1px solid #e0b25c; background: #fff7e6; border-radius: 4px; font-size: 14px; line-height: 1.55; }
+.bugFallback.show { display: block; }
+.bugFallback a { color: #0f5a8a; font-weight: 600; word-break: break-all; }
+.bugFallback .row2 { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+.bugFallback button { height: 30px; padding: 0 12px; border: 1px solid #9aa3a7; background: #fff; border-radius: 4px; cursor: pointer; font-weight: 500; }
 /* ---------- bug report ---------- */
 .dlgWrap { position: fixed; inset: 0; background: rgba(16, 24, 28, .5); display: none; z-index: 32; }
 .dlgWrap.open { display: grid; place-items: center; }
@@ -255,6 +264,8 @@ html[lang="ar"] .rintro, html[lang="ar"] .lnote { line-height: 1.85; }
   <label class="fl" for="bugSteps" data-t="bugSteps"></label><textarea id="bugSteps" rows="2" maxlength="600"></textarea>
   <label class="fchk"><input type="checkbox" id="bugAttach" checked> <span data-t="bugAttach"></span></label>
   <p class="small" data-t="bugNote"></p>
+  <div class="bugFallback" id="bugFallback" aria-live="polite"><span data-t="bugBlocked"></span> <b dir="ltr">+20 101 987 6314</b>
+    <div class="row2"><a id="bugLink" href="#" target="_blank" rel="noopener" data-t="bugOpenLink"></a><button type="button" id="bugCopy" data-t="bugCopy"></button></div></div>
   <div class="mfoot"><span></span><button class="send" type="submit"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17.5 14.4c-.3-.1-1.8-.9-2-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.4-.5c.2-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.1-.3-.2-.6-.3zM12 21.8a9.9 9.9 0 0 1-5-1.4l-.4-.2-3.7 1 1-3.6-.2-.4A9.9 9.9 0 1 1 12 21.8zm8.4-18.3A11.8 11.8 0 0 0 .2 11.9c0 2.1.5 4.1 1.6 5.9L.1 24l6.3-1.7a11.9 11.9 0 0 0 5.7 1.4A11.9 11.9 0 0 0 20.4 3.5z"/></svg><span data-t="bugSend"></span></button></div>
 </form></div>
 <div id="tip"></div><div id="toast"></div>

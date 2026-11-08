@@ -196,7 +196,14 @@ window.addEventListener('pointerdown', e => {
 });
 
 // =============================================== modal ===============================================
-function openLink(url) { if (!url) return; if (window.ett && window.ett.openExternal) window.ett.openExternal(url); else window.open(url, '_blank'); }
+// returns false when the page may not open windows (a sandboxed preview, a popup blocker)
+function openLink(url) {
+  if (!url) return false;
+  if (window.ett && window.ett.openExternal) { window.ett.openExternal(url); return true; }
+  let w = null; try { w = window.open(url, '_blank'); } catch (e) { }
+  if (w) { try { w.opener = null; } catch (e) { } return true; }
+  return false;
+}
 function showModal(title, html, link) {
   $('#modalTitle').textContent = title; $('#modalBody').innerHTML = html;
   const yt = $('#modalYT'); yt.disabled = !link; yt.querySelector('span').textContent = link ? t('watch') : t('videoSoon'); yt.onclick = link ? () => openLink(link) : null;
@@ -257,6 +264,13 @@ function drawGhost() {
 }
 
 // =============================================== rail & settings ===============================================
+function fitRail() {
+  const r = $('#rail'); r.classList.remove('c1', 'c2', 'c3');
+  const fits = () => { const box = r.getBoundingClientRect(), pad = 6; return r.scrollWidth <= r.clientWidth && [...r.children].every(el => { if (el.hidden || el.type === 'file') return true; const b = el.getBoundingClientRect(); return !b.width || (b.left >= box.left + pad - 1 && b.right <= box.right - pad + 1); }); };
+  for (const c of ['c1', 'c2', 'c3']) { if (fits()) break; r.classList.add(c); }
+}
+window.addEventListener('resize', fitRail);
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitRail);
 function applyTexts() {
   document.querySelectorAll('[data-t]').forEach(n => { n.textContent = t(n.dataset.t); });
   document.querySelectorAll('[data-hint]').forEach(n => { n.title = t(n.dataset.hint); });
@@ -267,6 +281,7 @@ function applyTexts() {
   $('#tGuide .state').textContent = training ? t('on') : t('off');
   drawHeadphones(); if ($('#guide').classList.contains('open')) renderGuide();
   if (typeof library !== 'undefined') library.relabel();
+  fitRail();
 }
 function setTraining(on) {
   training = on; document.body.classList.toggle('training', on);
@@ -326,7 +341,7 @@ function setupText() {
   ];
   return lines.join('\n');
 }
-function openBug() { closeMenus(); $('#settings').classList.remove('open'); $('#bugErr').textContent = ''; $('#bugWhat').removeAttribute('aria-invalid'); $('#bugDlg').classList.add('open'); setTimeout(() => $('#bugWhat').focus(), 30); }
+function openBug() { closeMenus(); $('#settings').classList.remove('open'); $('#bugErr').textContent = ''; $('#bugFallback').classList.remove('show'); $('#bugWhat').removeAttribute('aria-invalid'); $('#bugDlg').classList.add('open'); setTimeout(() => $('#bugWhat').focus(), 30); }
 function closeBug() { $('#bugDlg').classList.remove('open'); }
 $('#btnBug').onclick = openBug; $('#bugX').onclick = closeBug;
 $('#bugDlg').addEventListener('pointerdown', e => { if (e.target.id === 'bugDlg') closeBug(); });
@@ -339,9 +354,16 @@ $('#bugForm').onsubmit = e => {
   if (steps) msg += `\n\nBefore it: ${steps}`;
   if ($('#bugAttach').checked) msg += `\n\n— Details —\nDevice: ${deviceText()}\nLanguage: ${getLang()}\n${setupText()}`;
   if (msg.length > 3500) msg = msg.slice(0, 3500) + '…';
-  openLink(`https://wa.me/${BUG_PHONE}?text=${encodeURIComponent(msg)}`);
-  $('#bugWhat').value = ''; $('#bugSteps').value = ''; closeBug(); toast(t('bugOpened'));
+  const url = `https://wa.me/${BUG_PHONE}?text=${encodeURIComponent(msg)}`;
+  if (openLink(url)) { $('#bugWhat').value = ''; $('#bugSteps').value = ''; closeBug(); toast(t('bugOpened')); return; }
+  // could not open a window: keep the form and offer the link and the text instead
+  $('#bugLink').href = url; $('#bugCopy').onclick = () => copyText(msg); $('#bugFallback').classList.add('show');
 };
+function copyText(txt) {
+  const done = () => toast(t('bugCopied'));
+  const old = () => { const ta = document.createElement('textarea'); ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); done(); } catch (e) { } ta.remove(); };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done, old); else old();
+}
 $('#btnLib').onclick = () => library.toggleLib();
 $('#btnRef').onclick = () => library.toggleRef();
 $('#btnSave').onclick = () => { $('#settings').classList.remove('open'); download(new Blob([JSON.stringify(snapshot(), null, 1)], { type: 'application/json' }), `setup-${stamp()}.ett.json`); toast(t('savedSetup')); };
