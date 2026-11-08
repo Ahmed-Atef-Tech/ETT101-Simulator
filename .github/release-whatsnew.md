@@ -1,0 +1,2 @@
+- The preliminary-version notice is now written on every release page as well as inside the app (Beta tag next to the name, notice on first start, Settings → About this simulator).
+- التنبيه بتاع النسخة الأولية بقى مكتوب في صفحة كل release، ومعاه جوه البرنامج (علامة Beta جنب الاسم، والتنبيه أول مرة، والإعدادات ← عن البرنامج).

@@ -6,6 +6,8 @@
 #      A release starts automatically when that version has not been released yet.
 #   2) Actions tab -> "Release" -> "Run workflow" -> type the new version.
 #   3) Push a tag:  git tag v0.27.0 && git push origin v0.27.0
+# Release page text: .github/release-notice.md (the beta / non-commercial notice, on every release)
+# followed by .github/release-whatsnew.md (update it with each new version).
 # Downloads of build tools come from GitHub Releases; if GitHub is having an outage, re-run later.
 name: Release
 
@@ -63,7 +65,11 @@ jobs:
         run: |
           T="${{ steps.v.outputs.tag }}"
           if gh release view "$T" >/dev/null 2>&1; then echo "Draft $T already exists"; exit 0; fi
-          gh release create "$T" --draft --target "${{ github.sha }}" --title "ETT-101 Simulator $T" --notes "${NOTES:-Version ${{ steps.v.outputs.version }}}"
+          # every release page starts with the preliminary-version notice, then what changed
+          # (the "notes" typed when running the workflow by hand, else .github/release-whatsnew.md)
+          { cat .github/release-notice.md; echo; echo "### What's new in ${{ steps.v.outputs.version }}"; echo
+            if [ -n "$NOTES" ]; then echo "$NOTES"; elif [ -s .github/release-whatsnew.md ]; then cat .github/release-whatsnew.md; else echo "Version ${{ steps.v.outputs.version }}"; fi; } > "$RUNNER_TEMP/notes.md"
+          gh release create "$T" --draft --target "${{ github.sha }}" --title "ETT-101 Simulator $T" --notes-file "$RUNNER_TEMP/notes.md"
 
   build:
     needs: prepare

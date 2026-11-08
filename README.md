@@ -44,10 +44,12 @@ Reference: the course lab books Electrical Testing (6), ELC414 (Term 1) and Elec
 
 ## For maintainers: releasing an update
 
-1. Make the change.
+1. Make the change, and write what changed in `.github/release-whatsnew.md`.
 2. Raise `"version"` in `package.json` (for example `0.26.0` → `0.27.0`) and push to `main`.
    You can do this on github.com: open `package.json`, press the pencil icon, edit the number, and **Commit changes**.
 3. The **Release** workflow starts by itself. In about 10–15 minutes the release is published: installed Windows apps update themselves and Mac apps show a notice.
+
+Every release page starts with the beta / non-commercial notice from `.github/release-notice.md`, followed by `.github/release-whatsnew.md`.
 
 Pushes that don't change the version don't make a release. You can also start one by hand: **Actions → Release → Run workflow**.
 
