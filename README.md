@@ -4,7 +4,7 @@ An interactive simulator of the **Emona ETT-101 (Telecoms-Trainer 101)** kit and
 
 ## ⬇️ التحميل / Download
 
-**[آخر نسخة / Latest release](https://github.com/Ahmed-Atef-Tech/ETT101-Simulator/releases/latest)**
+**[صفحة التحميل / Download page](https://ahmed-atef-tech.github.io/ETT101-Simulator/)** · [GitHub release](https://github.com/Ahmed-Atef-Tech/ETT101-Simulator/releases/latest)
 
 | الجهاز | الملف |
 |---|---|
