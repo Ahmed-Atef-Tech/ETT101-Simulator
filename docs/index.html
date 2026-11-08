@@ -2,201 +2,268 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ETT-101 Simulator — Download</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ETT-101 Simulator | Ahmed Atef</title>
 <meta name="description" content="Download the Emona ETT-101 telecoms trainer simulator for Windows and Mac. Always the latest version.">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta property="og:title" content="ETT-101 Simulator | Ahmed Atef">
+<meta property="og:description" content="The telecoms lab on your computer: the Emona ETT-101 kit and a UTD2102CEL oscilloscope, for Windows and Mac.">
+<meta property="og:image" content="https://ahmed-atef-tech.github.io/ETT101-Simulator/app.jpg">
+<meta property="og:url" content="https://ahmed-atef-tech.github.io/ETT101-Simulator/">
+<meta name="theme-color" content="#0B0A0C">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+/* Same system as ahmed-atef-tech.github.io: blurred photo behind the page, frosted panels, warm white ink, copper accent. */
 :root {
-  --mat: #2a3b40; --mat-dot: #34494f; --mat-ink: #a9bcc0; --mat-hi: #e8eeec;
-  --rail: #d9d6ce; --rail-hi: #ebe9e3; --rail-lo: #bdb9af; --rail-edge: #a19d93;
-  --ink: #1e2427; --ink-2: #5b6266; --probe: #f2c21b;
-  --screen: #10171b; --scr-blue: #1f4fa3; --ch1: #f6e51d; --ch2: #39d0d8;
-  --paper: #f2f3f0; --rule: #c4cacd;
-  --lat: 'Barlow Semi Condensed', 'Segoe UI', Arial, sans-serif; --ar: 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
+  --paper: #0B0A0C;
+  --paper-2: rgba(255, 255, 255, .06);
+  --glass: rgba(255, 255, 255, .045);
+  --glass-line: rgba(255, 255, 255, .11);
+  --ink: #EFE9E0;
+  --ink-2: rgba(239, 233, 224, .66);
+  --mask: #0B110E;
+  --light: #F3F4F1;
+  --copper: #E8A15B;
+  --line: rgba(255, 255, 255, .11);
+  --display: "Inter", "Helvetica Neue", Arial, sans-serif;
+  --body: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
+  --code: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --ar: "IBM Plex Sans Arabic", "Segoe UI", Tahoma, sans-serif;
+  --gutter: clamp(16px, 3.4vw, 44px);
+  --ease: cubic-bezier(.22, .7, .18, 1);
+  color-scheme: dark;
 }
-* { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; }
-body { margin: 0; font-family: var(--ar); color: var(--mat-hi); background-color: var(--mat); background-image: radial-gradient(var(--mat-dot) 1.1px, transparent 1.4px); background-size: 15px 15px; line-height: 1.6; }
-html[lang="en"] body { font-family: var(--lat); }
-a { color: inherit; }
-:focus-visible { outline: 2px solid var(--probe); outline-offset: 3px; border-radius: 4px; }
-.lat { font-family: var(--lat); }
-.wrap { width: min(1080px, 100% - 32px); margin-inline: auto; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { background: var(--paper); }
+body { position: relative; z-index: 0; isolation: isolate; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 1.0625rem; line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+html[lang="ar"] body { font-family: var(--ar), var(--body); line-height: 1.75; }
+img { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+ul, ol { list-style: none; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; }
+html[lang="ar"] h1, html[lang="ar"] h2, html[lang="ar"] h3 { font-family: var(--ar); letter-spacing: 0 !important; }
+::selection { background: var(--copper); color: #160F0A; }
+:focus-visible { outline: 2px solid var(--copper); outline-offset: 3px; border-radius: 4px; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-left: max(var(--gutter), env(safe-area-inset-left, 0px)); padding-right: max(var(--gutter), env(safe-area-inset-right, 0px)); }
+.lat { font-family: var(--body); direction: ltr; unicode-bidi: isolate; }
 
-/* top strip, like the front rail of the instrument */
-.rail { background: linear-gradient(var(--rail-hi), var(--rail) 40%, #d2cfc6); border-bottom: 1px solid var(--rail-edge); box-shadow: 0 2px 6px rgba(0,0,0,.25); color: var(--ink); }
-.rail .wrap { display: flex; align-items: center; gap: 12px; min-height: 52px; }
-.brand { direction: ltr; font-family: var(--lat); font-weight: 700; font-size: 19px; white-space: nowrap; }
-.brand span { font-weight: 500; color: var(--ink-2); font-size: 15px; margin-inline-start: 6px; }
+/* long-exposure background, as on the main site */
+.bg { position: fixed; inset: 0; z-index: -2; background: var(--paper) url("https://ahmed-atef-tech.github.io/assets/photo/bg.jpg") 60% 40% / cover no-repeat; pointer-events: none; }
+.bg::before { content: ""; position: absolute; inset: 0; background: radial-gradient(120% 80% at 50% 120%, rgba(11,10,12,.7), rgba(11,10,12,0) 60%), linear-gradient(180deg, rgba(11,10,12,.25), rgba(11,10,12,.45)); }
+.bg::after { content: ""; position: absolute; inset: 0; opacity: .5; mix-blend-mode: overlay; background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='180' height='180' filter='url(%23n)' opacity='.5'/></svg>"); }
+.glass { background: var(--glass); border: 1px solid var(--glass-line); backdrop-filter: blur(18px) saturate(1.2); -webkit-backdrop-filter: blur(18px) saturate(1.2); }
+@media (max-width: 760px) { .glass { background: rgba(22, 20, 24, .74); backdrop-filter: none; -webkit-backdrop-filter: none; } }
+
+/* buttons */
+.btn { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 18px; border-radius: 8px; font: 500 .95rem var(--body); cursor: pointer; overflow: hidden; isolation: isolate; border: 1px solid transparent; transition: color 350ms var(--ease), border-color 350ms var(--ease); }
+html[lang="ar"] .btn { font-family: var(--ar); }
+.btn::before { content: ""; position: absolute; inset: 0; z-index: -1; transform: translateY(101%); transition: transform 450ms var(--ease); }
+.btn:hover::before { transform: none; }
+.btn-light { background: var(--light); color: var(--mask); }
+.btn-light::before { background: var(--copper); }
+.btn-light:hover { color: #fff; }
+.btn-glass { background: rgba(243, 244, 241, .1); color: var(--light); border-color: rgba(243, 244, 241, .22); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+.btn-glass::before { background: var(--light); }
+.btn-glass:hover { color: var(--mask); }
+
+/* nav */
+.nav { position: fixed; z-index: 50; top: calc(14px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); width: min(620px, calc(100% - 2 * var(--gutter))); display: flex; align-items: center; gap: 10px; padding: 7px; padding-inline-start: 16px; border-radius: 12px; background: rgba(11, 17, 14, .72); color: var(--light); backdrop-filter: blur(18px) saturate(1.3); -webkit-backdrop-filter: blur(18px) saturate(1.3); border: 1px solid rgba(243, 244, 241, .1); }
+.mark { display: flex; align-items: center; padding: 4px 0; }
+.logo { display: block; height: 22px; width: auto; fill: var(--light); }
+.nav .here { font: 500 .9rem var(--body); color: rgba(243, 244, 241, .72); white-space: nowrap; direction: ltr; }
 .grow { flex: 1; }
-.seg { display: inline-flex; border: 1px solid var(--rail-edge); border-radius: 4px; overflow: hidden; background: #fff; }
-.seg button { border: 0; background: none; padding: 5px 12px; font: 500 14px var(--lat); cursor: pointer; color: var(--ink); }
+.seg { display: inline-flex; padding: 3px; gap: 2px; border-radius: 8px; background: rgba(243, 244, 241, .08); }
+.seg button { border: 0; background: none; color: rgba(243, 244, 241, .72); padding: 5px 10px; border-radius: 6px; font: 500 .85rem var(--body); cursor: pointer; transition: color 250ms, background-color 250ms; }
 .seg button[lang="ar"] { font-family: var(--ar); }
-.seg button + button { border-inline-start: 1px solid var(--rail-edge); }
-.seg button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.seg button:hover { color: var(--light); }
+.seg button[aria-pressed="true"] { background: rgba(243, 244, 241, .16); color: var(--light); }
+@media (max-width: 600px) { .nav .here { display: none; } }
 
-/* hero */
-.hero { display: grid; grid-template-columns: 1.05fr 1fr; gap: 44px; align-items: center; padding: 56px 0 40px; }
-h1 { margin: 0 0 14px; font-size: clamp(30px, 4.2vw, 46px); line-height: 1.15; font-weight: 700; color: #fff; }
-html[lang="en"] h1 { letter-spacing: -.2px; }
-.lede { margin: 0; font-size: 18px; color: var(--mat-ink); max-width: 34em; }
+/* hero panel */
+.panel { position: relative; margin: 10px; border-radius: 28px; overflow: hidden; background: rgba(11, 17, 14, .82); color: var(--light); isolation: isolate; box-shadow: 0 0 0 1px var(--glass-line), 0 30px 80px rgba(0, 0, 0, .45); }
+.hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 520px); gap: 36px 52px; align-items: center; padding: clamp(96px, 11vw, 128px) clamp(20px, 4vw, 56px) clamp(28px, 4vw, 52px); }
+.status { display: inline-flex; align-items: center; gap: 10px; padding: 9px 14px; border-radius: 10px; font-size: .9rem; background: rgba(243, 244, 241, .1); border: 1px solid rgba(243, 244, 241, .16); margin-bottom: 26px; }
+.status i { width: 8px; height: 8px; border-radius: 50%; background: #7BE0A4; box-shadow: 0 0 0 4px rgba(123, 224, 164, .18); flex: none; }
+.status.off i { background: rgba(243, 244, 241, .4); box-shadow: 0 0 0 4px rgba(243, 244, 241, .1); }
+.hero h1 { font-weight: 700; font-size: clamp(2.5rem, 5vw, 4.6rem); line-height: .94; letter-spacing: -.055em; max-width: 16ch; margin-bottom: 22px; }
+.hero h1 .l2 { color: rgba(243, 244, 241, .55); }
+html[lang="ar"] .hero h1 { font-size: clamp(2.3rem, 5.4vw, 4.6rem); line-height: 1.12; }
+.hero .lede { color: rgba(243, 244, 241, .82); max-width: 46ch; margin-bottom: 28px; }
+.dl { display: flex; flex-wrap: wrap; gap: 10px; }
+.dl .btn { height: 56px; padding: 0 22px; font-size: 1rem; gap: 12px; }
+.dl .btn svg { width: 20px; height: 20px; fill: currentColor; flex: none; }
+.dl .btn small { font: 400 .8rem var(--code); opacity: .7; direction: ltr; unicode-bidi: isolate; }
+.mine { font-size: .82rem; color: var(--ink-2); margin-top: 12px; min-height: 1.4em; }
+.mine b { color: var(--copper); font-weight: 600; }
 
-/* the scope screen: the one loud thing on the page */
-.scope { background: linear-gradient(#efece6, #d9d5cd); border-radius: 12px; padding: 14px; box-shadow: 0 18px 40px rgba(0,0,0,.45), 0 1px 0 #fff inset; direction: ltr; }
-.scope-top { display: flex; align-items: center; gap: 10px; margin: 0 4px 10px; font: 600 12px var(--lat); color: #3b4246; }
-.scope-top .tag { background: #c8261d; color: #fff; padding: 1px 8px; border-radius: 2px; font-style: italic; }
-.screen { background: var(--scr-blue); border-radius: 6px; padding: 8px; box-shadow: 0 2px 6px rgba(0,0,0,.5) inset; }
-.screen-in { background: var(--screen); border-radius: 2px; position: relative; aspect-ratio: 16 / 9; overflow: hidden; }
+/* the scope screen, framed like the main site's code card */
+.code-card { border-radius: 16px; overflow: hidden; background: rgba(6, 5, 7, .55); border: 1px solid var(--glass-line); color: #DCE3DE; box-shadow: inset 0 0 0 1px rgba(243, 244, 241, .06); direction: ltr; }
+.code-bar { display: flex; align-items: center; gap: 7px; padding: 10px 14px; border-bottom: 1px solid rgba(243, 244, 241, .08); font: 400 .8rem var(--code); color: rgba(243, 244, 241, .55); }
+.code-bar i { width: 9px; height: 9px; border-radius: 50%; background: rgba(243, 244, 241, .16); }
+.code-bar i:first-child { background: var(--copper); }
+.code-bar span { margin-left: 6px; }
+.code-bar .r { margin-left: auto; }
+.screen { position: relative; aspect-ratio: 16 / 10; background: #0A0F10; }
 .screen canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
-.readout { display: flex; justify-content: space-between; gap: 8px; background: #0d2f6e; color: #e7eefc; font: 500 13px var(--lat); padding: 5px 9px; margin-top: 6px; border-radius: 2px; }
-.readout b { color: var(--ch1); font-weight: 600; }
-.readout .ver { color: #9ff3f7; }
+.readout { display: flex; justify-content: space-between; gap: 10px; padding: 9px 14px; border-top: 1px solid rgba(243, 244, 241, .08); font: 400 .78rem var(--code); color: rgba(243, 244, 241, .6); }
+.readout .y { color: #F2D64B; } .readout .c { color: #6FD3DA; } .readout .k { color: var(--copper); }
 
-/* downloads */
-.dl { padding: 8px 0 18px; }
-.keys { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.key { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 14px; text-decoration: none; color: var(--ink); padding: 18px 20px; border: 1px solid var(--rail-edge); border-radius: 6px; background: linear-gradient(#f7f6f2, #dedbd3); box-shadow: 0 1px 0 #fff inset, 0 3px 0 #9e9a90, 0 8px 18px rgba(0,0,0,.3); transition: transform .08s, box-shadow .08s; }
-.key:hover { background: linear-gradient(#fff, #e6e3dc); }
-.key:active { transform: translateY(2px); box-shadow: 0 1px 0 #fff inset, 0 1px 0 #9e9a90, 0 4px 10px rgba(0,0,0,.3); }
-.key svg { width: 34px; height: 34px; }
-.key .t { font-size: 21px; font-weight: 700; line-height: 1.2; }
-.key .s { font-size: 14px; color: var(--ink-2); font-family: var(--lat); }
-html[lang="ar"] .key .s span.ar { font-family: var(--ar); }
-.lamp { width: 14px; height: 6px; border-radius: 1px; background: #8e8a80; }
-.key.mine .lamp { background: var(--probe); box-shadow: 0 0 8px var(--probe); }
-.mine-note { font-size: 13px; color: #6d5a00; font-weight: 600; }
-.key[aria-disabled="true"] { opacity: .55; pointer-events: none; }
-.extras { display: flex; flex-wrap: wrap; gap: 10px 22px; margin: 18px 2px 0; font-size: 15.5px; color: var(--mat-ink); }
-.extras a { color: var(--mat-hi); text-decoration-color: rgba(232,238,236,.4); text-underline-offset: 3px; }
-.extras a:hover { text-decoration-color: var(--probe); }
-.status { margin: 12px 2px 0; font-size: 14px; color: var(--mat-ink); min-height: 1.6em; }
+/* sections */
+section.block { padding-top: clamp(80px, 10vw, 140px); }
+.s-head { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px 40px; align-items: end; padding-bottom: 28px; margin-bottom: 36px; }
+.s-head::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--line); }
+.s-head h2 { font-weight: 600; font-size: clamp(2.1rem, 5vw, 4rem); line-height: .98; letter-spacing: -.045em; }
+html[lang="ar"] .s-head h2 { line-height: 1.15; }
+.s-head p { color: var(--ink-2); max-width: 46ch; justify-self: end; }
+@media (max-width: 760px) { .s-head { grid-template-columns: minmax(0, 1fr); } .s-head p { justify-self: start; } }
 
-/* lab sheet paper for the install steps */
-.sheet { background-color: var(--paper); background-image: linear-gradient(rgba(64,104,132,.11) 1px, transparent 1px), linear-gradient(90deg, rgba(64,104,132,.11) 1px, transparent 1px); background-size: 12px 12px; color: var(--ink); border-radius: 6px; padding: 26px 30px 24px; margin: 34px 0 0; box-shadow: 0 14px 34px rgba(0,0,0,.35); }
-.sheet h2 { margin: 0 0 16px; font-size: 22px; border-bottom: 2px solid var(--ink); padding-bottom: 8px; }
-.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 34px; }
-.cols h3 { margin: 0 0 8px; font-size: 18px; }
-.cols ol { margin: 0; padding-inline-start: 22px; }
-.cols li { margin: 0 0 8px; font-size: 15.5px; }
-.cols li::marker { font-weight: 700; color: var(--ink-2); }
-.cols .lat-term { font-family: var(--lat); font-weight: 600; direction: ltr; unicode-bidi: isolate; }
-.size { direction: ltr; unicode-bidi: isolate; }
-.auto { margin: 18px 0 0; padding-top: 14px; border-top: 1px solid var(--rule); font-size: 15.5px; }
+.steps { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(18px, 2.4vw, 28px); }
+.step-card { border-radius: 22px; padding: 26px 26px 22px; }
+.step-card h3 { font-weight: 600; font-size: clamp(1.4rem, 2.4vw, 1.9rem); letter-spacing: -.035em; line-height: 1.05; margin-bottom: 14px; direction: ltr; text-align: start; }
+html[lang="ar"] .step-card h3 { text-align: right; }
+.step-card ol { border-top: 1px solid var(--line); counter-reset: s; }
+.step-card li { counter-increment: s; padding: 12px 0; border-bottom: 1px solid var(--line); color: var(--ink-2); display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 8px; }
+.step-card li::before { content: counter(s); font: 500 .8rem var(--code); color: var(--copper); padding-top: 4px; }
+.step-card li b { color: var(--ink); font-weight: 600; }
+.note { margin-top: 18px; color: var(--ink-2); max-width: 70ch; }
+.note b { color: var(--ink); font-weight: 600; }
+@media (max-width: 820px) { .steps { grid-template-columns: 1fr; } }
 
-figure { margin: 40px 0 0; }
-figure img { display: block; width: 100%; height: auto; border-radius: 6px; box-shadow: 0 14px 34px rgba(0,0,0,.4); }
-figcaption { margin-top: 10px; font-size: 14.5px; color: var(--mat-ink); }
-footer { padding: 34px 0 40px; font-size: 14px; color: var(--mat-ink); }
-footer a { color: var(--mat-hi); }
+.more { border-radius: 22px; padding: 6px 22px; }
+.row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) auto; gap: 12px 32px; align-items: center; padding: 20px 0; border-bottom: 1px solid var(--line); }
+.row:last-child { border-bottom: 0; }
+.row h3 { font-weight: 600; font-size: clamp(1.15rem, 2vw, 1.45rem); letter-spacing: -.025em; line-height: 1.15; }
+.row p { color: var(--ink-2); }
+.row a.act { color: var(--ink); border-bottom: 1px solid var(--copper); padding-bottom: 1px; font-weight: 500; white-space: nowrap; transition: color 250ms; }
+.row a.act:hover { color: var(--copper); }
+@media (max-width: 760px) { .row { grid-template-columns: 1fr; gap: 6px; } }
 
-[data-en] { display: none; }
-html[lang="en"] [data-en] { display: revert; }
-html[lang="en"] [data-ar] { display: none; }
+.shot { border-radius: 26px; padding: 12px; }
+.shot img { border-radius: 16px; width: 100%; height: auto; }
+.shot figcaption { padding: 14px 8px 4px; color: var(--ink-2); font-size: .95rem; }
 
-@media (max-width: 820px) {
-  .hero { grid-template-columns: 1fr; gap: 28px; padding: 34px 0 26px; }
-  .keys, .cols { grid-template-columns: 1fr; }
-  .cols { gap: 22px; }
-  .sheet { padding: 20px 18px; }
-  .brand span { display: none; }
-}
-@media (prefers-reduced-motion: reduce) { .key { transition: none; } }
+footer { padding-block: 64px 40px; color: var(--ink-2); font-size: .92rem; }
+footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; }
+.foot-mark { display: flex; align-items: center; gap: 16px; }
+.logo-dark { fill: var(--ink); height: 18px; }
+footer a { border-bottom: 1px solid var(--copper); }
+
+[data-en] { display: none !important; }
+html[lang="en"] [data-en] { display: revert !important; }
+html[lang="en"] [data-ar] { display: none !important; }
+
+@media (max-width: 900px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+@media (prefers-reduced-motion: reduce) { .btn, .btn::before, .seg button { transition: none; } }
 </style>
 </head>
 <body>
-<header class="rail"><div class="wrap">
-  <div class="brand">Telecoms-Trainer 101<span>simulator</span></div>
+<div class="bg" aria-hidden="true"></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><path id="lo-all" fill-rule="evenodd" d="M51.67 88.45C52.35 88.31 53.63 88.12 54.50 88.03C55.37 87.94 56.42 87.71 56.83 87.53C57.25 87.35 58.00 87.15 58.50 87.08C59.00 87.02 59.72 86.80 60.08 86.59C60.45 86.38 61.04 86.16 61.40 86.09C61.76 86.03 62.46 85.76 62.97 85.49C63.47 85.22 64.01 85.00 64.17 85.00C64.33 85.00 64.65 84.85 64.88 84.66C65.12 84.48 65.63 84.21 66.02 84.08C66.41 83.94 66.86 83.71 67.01 83.57C67.17 83.43 67.60 83.15 67.97 82.95C69.62 82.06 70.01 81.81 70.40 81.42C70.63 81.19 70.91 81.00 71.01 81.00C71.36 81.00 74.29 78.50 76.43 76.40C78.30 74.56 80.67 71.80 81.15 70.92C81.52 70.23 82.17 69.28 82.59 68.82C82.72 68.68 82.92 68.30 83.02 67.99C83.13 67.67 83.38 67.23 83.58 67.00C83.79 66.77 84.01 66.36 84.07 66.09C84.14 65.83 84.36 65.40 84.57 65.15C84.79 64.90 85.01 64.42 85.07 64.09C85.13 63.76 85.36 63.23 85.58 62.91C85.79 62.59 86.02 62.01 86.09 61.62C86.15 61.23 86.38 60.62 86.59 60.25C86.80 59.88 87.02 59.17 87.09 58.67C87.15 58.16 87.38 57.34 87.59 56.83C87.81 56.30 88.01 55.36 88.08 54.58C88.14 53.85 88.35 52.50 88.54 51.58C89.04 49.19 89.05 43.97 88.55 41.67C88.36 40.80 88.15 39.45 88.08 38.67C88.01 37.82 87.81 36.88 87.58 36.33C87.37 35.83 87.15 35.00 87.08 34.50C87.02 34.00 86.79 33.28 86.58 32.92C86.37 32.55 86.15 31.95 86.09 31.58C86.03 31.22 85.80 30.64 85.57 30.30C85.35 29.96 85.10 29.37 85.02 28.99C84.93 28.61 84.71 28.14 84.53 27.94C84.34 27.74 84.14 27.36 84.07 27.08C84.01 26.81 83.81 26.43 83.64 26.23C83.47 26.04 83.16 25.58 82.95 25.20C81.98 23.41 81.77 23.07 81.56 22.95C81.44 22.88 81.21 22.58 81.06 22.28C79.97 20.16 74.43 14.43 71.92 12.82C71.64 12.65 71.08 12.24 70.67 11.91C70.25 11.59 69.61 11.18 69.24 11.00C68.87 10.82 68.43 10.53 68.27 10.35C68.11 10.18 67.78 9.98 67.55 9.92C67.31 9.86 66.89 9.64 66.60 9.42C66.32 9.20 65.86 8.97 65.58 8.90C65.31 8.84 64.86 8.61 64.58 8.41C64.31 8.20 63.82 7.98 63.50 7.91C63.18 7.85 62.62 7.62 62.25 7.41C61.88 7.20 61.28 6.97 60.92 6.91C60.55 6.84 59.91 6.62 59.50 6.41C59.09 6.21 58.34 5.99 57.83 5.93C57.33 5.86 56.39 5.63 55.75 5.41C54.53 4.99 52.14 4.73 47.75 4.55C44.63 4.42 38.41 4.95 37.48 5.43C37.19 5.58 36.42 5.77 35.77 5.86C35.12 5.95 34.24 6.20 33.82 6.41C33.41 6.63 32.71 6.86 32.28 6.92C31.85 6.99 31.31 7.19 31.08 7.37C30.84 7.55 30.28 7.80 29.81 7.92C29.35 8.05 28.84 8.26 28.68 8.40C28.53 8.54 28.07 8.77 27.66 8.92C27.26 9.06 26.77 9.32 26.59 9.49C26.40 9.65 25.96 9.88 25.61 10.00C25.26 10.11 24.94 10.30 24.89 10.42C24.85 10.54 24.53 10.75 24.20 10.89C23.86 11.02 23.44 11.29 23.27 11.48C23.09 11.68 22.84 11.83 22.72 11.83C22.59 11.83 22.31 12.01 22.09 12.23C21.87 12.45 21.44 12.80 21.14 13.01C19.83 13.93 18.36 15.19 16.78 16.78C14.89 18.67 14.44 19.17 13.48 20.50C13.11 21.00 12.63 21.64 12.40 21.92C11.54 22.95 11.00 23.72 11.00 23.93C11.00 24.04 10.81 24.37 10.58 24.64C10.35 24.91 10.04 25.42 9.90 25.78C9.75 26.13 9.53 26.53 9.40 26.67C9.28 26.82 9.06 27.25 8.92 27.64C8.79 28.04 8.52 28.55 8.34 28.78C8.16 29.01 7.96 29.47 7.90 29.81C7.83 30.14 7.61 30.68 7.41 31.00C7.20 31.32 6.98 31.92 6.91 32.33C6.85 32.75 6.62 33.38 6.41 33.75C6.21 34.12 5.98 34.85 5.92 35.38C5.86 35.91 5.63 36.85 5.42 37.47C4.33 40.58 4.32 52.84 5.41 55.75C5.62 56.30 5.84 57.20 5.91 57.75C5.97 58.30 6.20 59.05 6.41 59.42C6.62 59.78 6.85 60.42 6.91 60.83C6.98 61.25 7.20 61.88 7.41 62.25C7.62 62.62 7.84 63.16 7.91 63.45C7.97 63.75 8.19 64.24 8.39 64.54C8.60 64.84 8.90 65.44 9.06 65.87C9.22 66.31 9.43 66.71 9.52 66.76C9.60 66.81 9.79 67.13 9.93 67.47C10.07 67.80 10.32 68.23 10.49 68.41C10.66 68.60 10.85 68.92 10.91 69.12C10.97 69.33 11.26 69.79 11.55 70.15C11.84 70.52 12.27 71.08 12.50 71.42C13.90 73.45 16.90 76.71 19.12 78.63C19.47 78.93 19.96 79.36 20.22 79.59C20.47 79.81 20.75 80.00 20.83 80.00C20.90 80.00 21.27 80.24 21.65 80.54C23.14 81.73 23.43 81.93 23.99 82.18C24.32 82.33 24.69 82.57 24.81 82.72C24.94 82.88 25.13 83.00 25.25 83.00C25.36 83.00 25.75 83.20 26.10 83.44C26.46 83.68 26.97 83.96 27.25 84.05C27.52 84.15 27.97 84.39 28.25 84.59C28.53 84.80 29.01 85.02 29.33 85.08C29.65 85.15 30.18 85.37 30.50 85.59C30.82 85.80 31.38 86.03 31.75 86.10C32.12 86.16 32.75 86.39 33.17 86.60C33.58 86.81 34.33 87.04 34.83 87.10C35.33 87.17 36.15 87.39 36.66 87.59C37.22 87.82 38.17 88.01 39.08 88.09C39.91 88.15 41.26 88.35 42.08 88.52C43.98 88.90 49.66 88.87 51.67 88.45Z M52.13 79.84C51.09 79.51 49.45 77.61 48.99 76.21C48.88 75.87 48.65 75.41 48.49 75.20C48.33 74.99 48.14 74.51 48.08 74.12C48.02 73.73 47.79 73.11 47.58 72.74C47.37 72.38 47.14 71.78 47.08 71.41C47.02 71.05 46.79 70.48 46.58 70.15C46.37 69.82 46.14 69.20 46.08 68.78C46.02 68.36 45.79 67.78 45.57 67.49C45.36 67.19 45.13 66.61 45.07 66.19C45.01 65.76 44.79 65.15 44.58 64.83C44.37 64.51 44.15 63.95 44.09 63.58C44.03 63.22 43.80 62.62 43.59 62.25C43.39 61.88 43.17 61.29 43.11 60.93C43.04 60.49 42.81 60.07 42.39 59.64L41.77 59.01L32.71 58.96C23.95 58.92 23.63 58.91 23.40 58.59C23.06 58.13 23.11 57.69 23.57 57.09C23.79 56.80 24.02 56.21 24.09 55.78C24.15 55.35 24.35 54.81 24.52 54.59C24.70 54.37 24.92 53.75 25.02 53.22C25.30 51.67 26.07 50.34 27.04 49.72L27.87 49.20L32.68 49.29C37.26 49.38 37.52 49.37 37.85 49.07C38.14 48.81 38.18 48.63 38.10 48.03C38.05 47.64 37.82 47.00 37.60 46.62C37.37 46.23 37.14 45.62 37.08 45.25C37.02 44.88 36.79 44.32 36.59 43.99C36.38 43.67 36.15 43.07 36.09 42.66C36.02 42.25 35.80 41.65 35.59 41.33C35.38 41.00 35.15 40.40 35.09 39.99C35.02 39.58 34.80 38.99 34.59 38.67C34.38 38.35 34.15 37.78 34.09 37.42C34.03 37.05 33.80 36.45 33.59 36.08C33.37 35.71 33.14 35.11 33.08 34.74C33.02 34.38 32.79 33.81 32.57 33.47C32.35 33.13 32.12 32.53 32.06 32.13C31.87 30.97 30.72 30.09 30.20 30.71C30.10 30.82 29.97 31.14 29.91 31.42C29.85 31.69 29.62 32.18 29.42 32.50C29.21 32.82 28.98 33.38 28.92 33.74C28.86 34.11 28.63 34.71 28.41 35.08C28.20 35.45 27.97 36.05 27.91 36.42C27.85 36.78 27.63 37.35 27.42 37.67C27.21 37.99 26.98 38.55 26.92 38.92C26.86 39.28 26.64 39.88 26.43 40.25C26.22 40.62 25.99 41.21 25.92 41.58C25.86 41.94 25.63 42.54 25.42 42.91C25.21 43.28 24.99 43.88 24.92 44.25C24.86 44.62 24.63 45.18 24.42 45.50C24.21 45.82 23.98 46.42 23.91 46.83C23.85 47.23 23.62 47.83 23.41 48.16C23.21 48.48 22.98 49.05 22.92 49.41C22.86 49.78 22.63 50.38 22.42 50.74C22.21 51.11 21.98 51.71 21.92 52.08C21.86 52.44 21.63 53.04 21.41 53.41C21.20 53.78 20.97 54.38 20.91 54.75C20.85 55.12 20.66 55.62 20.48 55.87C20.30 56.12 20.11 56.57 20.06 56.87C19.91 57.65 19.57 58.25 19.06 58.65C18.65 58.98 18.42 59.00 15.14 59.00C11.89 59.00 11.65 58.98 11.33 58.67C10.88 58.21 10.91 57.71 11.48 56.65C11.74 56.15 12.01 55.45 12.07 55.09C12.14 54.72 12.37 54.12 12.58 53.76C12.79 53.39 13.01 52.78 13.08 52.42C13.14 52.05 13.36 51.49 13.57 51.17C13.78 50.85 14.00 50.24 14.06 49.81C14.13 49.39 14.36 48.81 14.57 48.51C14.79 48.22 15.02 47.64 15.08 47.22C15.14 46.80 15.37 46.18 15.58 45.85C15.79 45.52 16.02 44.95 16.08 44.59C16.14 44.22 16.37 43.62 16.58 43.26C16.79 42.89 17.02 42.29 17.08 41.92C17.14 41.56 17.37 40.96 17.58 40.59C17.79 40.22 18.01 39.62 18.08 39.25C18.14 38.88 18.37 38.32 18.58 38.00C18.79 37.68 19.02 37.08 19.09 36.67C19.15 36.27 19.38 35.67 19.59 35.34C19.79 35.02 20.02 34.45 20.08 34.09C20.14 33.72 20.37 33.12 20.58 32.76C20.79 32.39 21.01 31.78 21.08 31.42C21.14 31.05 21.36 30.49 21.58 30.17C21.79 29.85 22.01 29.25 22.07 28.83C22.13 28.42 22.36 27.82 22.57 27.50C22.79 27.18 23.02 26.62 23.08 26.26C23.14 25.89 23.37 25.29 23.58 24.92C23.79 24.55 24.01 23.95 24.08 23.58C24.14 23.22 24.36 22.65 24.57 22.33C24.78 22.01 24.99 21.46 25.05 21.10C25.11 20.75 25.34 20.18 25.56 19.85C25.78 19.52 26.01 19.06 26.06 18.83C26.16 18.42 26.86 17.64 28.04 16.66C28.79 16.02 30.27 15.78 31.92 16.01C32.77 16.13 33.16 16.30 33.91 16.86C34.42 17.24 34.83 17.60 34.83 17.65C34.83 17.71 35.10 18.17 35.42 18.67C35.74 19.16 36.00 19.69 36.00 19.83C36.00 19.97 36.19 20.36 36.41 20.70C36.64 21.03 36.88 21.63 36.94 22.03C37.00 22.42 37.22 23.01 37.43 23.33C37.64 23.65 37.86 24.22 37.92 24.58C37.99 24.95 38.21 25.55 38.42 25.92C38.63 26.29 38.86 26.89 38.92 27.26C38.98 27.62 39.21 28.18 39.41 28.51C39.62 28.83 39.85 29.43 39.91 29.84C39.98 30.25 40.20 30.85 40.41 31.17C40.62 31.49 40.85 32.05 40.91 32.42C40.97 32.78 41.20 33.39 41.41 33.76C41.63 34.12 41.86 34.72 41.92 35.09C41.99 35.45 42.22 36.05 42.43 36.42C42.64 36.78 42.86 37.38 42.92 37.75C42.98 38.12 43.21 38.68 43.41 39.01C43.62 39.33 43.85 39.93 43.91 40.34C43.98 40.75 44.21 41.35 44.42 41.67C44.63 41.99 44.86 42.55 44.92 42.92C44.99 43.28 45.21 43.88 45.41 44.25C45.62 44.62 45.84 45.22 45.91 45.58C45.97 45.95 46.20 46.55 46.41 46.92C46.63 47.29 46.86 47.89 46.92 48.26C46.98 48.62 47.21 49.18 47.41 49.51C47.62 49.83 47.85 50.43 47.91 50.84C47.98 51.25 48.20 51.85 48.41 52.17C48.62 52.49 48.85 53.05 48.91 53.42C48.97 53.78 49.20 54.39 49.41 54.76C49.63 55.12 49.86 55.72 49.92 56.09C49.99 56.45 50.22 57.05 50.43 57.42C50.64 57.78 50.86 58.38 50.92 58.75C50.98 59.12 51.20 59.68 51.41 60.00C51.61 60.32 51.84 60.88 51.90 61.25C51.97 61.62 52.20 62.23 52.42 62.60C52.64 62.98 52.87 63.61 52.94 63.99C53.07 64.85 53.55 65.33 54.27 65.33C54.74 65.33 54.83 65.26 55.01 64.71C55.12 64.36 55.38 63.78 55.59 63.42C55.80 63.05 56.03 62.45 56.10 62.08C56.16 61.72 56.39 61.15 56.59 60.83C56.80 60.51 57.02 59.95 57.08 59.58C57.14 59.22 57.36 58.65 57.58 58.33C57.79 58.01 58.01 57.43 58.07 57.03C58.13 56.64 58.35 56.04 58.57 55.70C58.79 55.36 59.02 54.79 59.08 54.42C59.14 54.06 59.37 53.46 59.58 53.09C59.79 52.72 60.02 52.10 60.08 51.71C60.14 51.33 60.35 50.81 60.54 50.57C60.73 50.33 60.95 49.79 61.03 49.36C61.10 48.93 61.32 48.37 61.51 48.12C61.70 47.86 61.83 47.53 61.80 47.37C61.68 46.74 61.10 46.67 55.79 46.67L50.67 46.67L49.94 45.96C49.37 45.41 49.18 45.08 49.08 44.50C49.02 44.09 48.79 43.45 48.58 43.08C48.36 42.72 48.14 42.12 48.08 41.75C48.02 41.38 47.82 40.87 47.63 40.60C47.26 40.08 46.84 38.68 46.84 37.97C46.83 36.95 45.83 37.00 65.42 37.00C85.79 37.00 84.09 36.87 83.96 38.43C83.92 39.02 83.74 39.53 83.46 39.95C83.22 40.30 82.98 40.92 82.91 41.33C82.85 41.73 82.62 42.33 82.41 42.66C82.21 42.98 81.99 43.58 81.93 43.99C81.81 44.80 81.10 45.88 80.38 46.36C79.96 46.64 79.50 46.66 75.53 46.67L71.13 46.67L70.59 47.21C70.18 47.62 70.03 47.95 69.94 48.60C69.88 49.08 69.66 49.67 69.43 49.98C69.21 50.27 68.98 50.86 68.92 51.28C68.86 51.70 68.63 52.32 68.42 52.65C68.21 52.98 67.98 53.55 67.92 53.92C67.86 54.28 67.64 54.88 67.43 55.25C67.22 55.62 66.99 56.21 66.92 56.58C66.86 56.94 66.63 57.54 66.42 57.91C66.21 58.28 65.99 58.88 65.92 59.25C65.86 59.62 65.63 60.18 65.42 60.50C65.21 60.82 64.98 61.42 64.91 61.83C64.85 62.23 64.62 62.83 64.41 63.16C64.21 63.48 63.98 64.05 63.92 64.42C63.86 64.78 63.64 65.38 63.43 65.75C63.22 66.12 62.99 66.71 62.92 67.08C62.86 67.44 62.63 68.04 62.42 68.41C62.21 68.78 61.99 69.38 61.92 69.75C61.86 70.12 61.63 70.68 61.42 71.00C61.21 71.32 60.98 71.92 60.92 72.33C60.85 72.75 60.63 73.35 60.42 73.67C60.20 73.99 59.98 74.57 59.92 74.95C59.86 75.34 59.66 75.85 59.47 76.08C59.29 76.31 59.07 76.75 58.99 77.04C58.84 77.58 58.19 78.31 56.93 79.37C56.29 79.91 56.26 79.92 54.43 79.95C53.41 79.97 52.38 79.92 52.13 79.84Z M110.63 58.71C110.82 58.55 111.23 58.00 111.56 57.50C111.88 57.00 112.28 56.43 112.45 56.25C113.07 55.56 113.83 54.49 114.16 53.84C114.35 53.47 114.56 53.17 114.63 53.17C114.70 53.17 114.90 52.90 115.07 52.58C115.24 52.26 115.45 52.00 115.52 52.00C115.60 52.00 115.78 51.76 115.94 51.46C116.09 51.16 116.37 50.72 116.57 50.48C116.76 50.24 117.05 49.83 117.20 49.56C117.36 49.30 117.76 48.75 118.08 48.33C118.40 47.92 118.78 47.36 118.94 47.08C119.09 46.81 119.41 46.34 119.65 46.05C120.48 45.03 120.92 44.44 121.25 43.91C122.32 42.19 122.50 42.00 123.01 42.00C123.40 42.00 123.58 42.11 123.80 42.52C123.96 42.81 124.25 43.25 124.46 43.50C124.66 43.76 124.83 44.05 124.83 44.14C124.83 44.24 125.04 44.57 125.29 44.87C125.93 45.63 127.00 47.24 127.00 47.44C127.00 47.53 127.18 47.78 127.41 47.99C127.63 48.20 128.07 48.79 128.37 49.29C128.67 49.80 129.16 50.49 129.46 50.83C129.76 51.18 130.00 51.61 130.00 51.81C130.00 52.19 129.44 52.58 129.08 52.44C128.95 52.39 126.74 52.34 124.16 52.32L119.47 52.30L118.73 53.02C118.33 53.41 118.00 53.83 118.00 53.94C118.00 54.05 117.73 54.46 117.40 54.86C116.02 56.54 114.83 58.19 114.83 58.42C114.83 58.99 115.02 59.00 129.50 59.00C144.04 59.00 144.17 58.99 144.17 58.41C144.17 58.30 143.96 57.95 143.71 57.62C143.46 57.30 143.12 56.82 142.96 56.56C142.80 56.30 142.41 55.75 142.09 55.33C141.76 54.92 141.34 54.26 141.13 53.88C140.93 53.49 140.71 53.17 140.65 53.17C140.58 53.17 140.28 52.78 139.97 52.31C139.43 51.47 138.91 50.70 138.26 49.73C138.08 49.47 137.74 49.01 137.51 48.73C137.27 48.44 136.75 47.67 136.35 47.02C135.94 46.37 135.54 45.83 135.46 45.83C135.38 45.83 135.20 45.59 135.07 45.29C134.81 44.73 134.29 43.94 133.65 43.10C133.44 42.84 132.95 42.13 132.56 41.52C132.17 40.91 131.70 40.23 131.52 40.00C130.92 39.26 130.35 38.43 130.14 38.00C130.02 37.77 129.74 37.34 129.51 37.05C129.27 36.76 128.86 36.20 128.58 35.81C128.31 35.42 127.61 34.63 127.02 34.07C126.05 33.12 125.86 33.01 124.74 32.74C123.51 32.45 122.80 32.47 121.08 32.82C120.33 32.98 120.10 33.15 118.70 34.62C117.84 35.51 117.03 36.47 116.90 36.74C116.65 37.28 116.07 38.15 115.52 38.83C114.79 39.73 113.83 41.08 113.83 41.22C113.83 41.31 113.61 41.65 113.34 41.98C113.06 42.31 112.69 42.77 112.50 43.00C112.31 43.23 111.79 43.98 111.33 44.67C110.87 45.35 110.23 46.25 109.92 46.67C109.60 47.08 109.22 47.64 109.06 47.92C108.91 48.19 108.59 48.66 108.35 48.96C108.11 49.26 107.72 49.75 107.48 50.04C107.24 50.34 106.92 50.81 106.77 51.08C106.62 51.36 106.23 51.92 105.91 52.33C105.17 53.30 104.50 54.24 104.08 54.91C103.74 55.45 103.27 56.09 102.46 57.06C101.80 57.88 101.62 58.43 101.93 58.74C102.15 58.96 102.82 59.00 106.24 59.00C109.86 59.00 110.33 58.97 110.63 58.71Z M155.22 58.81C155.42 58.70 155.64 58.53 155.71 58.43C155.78 58.33 155.83 56.23 155.81 53.77C155.79 49.59 155.81 49.26 156.09 49.06C156.52 48.74 170.54 48.73 171.17 49.05L171.58 49.26L171.63 53.83C171.67 57.79 171.71 58.44 171.95 58.70C172.19 58.97 172.54 59.00 175.41 59.00C177.90 59.00 178.67 58.95 178.93 58.76C179.24 58.53 179.25 58.18 179.29 46.01C179.33 33.73 179.32 33.49 179.00 33.16C178.69 32.86 178.43 32.83 175.59 32.83C172.58 32.83 171.69 32.96 171.65 33.40C171.65 33.50 171.65 35.33 171.67 37.47C171.69 40.95 171.66 41.40 171.40 41.68C171.13 41.99 170.79 42.00 163.66 42.00C157.24 42.00 156.18 41.97 156.00 41.75C155.85 41.57 155.80 40.44 155.80 37.43C155.81 33.91 155.78 33.33 155.55 33.14C155.35 32.98 154.40 32.90 151.96 32.86C149.14 32.82 148.59 32.85 148.24 33.07L147.83 33.34L147.83 45.91C147.83 57.11 147.86 58.50 148.10 58.74C148.32 58.96 148.87 59.00 151.61 59.00C153.73 59.00 154.98 58.93 155.22 58.81Z M209.84 58.25C210.31 57.79 210.87 57.07 211.08 56.66C211.30 56.24 211.58 55.80 211.72 55.69C211.85 55.58 212.01 55.24 212.07 54.94C212.13 54.63 212.35 54.22 212.57 54.01C212.79 53.81 213.01 53.39 213.07 53.09C213.13 52.79 213.32 52.41 213.50 52.25C213.68 52.09 213.91 51.69 214.02 51.35C214.13 51.02 214.38 50.52 214.59 50.25C214.79 49.98 215.05 49.47 215.16 49.13C215.27 48.78 215.44 48.46 215.53 48.40C215.63 48.34 215.88 47.91 216.10 47.44C216.31 46.97 216.60 46.40 216.74 46.17C216.87 45.94 217.18 45.29 217.43 44.72C217.67 44.15 218.01 43.56 218.18 43.40C218.65 42.98 219.00 43.35 219.00 44.28C219.00 44.69 219.15 45.31 219.34 45.69C219.53 46.06 219.79 46.98 219.91 47.74C220.03 48.49 220.28 49.41 220.46 49.77C220.64 50.12 220.84 50.87 220.91 51.42C220.97 51.97 221.20 52.80 221.41 53.26C221.62 53.73 221.84 54.54 221.91 55.08C222.02 56.00 222.84 58.34 223.21 58.79C223.33 58.95 224.21 59.00 226.56 59.00C228.32 59.00 229.91 58.95 230.11 58.90C230.60 58.77 230.71 58.41 230.44 57.86C230.31 57.62 230.15 57.00 230.09 56.50C230.02 56.00 229.80 55.21 229.59 54.75C229.38 54.29 229.15 53.50 229.09 53.00C229.02 52.50 228.80 51.71 228.59 51.25C228.38 50.79 228.15 50.00 228.08 49.50C228.02 49.00 227.79 48.21 227.57 47.75C227.36 47.29 227.13 46.50 227.07 46.00C227.01 45.50 226.79 44.75 226.58 44.33C226.38 43.92 226.16 43.13 226.09 42.59C226.02 42.04 225.79 41.25 225.58 40.83C225.37 40.42 225.15 39.63 225.08 39.08C225.01 38.53 224.78 37.73 224.56 37.30C224.34 36.86 224.17 36.30 224.17 36.05C224.16 35.46 223.86 34.88 223.06 33.92C222.53 33.28 222.24 33.10 221.32 32.83C220.00 32.44 219.49 32.42 218.22 32.74C217.35 32.96 217.13 33.12 216.13 34.20C215.51 34.86 214.96 35.62 214.91 35.87C214.85 36.13 214.63 36.55 214.43 36.80C214.22 37.05 213.99 37.44 213.92 37.66C213.84 37.89 213.65 38.27 213.48 38.50C213.15 38.95 212.55 40.01 212.04 41.09C211.86 41.45 211.59 41.85 211.45 41.97C211.30 42.09 211.10 42.47 210.99 42.80C210.88 43.14 210.67 43.55 210.52 43.72C210.27 44.01 209.82 44.81 209.00 46.47C208.80 46.87 208.46 47.46 208.24 47.79C208.01 48.11 207.83 48.51 207.83 48.67C207.83 48.83 207.68 49.15 207.49 49.39C206.86 50.19 206.00 49.84 206.00 48.79C206.00 48.57 205.82 48.22 205.59 48.01C205.37 47.80 205.13 47.39 205.07 47.10C205.01 46.82 204.79 46.40 204.58 46.17C204.38 45.94 204.15 45.56 204.09 45.33C204.02 45.10 203.80 44.65 203.59 44.33C202.86 43.20 202.50 42.57 202.16 41.83C201.97 41.42 201.68 40.93 201.51 40.75C201.35 40.57 201.13 40.16 201.02 39.84C200.92 39.53 200.70 39.13 200.54 38.95C200.25 38.64 200.05 38.28 199.11 36.44C198.85 35.93 198.53 35.43 198.40 35.32C198.27 35.21 198.17 35.02 198.17 34.89C198.17 34.76 197.81 34.29 197.38 33.85C196.72 33.18 196.40 32.99 195.53 32.77C194.33 32.46 193.60 32.43 192.90 32.65C192.63 32.74 192.22 32.85 191.98 32.90C191.31 33.05 190.06 34.31 189.92 35.00C189.85 35.32 189.62 35.92 189.41 36.33C189.20 36.75 188.97 37.50 188.91 38.00C188.85 38.50 188.62 39.25 188.42 39.67C188.21 40.08 187.99 40.83 187.92 41.33C187.85 41.84 187.62 42.62 187.41 43.08C187.20 43.54 186.98 44.33 186.91 44.83C186.85 45.34 186.62 46.09 186.41 46.50C186.20 46.91 185.97 47.66 185.91 48.17C185.85 48.67 185.62 49.42 185.42 49.83C185.21 50.25 184.99 51.00 184.92 51.50C184.86 52.00 184.63 52.79 184.42 53.25C184.21 53.71 183.98 54.50 183.92 55.00C183.85 55.50 183.61 56.25 183.40 56.67C182.97 57.47 182.88 58.48 183.20 58.80C183.34 58.94 184.34 59.00 186.63 59.00L189.87 59.00L190.41 58.46C190.87 57.99 190.97 57.75 191.07 56.82C191.13 56.21 191.36 55.34 191.57 54.89C191.79 54.43 192.02 53.58 192.08 53.00C192.15 52.43 192.38 51.57 192.59 51.10C192.80 50.63 193.03 49.80 193.09 49.25C193.15 48.70 193.39 47.86 193.61 47.39C193.87 46.82 194.04 46.08 194.11 45.18C194.24 43.54 194.44 43.19 195.11 43.42C195.49 43.55 195.65 43.77 195.89 44.50C196.05 45.01 196.29 45.53 196.41 45.67C196.54 45.80 196.83 46.33 197.07 46.83C197.68 48.10 197.97 48.68 198.25 49.17C198.39 49.40 198.68 49.97 198.91 50.44C199.13 50.92 199.39 51.35 199.48 51.40C199.57 51.46 199.73 51.78 199.84 52.13C199.95 52.47 200.18 52.90 200.35 53.09C200.52 53.27 200.77 53.76 200.92 54.17C201.06 54.57 201.32 55.06 201.50 55.25C201.68 55.44 201.87 55.82 201.93 56.10C202.04 56.67 204.06 58.92 204.58 59.06C204.77 59.10 205.83 59.13 206.95 59.11L208.99 59.08L209.84 58.25Z M258.83 58.84C259.09 58.70 259.58 58.15 261.60 55.77C261.82 55.51 262.00 55.23 262.00 55.15C262.00 55.07 262.25 54.72 262.55 54.38C263.23 53.61 263.81 52.64 263.73 52.42C263.69 52.31 260.05 52.27 253.15 52.30C243.44 52.34 242.60 52.33 242.31 52.06C241.90 51.69 241.86 49.44 242.26 48.87L242.52 48.50L249.99 48.50C256.05 48.50 257.57 48.46 258.02 48.26C258.59 48.03 259.38 47.17 260.19 45.91C260.43 45.53 260.97 44.87 261.39 44.43C261.82 43.99 262.17 43.54 262.17 43.42C262.17 42.85 261.83 42.83 252.09 42.84C244.98 42.85 242.41 42.80 242.23 42.65C241.90 42.37 241.91 40.20 242.26 39.70L242.52 39.33L250.53 39.33C259.39 39.33 259.40 39.33 259.95 38.27C260.27 37.65 261.21 36.46 262.83 34.65C263.77 33.60 263.86 33.23 263.24 33.00C262.54 32.73 234.64 32.78 234.27 33.05C234.00 33.24 233.98 34.07 234.00 45.91C234.00 54.84 234.06 58.62 234.19 58.78C234.34 58.96 236.63 59.00 246.45 59.00C253.99 59.00 258.64 58.94 258.83 58.84Z M288.25 58.56C288.80 58.37 289.66 58.16 290.17 58.10C290.67 58.03 291.35 57.81 291.67 57.61C291.99 57.40 292.56 57.14 292.93 57.03C293.31 56.93 293.75 56.69 293.92 56.50C294.08 56.32 294.32 56.17 294.44 56.17C294.79 56.17 297.27 53.91 297.85 53.05C298.15 52.63 298.52 52.15 298.69 51.98C298.85 51.81 299.04 51.47 299.10 51.21C299.16 50.96 299.39 50.45 299.60 50.08C300.47 48.57 300.50 42.45 299.65 41.29C299.47 41.03 299.21 40.52 299.08 40.15C298.95 39.78 298.67 39.25 298.46 38.98C297.83 38.15 295.96 36.32 295.31 35.90C294.97 35.69 294.65 35.44 294.60 35.35C294.54 35.26 294.22 35.10 293.87 34.99C293.53 34.89 292.99 34.62 292.67 34.41C292.35 34.20 291.65 33.95 291.13 33.85C290.60 33.76 289.94 33.56 289.64 33.41C288.81 32.97 286.43 32.85 279.21 32.84C272.88 32.83 272.48 32.85 272.21 33.14C271.38 34.03 270.27 35.47 269.96 36.08C269.81 36.36 269.28 37.02 268.76 37.55C267.74 38.62 267.76 38.56 268.01 39.01C268.17 39.32 268.45 39.33 276.81 39.33C284.09 39.33 285.58 39.37 286.27 39.59C286.72 39.73 287.42 39.91 287.84 39.99C288.78 40.18 290.48 41.30 291.20 42.21C291.76 42.91 292.42 44.31 292.67 45.32C293.07 46.93 291.47 50.08 289.83 50.91C289.51 51.07 289.10 51.34 288.92 51.51C288.68 51.72 287.99 51.89 286.58 52.08C283.99 52.43 275.88 52.39 275.44 52.02C275.20 51.82 275.17 51.29 275.17 47.57C275.17 43.96 275.13 43.32 274.90 43.10C274.68 42.87 274.11 42.83 271.19 42.83C268.62 42.83 267.65 42.89 267.44 43.05C267.16 43.25 267.14 43.77 267.16 50.82C267.17 54.98 267.22 58.45 267.27 58.54C267.33 58.62 267.53 58.76 267.73 58.84C267.93 58.92 272.31 58.97 277.67 58.95C286.89 58.91 287.29 58.89 288.25 58.56Z M327.11 58.67C327.41 58.50 327.73 58.18 327.84 57.97C327.95 57.76 328.21 57.40 328.42 57.17C328.88 56.67 330.00 55.02 330.00 54.84C330.00 54.77 330.16 54.58 330.35 54.40C330.55 54.23 330.91 53.79 331.15 53.44C331.61 52.75 332.13 51.98 332.88 50.85C333.14 50.47 333.46 50.03 333.60 49.87C333.96 49.46 334.59 48.52 334.99 47.80C335.18 47.46 335.43 47.12 335.54 47.05C335.75 46.92 336.41 45.99 337.08 44.90C337.27 44.61 337.83 43.83 338.33 43.17C339.45 41.71 339.78 41.67 340.61 42.92C340.92 43.38 341.36 43.96 341.59 44.21C341.81 44.46 342.00 44.74 342.00 44.82C342.00 44.98 342.96 46.45 343.54 47.17C343.75 47.43 344.14 48.02 344.42 48.50C344.69 48.98 345.32 49.84 345.80 50.42C346.42 51.16 346.68 51.60 346.64 51.87L346.58 52.25L341.49 52.28C335.17 52.31 335.85 52.04 333.56 55.42C333.12 56.06 332.65 56.70 332.50 56.83C332.02 57.28 331.33 58.30 331.33 58.57C331.33 58.71 331.50 58.87 331.71 58.92C331.91 58.97 338.53 58.99 346.41 58.96C360.20 58.92 360.75 58.90 360.80 58.61C360.84 58.44 360.68 58.10 360.46 57.86C359.97 57.31 359.26 56.23 358.98 55.62C358.87 55.37 358.72 55.17 358.64 55.17C358.51 55.17 358.05 54.53 357.08 53.00C356.20 51.59 355.68 50.86 355.50 50.75C355.41 50.69 355.18 50.37 354.99 50.03C354.62 49.35 354.02 48.47 353.49 47.83C353.30 47.60 352.93 47.08 352.68 46.67C352.06 45.64 351.76 45.21 351.08 44.33C350.77 43.92 350.34 43.28 350.15 42.92C349.95 42.55 349.69 42.19 349.56 42.12C349.43 42.04 349.18 41.69 349.00 41.32C348.81 40.96 348.60 40.67 348.53 40.67C348.46 40.67 348.23 40.35 348.03 39.96C347.83 39.57 347.40 38.91 347.08 38.50C346.49 37.74 346.40 37.60 345.35 36.01C345.02 35.52 344.28 34.65 343.70 34.07C342.74 33.12 342.57 33.01 341.48 32.77C340.05 32.45 339.38 32.44 338.14 32.74C337.09 32.99 337.05 33.01 336.02 33.79C335.32 34.33 334.64 35.13 333.92 36.28C333.73 36.57 333.23 37.27 332.79 37.82C332.36 38.38 332.00 38.90 332.00 38.99C332.00 39.13 331.17 40.24 330.51 40.96C330.32 41.17 330.02 41.62 329.83 41.96C329.65 42.30 329.23 42.92 328.91 43.33C328.17 44.30 327.50 45.23 327.08 45.91C326.74 46.45 326.26 47.09 325.46 48.07C325.21 48.38 325.00 48.71 325.00 48.80C325.00 48.90 324.80 49.21 324.56 49.50C324.04 50.12 323.66 50.64 322.42 52.42C321.91 53.15 321.23 54.09 320.91 54.50C320.60 54.91 320.18 55.51 320.00 55.83C319.56 56.57 318.91 57.48 318.49 57.93C318.16 58.27 318.07 58.68 318.28 58.89C318.34 58.95 320.23 59.00 322.49 59.00C326.25 59.00 326.63 58.97 327.11 58.67Z M373.60 58.58C373.81 58.30 373.84 56.88 373.83 49.20C373.81 41.16 373.84 40.10 374.07 39.74L374.34 39.33L378.48 39.33C381.10 39.33 382.81 39.27 383.15 39.15C383.65 38.97 383.97 38.61 384.91 37.10C385.35 36.41 387.30 34.12 387.60 33.95C387.92 33.77 387.90 33.06 387.57 32.93C387.08 32.75 359.25 32.82 358.70 33.01C358.42 33.11 358.15 33.31 358.09 33.47C357.87 34.04 355.42 37.13 354.47 38.03C353.94 38.54 353.93 38.56 354.17 39.01C354.34 39.32 354.58 39.33 359.76 39.33C364.94 39.33 365.18 39.35 365.50 39.67C365.83 39.99 365.83 40.22 365.83 49.13C365.83 57.22 365.86 58.30 366.10 58.64C366.36 59.02 366.38 59.02 369.86 58.97C373.13 58.92 373.38 58.89 373.60 58.58Z M416.20 58.54C416.50 58.29 416.81 57.99 416.88 57.88C416.96 57.76 417.41 57.20 417.89 56.62C418.37 56.05 418.96 55.28 419.21 54.92C419.46 54.55 419.93 53.89 420.26 53.45C420.59 53.00 420.83 52.57 420.80 52.47C420.76 52.36 417.19 52.31 410.21 52.33C397.90 52.35 399.00 52.53 399.00 50.45C399.00 49.63 399.08 49.12 399.26 48.87L399.52 48.50L407.01 48.50C413.50 48.50 414.58 48.46 415.16 48.23C415.53 48.08 415.83 47.91 415.83 47.85C415.83 47.79 416.11 47.39 416.46 46.96C416.80 46.54 417.27 45.91 417.50 45.57C417.73 45.23 418.20 44.66 418.54 44.30C419.21 43.61 419.30 43.32 418.94 43.02C418.77 42.88 416.07 42.83 409.07 42.84C399.97 42.85 399.41 42.83 399.20 42.55C398.91 42.16 398.99 39.99 399.31 39.61C399.52 39.36 400.34 39.33 407.61 39.33C414.39 39.33 415.76 39.29 416.16 39.09C416.42 38.95 416.95 38.37 417.34 37.80C418.10 36.68 418.58 36.08 419.96 34.50C420.86 33.48 420.93 33.11 420.28 32.94C420.08 32.88 413.54 32.84 405.74 32.84C394.58 32.83 391.50 32.88 391.28 33.04C391.01 33.24 390.99 34.11 391.00 45.92C391.00 57.59 391.02 58.60 391.28 58.79C391.50 58.95 394.23 59.00 403.60 59.00L415.64 59.00L416.20 58.54Z M431.90 58.74C432.13 58.51 432.17 57.85 432.17 54.08C432.17 49.73 432.17 49.68 432.54 49.43C432.86 49.20 433.84 49.17 439.88 49.17C445.80 49.17 446.92 49.13 447.34 48.91C447.61 48.77 447.83 48.59 447.83 48.51C447.83 48.43 448.13 47.97 448.49 47.48C449.09 46.64 449.47 46.19 450.42 45.12C451.47 43.93 451.73 43.29 451.24 43.10C451.09 43.05 446.89 43.00 441.89 43.00C435.95 43.00 432.70 42.94 432.49 42.83C432.21 42.68 432.17 42.47 432.17 41.34C432.17 39.94 432.33 39.58 433.05 39.42C433.25 39.37 436.82 39.32 440.97 39.29L448.53 39.25L448.84 38.83C449.01 38.60 449.30 38.23 449.48 38.00C449.96 37.41 450.87 36.16 451.20 35.65C451.35 35.41 451.82 34.88 452.24 34.46C453.08 33.61 453.22 33.06 452.62 32.92C452.42 32.87 446.06 32.85 438.48 32.87C427.25 32.91 424.67 32.96 424.45 33.14C424.20 33.34 424.18 34.54 424.17 45.75C424.17 52.55 424.21 58.25 424.27 58.41C424.46 58.90 425.00 58.98 428.36 58.99C431.13 59.00 431.68 58.96 431.90 58.74Z"/></defs></svg>
+
+<header class="nav" aria-label="Main">
+  <a class="mark" href="https://ahmed-atef-tech.github.io/"><svg class="logo" viewBox="0 0 458 93" role="img" aria-label="Ahmed Atef"><use href="#lo-all"/></svg></a>
+  <span class="here">/ ETT-101 Simulator</span>
   <span class="grow"></span>
-  <div class="seg" role="group" aria-label="Language"><button type="button" lang="ar" data-lang="ar">العربية</button><button type="button" lang="en" data-lang="en">English</button></div>
-</div></header>
+  <div class="seg" role="group" aria-label="Language"><button type="button" lang="ar" data-lang="ar">عربي</button><button type="button" lang="en" data-lang="en">EN</button></div>
+</header>
 
-<main class="wrap">
-  <section class="hero">
+<main>
+  <section class="panel hero">
     <div>
-      <h1><span data-ar>معمل الاتصالات على جهازك</span><span data-en>The telecoms lab on your computer</span></h1>
+      <p class="status off" id="status"><i aria-hidden="true"></i><span id="statusText">…</span></p>
+      <h1><span data-ar><span class="l1">معمل الاتصالات</span><br><span class="l2">على جهازك.</span></span><span data-en><span class="l1">The telecoms lab</span><br><span class="l2">on your computer.</span></span></h1>
       <p class="lede" data-ar>محاكي لكيت Emona ETT-101 وأوسيلوسكوب UTD2102CEL. وصّل الأسلاك، لف المقابض، وشوف الإشارة على الشاشة زي المعمل بالظبط، ومعاه كل تجارب الترم الأول والتاني جاهزة.</p>
-      <p class="lede" data-en>A simulator of the Emona ETT-101 trainer and the UTD2102CEL oscilloscope. Plug in leads, turn the knobs and watch the signals on the screen as in the lab, with every Term 1 and Term 2 experiment ready to load.</p>
-    </div>
-    <div class="scope" aria-hidden="true">
-      <div class="scope-top"><span class="tag">DSO</span><span>UTD2102CEL</span><span class="grow"></span><span>AM · m = 0.5</span></div>
-      <div class="screen"><div class="screen-in"><canvas id="trace"></canvas></div>
-        <div class="readout"><span><b>CH1</b> 500mV</span><span>CH2 1.00V</span><span>M 100µs</span><span class="ver" id="scrVer">v —</span></div></div>
-    </div>
-  </section>
-
-  <section class="dl" aria-labelledby="dlh">
-    <h2 id="dlh" class="sr" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)"><span data-ar>تحميل</span><span data-en>Download</span></h2>
-    <div class="keys">
-      <a class="key" id="kWin" href="https://github.com/Ahmed-Atef-Tech/ETT101-Simulator/releases/latest">
-        <svg viewBox="0 0 32 32" aria-hidden="true"><path fill="#1e2427" d="M3 6.2 13.6 4.8v10.3H3zm0 19.6 10.6 1.4V16.9H3zm12.2 1.6L29 29.3V16.9H15.2zm0-22.8v10.5H29V2.7z"/></svg>
-        <span><span class="t"><span data-ar>تحميل لـ Windows</span><span data-en>Download for Windows</span></span><br>
-          <span class="s"><span data-ar class="ar">Windows 10 و 11</span><span data-en>Windows 10 and 11</span> · <span class="size" id="sWin"></span></span>
-          <span class="mine-note" data-ar hidden> · جهازك</span><span class="mine-note" data-en hidden> · your computer</span></span>
-        <span class="lamp"></span>
-      </a>
-      <a class="key" id="kMac" href="https://github.com/Ahmed-Atef-Tech/ETT101-Simulator/releases/latest">
-        <svg viewBox="0 0 32 32" aria-hidden="true"><path fill="#1e2427" d="M21.6 16.9c0-3.2 2.6-4.7 2.7-4.8-1.5-2.2-3.8-2.5-4.6-2.5-1.9-.2-3.8 1.1-4.8 1.1-1 0-2.5-1.1-4.1-1.1-2.1 0-4.1 1.3-5.2 3.2-2.2 3.9-.6 9.6 1.6 12.7 1.1 1.5 2.3 3.2 3.9 3.2 1.6-.1 2.2-1 4.1-1s2.4 1 4.1 1c1.7 0 2.8-1.6 3.8-3.1 1.2-1.8 1.7-3.5 1.7-3.6-.1 0-3.2-1.2-3.2-5.1zM18.5 7.5c.9-1.1 1.5-2.5 1.3-4-1.3.1-2.8.9-3.7 1.9-.8.9-1.5 2.4-1.3 3.9 1.4.1 2.8-.7 3.7-1.8z"/></svg>
-        <span><span class="t"><span data-ar>تحميل لـ Mac</span><span data-en>Download for Mac</span></span><br>
-          <span class="s"><span data-ar class="ar">Intel و Apple Silicon</span><span data-en>Intel and Apple Silicon</span> · <span class="size" id="sMac"></span></span>
-          <span class="mine-note" data-ar hidden> · جهازك</span><span class="mine-note" data-en hidden> · your computer</span></span>
-        <span class="lamp"></span>
-      </a>
-    </div>
-    <p class="status" id="status" aria-live="polite"></p>
-    <div class="extras">
-      <a id="lSetups" href="https://github.com/Ahmed-Atef-Tech/ETT101-Simulator/releases/latest"><span data-ar>ملفات التجارب (OPEN SETUP)</span><span data-en>Experiment setup files (OPEN SETUP)</span></a>
-      <a id="lRef" href="https://github.com/Ahmed-Atef-Tech/ETT101-Simulator/releases/latest"><span data-ar>مرجع الموديل والمعادلات</span><span data-en>Model reference and equations</span></a>
-      <a href="https://github.com/Ahmed-Atef-Tech/ETT101-Simulator/releases"><span data-ar>كل النسخ القديمة</span><span data-en>All earlier versions</span></a>
-    </div>
-  </section>
-
-  <section class="sheet" aria-labelledby="inst">
-    <h2 id="inst"><span data-ar>التثبيت</span><span data-en>Installing</span></h2>
-    <div class="cols">
-      <div>
-        <h3>Windows</h3>
-        <ol data-ar>
-          <li>افتح ملف الـ Setup اللي نزل.</li>
-          <li>لو ظهرت رسالة زرقاء <span class="lat-term">“Windows protected your PC”</span>: دوس <span class="lat-term">More info</span> وبعدين <span class="lat-term">Run anyway</span>. ده عادي لأن البرنامج مش موقّع بشهادة مدفوعة.</li>
-          <li>كمّل التثبيت، وهتلاقي البرنامج على سطح المكتب.</li>
-        </ol>
-        <ol data-en>
-          <li>Open the Setup file you downloaded.</li>
-          <li>If a blue <span class="lat-term">“Windows protected your PC”</span> box appears, click <span class="lat-term">More info</span>, then <span class="lat-term">Run anyway</span>. It shows because the app isn’t signed with a paid certificate.</li>
-          <li>Finish the installer; the app is on your desktop.</li>
-        </ol>
+      <p class="lede" data-en>A simulator of the Emona ETT-101 trainer and the UTD2102CEL oscilloscope. Plug in leads, turn the knobs and watch the signals as in the lab, with every Term 1 and Term 2 experiment ready to load.</p>
+      <div class="dl">
+        <a class="btn btn-glass" id="kWin" href="https://github.com/Ahmed-Atef-Tech/ETT101-Simulator/releases/latest">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 4.6 10.2 3.5v8H2zm0 14.8 8.2 1.1v-7.9H2zm9.2 1.2L22 22v-9.5H11.2zM11.2 3.4v8.1H22V2z"/></svg>
+          <span><span data-ar>تحميل لـ Windows</span><span data-en>Download for Windows</span></span><small id="sWin"></small></a>
+        <a class="btn btn-glass" id="kMac" href="https://github.com/Ahmed-Atef-Tech/ETT101-Simulator/releases/latest">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.4 12.8c0-2.4 2-3.6 2.1-3.7-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9-.8 0-1.9-.8-3.1-.8-1.6 0-3.1 1-3.9 2.4-1.7 2.9-.4 7.3 1.2 9.6.8 1.2 1.8 2.4 3 2.4 1.2-.1 1.7-.8 3.1-.8 1.5 0 1.9.8 3.1.8 1.3 0 2.1-1.2 2.9-2.3.9-1.3 1.3-2.6 1.3-2.7-.1 0-2.5-1-2.5-3.9zM14 5.7c.7-.8 1.1-1.9 1-3-1 0-2.1.7-2.8 1.5-.6.7-1.2 1.8-1 2.9 1.1.1 2.1-.6 2.8-1.4z"/></svg>
+          <span><span data-ar>تحميل لـ Mac</span><span data-en>Download for Mac</span></span><small id="sMac"></small></a>
       </div>
-      <div>
-        <h3>Mac</h3>
-        <ol data-ar>
-          <li>افتح ملف الـ dmg واسحب البرنامج لفولدر <span class="lat-term">Applications</span>.</li>
-          <li>أول مرة بس: افتح البرنامج، ولو قالك إنه من مطوّر مش معروف، افتح <span class="lat-term">System Settings</span> وبعدين <span class="lat-term">Privacy &amp; Security</span> ودوس <span class="lat-term">Open Anyway</span>.</li>
-          <li>بعد كده بيفتح عادي.</li>
-        </ol>
-        <ol data-en>
-          <li>Open the dmg file and drag the app into <span class="lat-term">Applications</span>.</li>
-          <li>First time only: open the app; if macOS says the developer can’t be verified, go to <span class="lat-term">System Settings → Privacy &amp; Security</span> and click <span class="lat-term">Open Anyway</span>.</li>
-          <li>After that it opens normally.</li>
-        </ol>
-      </div>
+      <p class="mine" id="mine"></p>
     </div>
-    <p class="auto" data-ar><b>التحديثات:</b> على Windows البرنامج بيحدّث نفسه لوحده لما تنزل نسخة جديدة. على Mac بيقولك إن فيه نسخة جديدة وبيفتحلك الصفحة دي تنزّلها.</p>
-    <p class="auto" data-en><b>Updates:</b> on Windows the app updates itself when a new version is out. On Mac it tells you and opens this page so you can download it.</p>
+    <div class="code-card" aria-hidden="true">
+      <div class="code-bar"><i></i><i></i><i></i><span>UTD2102CEL</span><span class="r">AM · m = 0.5</span></div>
+      <div class="screen"><canvas id="trace"></canvas></div>
+      <div class="readout"><span class="y">CH1 500mV</span><span class="c">CH2 1.00V</span><span>M 100µs</span><span class="k" id="scrVer">v—</span></div>
+    </div>
   </section>
 
-  <figure>
-    <img src="app.jpg" width="1800" height="967" loading="lazy" alt="The simulator: the ETT-101 kit on the left wired for AM, the oscilloscope on the right showing the message and the AM signal">
-    <figcaption data-ar>تجربة الـ AM: الكيت متوصّل على الشمال، والأوسيلوسكوب على اليمين بيعرض الرسالة وإشارة الـ AM.</figcaption>
-    <figcaption data-en>The AM experiment: the kit wired on the left, the oscilloscope on the right showing the message and the AM signal.</figcaption>
-  </figure>
+  <div class="wrap">
+    <section class="block" aria-labelledby="inst">
+      <div class="s-head">
+        <h2 id="inst"><span data-ar>التثبيت</span><span data-en>Installing</span></h2>
+        <p data-ar>خطوة واحدة بس أول مرة، عشان البرنامج مش موقّع بشهادة مدفوعة. بعد كده بيفتح عادي.</p>
+        <p data-en>One extra click the first time, because the app isn’t signed with a paid certificate. After that it opens normally.</p>
+      </div>
+      <div class="steps">
+        <article class="step-card glass">
+          <h3>Windows</h3>
+          <ol data-ar>
+            <li><span>افتح ملف الـ <span class="lat">Setup</span> اللي نزل.</span></li>
+            <li><span>لو ظهرت رسالة زرقاء <b class="lat">Windows protected your PC</b>، دوس <b class="lat">More info</b> وبعدين <b class="lat">Run anyway</b>.</span></li>
+            <li><span>كمّل التثبيت، وهتلاقي البرنامج على سطح المكتب.</span></li>
+          </ol>
+          <ol data-en>
+            <li><span>Open the Setup file you downloaded.</span></li>
+            <li><span>If a blue <b>Windows protected your PC</b> box appears, click <b>More info</b>, then <b>Run anyway</b>.</span></li>
+            <li><span>Finish the installer; the app is on your desktop.</span></li>
+          </ol>
+        </article>
+        <article class="step-card glass">
+          <h3>Mac</h3>
+          <ol data-ar>
+            <li><span>افتح ملف الـ <span class="lat">dmg</span> واسحب البرنامج لفولدر <b class="lat">Applications</b>.</span></li>
+            <li><span>أول مرة بس: لو الماك قالك إن المطوّر مش معروف، افتح <b class="lat">System Settings</b> وبعدين <b class="lat">Privacy &amp; Security</b> ودوس <b class="lat">Open Anyway</b>.</span></li>
+            <li><span>بعد كده بيفتح عادي.</span></li>
+          </ol>
+          <ol data-en>
+            <li><span>Open the dmg file and drag the app into <b>Applications</b>.</span></li>
+            <li><span>First time only: if macOS says the developer can’t be verified, open <b>System Settings</b>, then <b>Privacy &amp; Security</b>, and click <b>Open Anyway</b>.</span></li>
+            <li><span>After that it opens normally.</span></li>
+          </ol>
+        </article>
+      </div>
+      <p class="note" data-ar><b>التحديثات:</b> على Windows البرنامج بيحدّث نفسه لوحده لما تنزل نسخة جديدة. على Mac بيقولك إن فيه نسخة جديدة وبيفتحلك الصفحة دي تنزّلها.</p>
+      <p class="note" data-en><b>Updates:</b> on Windows the app updates itself when a new version is out. On Mac it tells you and opens this page.</p>
+    </section>
+
+    <section class="block" aria-labelledby="more">
+      <div class="s-head">
+        <h2 id="more"><span data-ar>ملفات تانية</span><span data-en>Other files</span></h2>
+        <p data-ar>التجارب الجاهزة والمرجع موجودين جوه البرنامج نفسه. دول نسخ منفصلة لو محتاجهم برّه.</p>
+        <p data-en>The ready-made experiments and the reference are inside the app. These are separate copies if you need them outside it.</p>
+      </div>
+      <div class="more glass">
+        <div class="row"><h3><span data-ar>ملفات التجارب</span><span data-en>Experiment files</span></h3>
+          <p data-ar>الـ 68 تجربة من كتب الترم الأول والتاني، تفتحها من <span class="lat">OPEN SETUP</span>.</p><p data-en>All 68 experiments from the Term 1 and Term 2 books, for OPEN SETUP.</p>
+          <a class="act" id="lSetups" href="https://github.com/Ahmed-Atef-Tech/ETT101-Simulator/releases/latest"><span data-ar>تحميل الـ zip</span><span data-en>Download zip</span></a></div>
+        <div class="row"><h3><span data-ar>مرجع الموديل</span><span data-en>Model reference</span></h3>
+          <p data-ar>معادلة وأرقام كل بلوك، ومصدر كل رقم.</p><p data-en>Every module’s equation and values, and where each number comes from.</p>
+          <a class="act" id="lRef" href="https://github.com/Ahmed-Atef-Tech/ETT101-Simulator/releases/latest"><span data-ar>فتح المرجع</span><span data-en>Open reference</span></a></div>
+        <div class="row"><h3><span data-ar>النسخ القديمة</span><span data-en>Earlier versions</span></h3>
+          <p data-ar>كل النسخ اللي نزلت قبل كده، مع اللي اتغيّر في كل واحدة.</p><p data-en>Every earlier version, with what changed in each.</p>
+          <a class="act" href="https://github.com/Ahmed-Atef-Tech/ETT101-Simulator/releases"><span data-ar>على GitHub</span><span data-en>On GitHub</span></a></div>
+      </div>
+    </section>
+
+    <section class="block">
+      <figure class="shot glass">
+        <img src="app.jpg" width="1800" height="967" loading="lazy" alt="The simulator: the ETT-101 kit on the left wired for AM, the oscilloscope on the right showing the message and the AM signal">
+        <figcaption data-ar>تجربة الـ AM: الكيت متوصّل على الشمال، والأوسيلوسكوب على اليمين بيعرض الرسالة وإشارة الـ AM.</figcaption>
+        <figcaption data-en>The AM experiment: the kit wired on the left, the oscilloscope on the right showing the message and the AM signal.</figcaption>
+      </figure>
+    </section>
+  </div>
 </main>
 
-<footer class="wrap">
-  <span data-ar>البرنامج مفتوح المصدر على <a href="https://github.com/Ahmed-Atef-Tech/ETT101-Simulator">GitHub</a>. مش تابع لشركة Emona أو UNI-T.</span>
-  <span data-en>The source is on <a href="https://github.com/Ahmed-Atef-Tech/ETT101-Simulator">GitHub</a>. Not affiliated with Emona or UNI-T.</span>
-</footer>
+<footer><div class="wrap">
+  <span class="foot-mark"><a href="https://ahmed-atef-tech.github.io/" style="border:0"><svg class="logo logo-dark" viewBox="0 0 458 93" role="img" aria-label="Ahmed Atef"><use href="#lo-all"/></svg></a><span data-ar>مش تابع لشركة Emona أو UNI-T</span><span data-en>Not affiliated with Emona or UNI-T</span></span>
+  <span><a href="https://github.com/Ahmed-Atef-Tech/ETT101-Simulator"><span data-ar>الكود على GitHub</span><span data-en>Source on GitHub</span></a></span>
+</div></footer>
 
 <script>
 (() => {
@@ -204,35 +271,33 @@ html[lang="en"] [data-ar] { display: none; }
   const $ = id => document.getElementById(id);
   const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) { } } };
 
-  // ---------- language ----------
-  let lang = store.get('ett.dl.lang') || 'ar'; // the students read Arabic first
+  // which computer is this
+  const ua = navigator.userAgent, plat = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '';
+  const os = (/Win/i.test(plat) || /Windows/i.test(ua)) ? 'win' : ((/Mac/i.test(plat) || /Mac OS X/i.test(ua)) && !/iPhone|iPad/i.test(ua)) ? 'mac' : null;
+  if (os) { const k = $(os === 'win' ? 'kWin' : 'kMac'); k.classList.replace('btn-glass', 'btn-light'); k.parentNode.prepend(k); }
+
+  // latest release
+  let rel = null, failed = false, lang = store.get('ett.dl.lang') || 'ar';
+  const mb = n => (n / 1048576).toFixed(0) + ' MB';
+  function paint() {
+    const ar = lang === 'ar', st = $('status');
+    st.classList.toggle('off', !rel);
+    if (failed) $('statusText').textContent = ar ? 'مش قادر أوصل لـ GitHub دلوقتي — الزراير هتفتح صفحة آخر نسخة' : 'Can’t reach GitHub right now — the buttons open the latest release page';
+    else if (!rel) $('statusText').textContent = ar ? 'بجيب آخر نسخة…' : 'Checking the latest version…';
+    else {
+      const date = new Date(rel.published_at).toLocaleDateString(ar ? 'ar-EG' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+      $('statusText').textContent = ar ? `آخر نسخة ${rel.tag_name}، نزلت ${date}` : `Latest ${rel.tag_name}, released ${date}`;
+    }
+    $('mine').innerHTML = os ? (ar ? `الزرار الفاتح لجهازك: <b>${os === 'win' ? 'Windows' : 'Mac'}</b>` : `The light button matches your computer: <b>${os === 'win' ? 'Windows' : 'Mac'}</b>`) : '';
+  }
   function setLang(l) {
     lang = l; store.set('ett.dl.lang', l);
     document.documentElement.lang = l; document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr';
     document.querySelectorAll('[data-lang]').forEach(b => b.setAttribute('aria-pressed', b.dataset.lang === l ? 'true' : 'false'));
-    paintStatus();
+    paint();
   }
   document.querySelectorAll('[data-lang]').forEach(b => b.onclick = () => setLang(b.dataset.lang));
-
-  // ---------- which computer is this ----------
-  const ua = navigator.userAgent, plat = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '';
-  const os = /Win/i.test(plat) || /Windows/i.test(ua) ? 'win' : (/Mac/i.test(plat) || /Mac OS X/i.test(ua)) && !/iPhone|iPad/i.test(ua) ? 'mac' : null;
-  if (os) {
-    const k = $(os === 'win' ? 'kWin' : 'kMac'); k.classList.add('mine'); k.querySelectorAll('.mine-note').forEach(n => n.hidden = false);
-    if (os === 'mac') k.parentNode.prepend(k);
-  }
-
-  // ---------- latest release ----------
-  let rel = null, failed = false;
-  const mb = n => (n / 1048576).toFixed(0) + ' MB';
-  function paintStatus() {
-    const s = $('status');
-    if (failed) { s.textContent = lang === 'ar' ? 'مش قادر أوصل لـ GitHub دلوقتي. الزراير هتفتح صفحة آخر نسخة على GitHub.' : 'GitHub can’t be reached right now. The buttons open the latest release page on GitHub.'; return; }
-    if (!rel) { s.textContent = lang === 'ar' ? 'بجيب آخر نسخة…' : 'Checking the latest version…'; return; }
-    const d = new Date(rel.published_at), date = d.toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-    s.textContent = lang === 'ar' ? `آخر نسخة ${rel.tag_name} — نزلت ${date}` : `Latest version ${rel.tag_name}, released ${date}`;
-  }
-  paintStatus();
+  setLang(lang);
   fetch(`https://api.github.com/repos/${REPO}/releases/latest`, { headers: { Accept: 'application/vnd.github+json' } })
     .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
     .then(j => {
@@ -242,40 +307,32 @@ html[lang="en"] [data-ar] { display: none; }
       if (mac) { $('kMac').href = mac.browser_download_url; $('sMac').textContent = mb(mac.size); }
       if (setups) $('lSetups').href = setups.browser_download_url;
       if (ref) $('lRef').href = ref.browser_download_url;
-      $('scrVer').textContent = j.tag_name; paintStatus();
+      $('scrVer').textContent = j.tag_name; paint();
     })
-    .catch(() => { failed = true; paintStatus(); });
+    .catch(() => { failed = true; paint(); });
 
-  // ---------- the scope trace: AM, m = 0.5 (same numbers as Exp 1) ----------
-  const cv = $('trace'), ctx = cv.getContext('2d');
-  const still = matchMedia('(prefers-reduced-motion: reduce)');
-  let w = 0, h = 0, t0 = performance.now();
+  // the scope trace: Exp 1 AM, m = 0.5 (message on CH1, AM signal on CH2)
+  const cv = $('trace'), ctx = cv.getContext('2d'), still = matchMedia('(prefers-reduced-motion: reduce)');
+  let w = 0, h = 0, t0 = 0;
   function size() { const r = cv.getBoundingClientRect(), d = Math.min(2, devicePixelRatio || 1); w = r.width; h = r.height; cv.width = Math.round(w * d); cv.height = Math.round(h * d); ctx.setTransform(d, 0, 0, d, 0, 0); }
-  function grid() {
-    ctx.strokeStyle = 'rgba(160,180,200,.16)'; ctx.lineWidth = 1;
+  function draw(now) {
+    const p = still.matches ? 1 : Math.min(1, (now - t0) / 1400), x1 = w * p, div = h / 8, cyc = 2.5;
+    ctx.clearRect(0, 0, w, h);
+    ctx.strokeStyle = 'rgba(243,244,241,.07)'; ctx.lineWidth = 1;
     for (let i = 1; i < 10; i++) { const x = Math.round(w * i / 10) + .5; ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
     for (let i = 1; i < 8; i++) { const y = Math.round(h * i / 8) + .5; ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
-  }
-  function draw(now) {
-    const reveal = still.matches ? 1 : Math.min(1, (now - t0) / 1400), x1 = w * reveal;
-    ctx.clearRect(0, 0, w, h); grid();
-    const cycles = 2.5, carrier = 50, div = h / 8;
-    // CH2: AM = (1 + 0.5 sin) x carrier, 1 V/div, centred on the 4th division from the bottom
-    ctx.beginPath(); ctx.strokeStyle = '#39d0d8'; ctx.lineWidth = 1.1;
+    ctx.beginPath(); ctx.strokeStyle = '#6FD3DA'; ctx.lineWidth = 1.1;
     const n = Math.max(2, Math.floor(x1 * 3));
-    for (let i = 0; i <= n; i++) { const x = x1 * i / n, ph = x / w * cycles * 2 * Math.PI; const y = h * 0.66 - div * 2 * (1 + 0.5 * Math.sin(ph)) * Math.sin(ph * carrier / cycles) * 0.55; i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+    for (let i = 0; i <= n; i++) { const x = x1 * i / n, ph = x / w * cyc * 2 * Math.PI, y = h * .66 - div * 1.1 * (1 + .5 * Math.sin(ph)) * Math.sin(ph * 20); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
     ctx.stroke();
-    // CH1: the message, 1 V DC + 1 Vp-p at 0.5 V/div, drawn in the top half
-    ctx.beginPath(); ctx.strokeStyle = '#f6e51d'; ctx.lineWidth = 1.8;
-    for (let i = 0; i <= 200; i++) { const x = x1 * i / 200, ph = x / w * cycles * 2 * Math.PI; const y = h * 0.24 - div * 0.9 * Math.sin(ph); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+    ctx.beginPath(); ctx.strokeStyle = '#F2D64B'; ctx.lineWidth = 1.8;
+    for (let i = 0; i <= 200; i++) { const x = x1 * i / 200, ph = x / w * cyc * 2 * Math.PI, y = h * .22 - div * .85 * Math.sin(ph); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
     ctx.stroke();
-    if (reveal < 1) requestAnimationFrame(draw);
+    if (p < 1) requestAnimationFrame(draw);
   }
   const start = () => { size(); t0 = performance.now(); requestAnimationFrame(draw); };
   addEventListener('resize', () => { size(); draw(performance.now() + 1e6); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(start); else start();
-
-  setLang(lang);
 })();
 </script>
 </body>
