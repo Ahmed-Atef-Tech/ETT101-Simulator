@@ -154,11 +154,16 @@ html .about h2 { font-family: var(--display); letter-spacing: -.05em !important;
 .about .sub { color: rgba(243, 244, 241, .82); max-width: 48ch; }
 .about .row-b { display: flex; flex-wrap: wrap; gap: 10px; }
 @media (max-width: 760px) { .panel-bg img { object-position: 50% 22%; } }
-footer { padding-block: 64px 40px; color: var(--ink-2); font-size: .92rem; }
-footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; }
-.foot-mark { display: flex; align-items: center; gap: 16px; }
 .logo-dark { fill: var(--ink); height: 18px; }
-footer a { border-bottom: 1px solid var(--copper); }
+/* footer: logo and source link on one line, the small print under a thin rule */
+footer { padding-block: 56px 36px; color: var(--ink-2); }
+.foot { display: grid; gap: 16px; }
+.foot-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-top: 24px; border-top: 1px solid var(--line); }
+.foot-logo { display: inline-flex; padding: 10px 0; }
+.foot-gh { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--line); color: var(--ink); font-size: .88rem; white-space: nowrap; transition: color .4s, border-color .4s; }
+.foot-gh:hover, .foot-gh:focus-visible { color: var(--copper); border-color: rgba(232, 161, 91, .5); }
+.foot-gh svg { width: 16px; height: 16px; fill: currentColor; flex: none; }
+.foot-note { margin: 0; font-size: .8rem; line-height: 1.6; color: rgba(239, 233, 224, .5); }
 
 [data-en] { display: none !important; }
 html[lang="en"] [data-en] { display: revert !important; }
@@ -279,9 +284,12 @@ html[lang="en"] [data-ar] { display: none !important; }
   </section></div>
 </main>
 
-<footer><div class="wrap">
-  <span class="foot-mark"><a href="https://ahmed-atef-tech.github.io/" style="border:0"><svg class="logo logo-dark" viewBox="0 0 458 93" role="img" aria-label="Ahmed Atef"><use href="#lo-all"/></svg></a><span data-ar>نسخة أولية · مجاني وغير ربحي · مش تابع لشركة Emona أو UNI-T</span><span data-en>Beta · free and non-commercial · not affiliated with Emona or UNI-T</span></span>
-  <span><a href="https://github.com/Ahmed-Atef-Tech/ETT101-Simulator"><span data-ar>الكود على GitHub</span><span data-en>Source on GitHub</span></a></span>
+<footer><div class="wrap foot">
+  <div class="foot-top">
+    <a class="foot-logo" href="https://ahmed-atef-tech.github.io/"><svg class="logo logo-dark" viewBox="0 0 458 93" role="img" aria-label="Ahmed Atef"><use href="#lo-all"/></svg></a>
+    <a class="foot-gh" href="https://github.com/Ahmed-Atef-Tech/ETT101-Simulator"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg><span data-ar>الكود على GitHub</span><span data-en>Source on GitHub</span></a>
+  </div>
+  <p class="foot-note"><span data-ar>نسخة أولية · مجاني وغير ربحي · مش تابع لشركة Emona أو UNI-T</span><span data-en>Beta · free and non-commercial · not affiliated with Emona&nbsp;or&nbsp;UNI-T</span></p>
 </div></footer>
 
 <script>
