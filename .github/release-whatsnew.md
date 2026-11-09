@@ -1,2 +1,1 @@
 - Shorter preliminary-version notice in the app and on the download page: when the simulator and the real kit differ, the real kit is the reference.
-- صياغة أقصر لتنبيه النسخة الأولية جوه البرنامج وفي صفحة التحميل: لو فيه اختلاف بين البرنامج والكيت الحقيقي، الكيت الحقيقي هو المرجع.

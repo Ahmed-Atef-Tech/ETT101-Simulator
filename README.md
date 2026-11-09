@@ -5,40 +5,39 @@ An interactive simulator of the **Emona ETT-101 (Telecoms-Trainer 101)** kit and
 > [!IMPORTANT]
 > **Preliminary (beta) version.** This simulator is still being tested and may not match the real Emona ETT-101 kit 100%. When it differs, the real kit is the reference.
 > It was made **only to help students**. It is **free and non-commercial**: it must not be sold, rented, put behind a paywall, bundled with paid courses or used to make money in any way. Not affiliated with Emona Instruments or UNI-T.
->
-> **نسخة أولية (تجريبية).** البرنامج لسه تحت الاختبار، وممكن متكونش مطابقة لكيت Emona ETT-101 الحقيقي 100%. لو فيه اختلاف، الكيت الحقيقي هو المرجع.
-> البرنامج معمول **لمساعدة الطلبة بس**، وهو **مجاني وغير ربحي**: ممنوع بيعه أو تأجيره أو إنه يتحط في كورس مدفوع أو التربح منه بأي شكل من الأشكال. مش تابع لشركة Emona Instruments أو UNI-T.
 
-## ⬇️ التحميل / Download
+## ⬇️ Download
 
-**[صفحة التحميل / Download page](https://ahmed-atef-tech.github.io/ETT101-Simulator/)** · [GitHub release](https://github.com/Ahmed-Atef-Tech/ETT101-Simulator/releases/latest)
+**[Download page](https://ahmed-atef-tech.github.io/ETT101-Simulator/)** · [GitHub release](https://github.com/Ahmed-Atef-Tech/ETT101-Simulator/releases/latest)
 
-| الجهاز | الملف |
+| Device | File |
 |---|---|
 | Windows 10 / 11 | `ETT101-Simulator-Setup-x.y.z.exe` |
 | Mac | `ETT101-Simulator-x.y.z-mac.dmg` |
-| ملفات التجارب (OPEN SETUP) | `ETT101-Experiments-Setups.zip` |
-| مرجع الموديل والمعادلات | `ETT101-Model-Reference.md` |
+| Experiment files (OPEN SETUP) | `ETT101-Experiments-Setups.zip` |
+| Model and equations reference | `ETT101-Model-Reference.md` |
 
-جوه البرنامج: زرار **تحميل تجربة** فيه كل التجارب دي جاهزة ومعاها رقم الصفحة في الكتاب، وزرار **المرجع** بيعرض مرجع الموديل.
+Inside the app, the **Load experiment** button has all of these experiments ready, each with its page number in the lab book, and the **Reference** button shows the model reference.
 
-ملفات التجارب: فك الـ zip، وجوه البرنامج دوس **OPEN SETUP** واختار التجربة. الفولدرات: `Term1` و `Term2` و `Extra`.
+Experiment files: unzip the file, then in the app press **OPEN SETUP** and choose the experiment. The folders are `Term1`, `Term2` and `Extra`.
+
+## Installing
+
+### Windows
+1. Download the Setup file and open it.
+2. If a blue **"Windows protected your PC"** message appears, press **More info**, then **Run anyway**. This is normal, because the app isn't signed with a paid certificate.
+3. **Updates are automatic:** every time you open the app it checks by itself, downloads the new version in the background, and installs it when you close the app.
+
+### Mac
+1. Download the `dmg` file, open it, and drag the app into the **Applications** folder.
+2. First time only: open the app. If a message says it's from an unidentified developer, go to **System Settings → Privacy & Security**, scroll down and press **Open Anyway**.
+3. When a new version comes out, the app tells you and opens the download page.
 
 ## Expected results
 
 **[Expected results for every experiment](docs/results/README.md)**: the block diagram, the wiring on the kit, the oscilloscope screen, and what the lab book expects next to what the simulator shows, for all 69 experiments.
 
 Reference: the course lab books Electrical Testing (6), ELC414 (Term 1) and Electrical Testing (7), ELC424 (Term 2) are adapted from Barry Duncan, *Experiments in Modern Analog and Digital Telecommunications* (Emona Telecoms-Trainer 101 Lab Manual, Volume 1) and *Further Experiments in Modern Analog and Digital Telecommunications* (Volume 2), Emona Instruments Pty Ltd. Term 1 Exp 1–7 = Emona Vol. 1 Exp 4–10; Term 2 = Emona Vol. 1 Exp 11–13 and 15–19, and Vol. 2 Exp 6, 8, 9, 16 and 17.
-
-### Windows
-1. نزّل ملف الـ Setup وافتحه.
-2. لو ظهرت رسالة زرقاء **"Windows protected your PC"**: دوس **More info** ثم **Run anyway**. ده عادي لأن البرنامج مش موقّع بشهادة مدفوعة.
-3. **التحديثات أوتوماتيك:** كل ما تفتح البرنامج بيشيّك لوحده، وينزّل النسخة الجديدة في الخلفية، ويتركب أول ما تقفله.
-
-### Mac
-1. نزّل ملف الـ `dmg`، افتحه، واسحب البرنامج لفولدر **Applications**.
-2. أول مرة بس: افتح البرنامج، ولو ظهرت رسالة إنه من مطوّر مش معروف، روح **System Settings ← Privacy & Security** وانزل لتحت ودوس **Open Anyway**.
-3. لما تنزل نسخة جديدة، البرنامج هيقولك ويفتحلك صفحة التحميل.
 
 ---
 
