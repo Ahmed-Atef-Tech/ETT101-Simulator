@@ -133,7 +133,7 @@ html[lang="ar"] .acts { line-height: 1.85; }
 .video svg { width: 14px; height: 14px; }
 
 /* ---------- settings popover ---------- */
-#settings { position: fixed; top: 54px; inset-inline-end: 12px; width: 300px; z-index: 12; display: none; padding: 12px 14px; background: var(--paper); border: 1px solid #c9cdcf; border-radius: 6px; box-shadow: 0 14px 34px rgba(0,0,0,.4); }
+#settings { position: fixed; top: 54px; right: 12px; width: 300px; z-index: 12; display: none; padding: 12px 14px; background: var(--paper); border: 1px solid #c9cdcf; border-radius: 6px; box-shadow: 0 14px 34px rgba(0,0,0,.4); }
 #settings.open { display: block; }
 .row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 0; font-size: 15px; }
 .seg { display: inline-flex; border: 1px solid #9aa3a7; border-radius: 4px; overflow: hidden; }
@@ -249,7 +249,7 @@ html[lang="ar"] .rintro, html[lang="ar"] .lnote { line-height: 1.85; }
 </style>
 </head>
 <body class="training">
-<header id="rail">
+<header id="rail" dir="ltr"><!-- same layout in both languages; only the labels are translated -->
   <div class="brand"><span class="name" data-t="appName"></span><span class="sub" data-t="appSub"></span><button class="beta" id="btnBeta" data-t="beta" data-hint="betaHint"></button></div>
   <button class="key toggle" id="tGuide" role="switch" aria-checked="true" data-hint="modeHint"><span data-t="guidance"></span><span class="track"><span class="thumb"></span></span><span class="state"></span></button>
   <button class="key" id="btnGuide"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="1.5" width="10" height="13" rx="1"/><path d="M5.5 5h5M5.5 7.5h5M5.5 10h3"/></svg><span data-t="experiments"></span></button>
