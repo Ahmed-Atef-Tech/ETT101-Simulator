@@ -1,4 +1,6 @@
-- Lab sheets are easier to read: each step is now a short numbered list of actions, and the numbers are the step numbers in the book, so you can follow the sheet next to the book. The connections to make are listed under the steps.
-- The Arabic interface is now in simple Modern Standard Arabic, and English names and values inside Arabic text (module names, units, settings) display in the right order.
-- أصبحت أوراق التجارب أسهل في القراءة: كل خطوة الآن قائمة مرقّمة من الإجراءات القصيرة، والأرقام هي أرقام الخطوات في الكتاب، لتتابع الورقة بجانب الكتاب. والتوصيلات المطلوبة مذكورة أسفل الخطوات.
-- أصبحت الواجهة العربية بلغة عربية فصحى بسيطة، وتظهر الأسماء والقيم الإنجليزية داخل النص العربي (أسماء الوحدات ووحدات القياس والإعدادات) بترتيبها الصحيح.
+- The lab sheet always opens on the right side of the screen, in English and in Arabic.
+- The button next to the lead colours now centres the view: after zooming or dragging away, one click brings the kit and the scope back. Full screen is still on the F key (and F11 in the desktop app).
+- Black leads are now a dark graphite grey, so they stand out against the black kit panel.
+- تظهر ورقة التجربة دائماً على يمين الشاشة، بالعربية وبالإنجليزية.
+- أصبح الزر المجاور لألوان الأسلاك زرَّ توسيط للعرض: بعد التكبير أو السحب بعيداً، تعيد نقرة واحدة الجهاز وراسم الإشارة إلى مكانهما. ويبقى ملء الشاشة على المفتاح F (و F11 في تطبيق سطح المكتب).
+- أصبح لون السلك الأسود رمادياً داكناً ليظهر بوضوح فوق لوحة الجهاز السوداء.

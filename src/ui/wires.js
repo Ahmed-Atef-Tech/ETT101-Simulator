@@ -2,8 +2,8 @@
 import { el } from './svg.js';
 import { SOCKET_POS } from './layout.js';
 
-export const LEAD_COLORS = { red: '#d3261f', black: '#1a1a1a', yellow: '#f2c21b', blue: '#1f5fd1', green: '#1f9a45' };
-const DARK = { red: '#7c120e', black: '#000', yellow: '#94720a', blue: '#0e3274', green: '#0d5023' };
+export const LEAD_COLORS = { red: '#d3261f', black: '#4a5057', yellow: '#f2c21b', blue: '#1f5fd1', green: '#1f9a45' };
+const DARK = { red: '#7c120e', black: '#16191c', yellow: '#94720a', blue: '#0e3274', green: '#0d5023' };
 const PROBE_TAG = { CH1: '#f2d21b', CH2: '#35d0f0', EXT: '#c8c8c8' };
 
 export class Wires {
@@ -136,15 +136,15 @@ export class Wires {
       const g = el('g', { class: 'lead probe' + (pid === this.sel ? ' sel' : ''), 'data-probe': ch }, this.probeG);
       const d = this.probeBend[ch] ? this.through(a, b, this.probeBend[ch]) : this.curve(a, b, true);
       el('path', { d, fill: 'none', 'stroke-width': 22, 'stroke-linecap': 'round', class: 'leadGlow' }, g);
-      el('path', { d, fill: 'none', stroke: pc === 'black' ? '#050505' : dk, 'stroke-width': 10, 'stroke-linecap': 'round', class: 'leadOut' }, g);
-      el('path', { d, fill: 'none', stroke: pc === 'black' ? '#2a2a2a' : c, 'stroke-width': 7, 'stroke-linecap': 'round' }, g);
+      el('path', { d, fill: 'none', stroke: pc === 'black' ? '#101214' : dk, 'stroke-width': 10, 'stroke-linecap': 'round', class: 'leadOut' }, g);
+      el('path', { d, fill: 'none', stroke: pc === 'black' ? '#3d4248' : c, 'stroke-width': 7, 'stroke-linecap': 'round' }, g);
       el('path', { d, fill: 'none', stroke: 'rgba(255,255,255,.18)', 'stroke-width': 2, transform: 'translate(-1,-2)' }, g);
       el('path', { d, fill: 'none', stroke: 'transparent', 'stroke-width': 16, class: 'leadHit' }, g);
       g.addEventListener('click', e => { if (e.detail > 1 || this.justBent) return; e.stopPropagation(); this.select(this.sel === pid ? null : pid); });
       g.addEventListener('contextmenu', e => { e.preventDefault(); this.hooks.leadMenu({ probe: ch }, e); });
       g.addEventListener('pointerenter', e => this.hooks.hoverLead({ probe: ch }, e)); g.addEventListener('pointerleave', () => this.hooks.hoverLead(null));
       g.addEventListener('dblclick', e => { e.stopPropagation(); this.setProbe(ch, null); });
-      const p = plug(s, pc === 'black' ? '#2b2b2b' : c, dk, PROBE_TAG[ch], pid); p.addEventListener('dblclick', e => { e.stopPropagation(); this.setProbe(ch, null); });
+      const p = plug(s, pc === 'black' ? '#3d4248' : c, dk, PROBE_TAG[ch], pid); p.addEventListener('dblclick', e => { e.stopPropagation(); this.setProbe(ch, null); });
       // BNC plug at scope
       const g2 = el('g', { transform: `translate(${a[0]},${a[1]})`, 'data-bnc': ch, class: 'bncPlug' }, this.probeG);
       el('circle', { r: 17, fill: 'url(#bncGrad)', stroke: '#555', 'stroke-width': 1.5 }, g2);

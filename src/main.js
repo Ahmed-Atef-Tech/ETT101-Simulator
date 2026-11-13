@@ -90,7 +90,7 @@ function drawHeadphones() {
 }
 
 // =============================================== views: kit / both / scope / free zoom ===============================================
-let view = { ...VB }, viewMode = 'both';
+let view = { ...VB }, viewMode = 'both', lastFit = 'both';
 try { const v = localStorage.getItem('ett.view'); if (v) viewMode = v; } catch (e) { }
 function applyView() { svg.setAttribute('viewBox', `${view.x} ${view.y} ${view.w} ${view.h}`); }
 function focusRect(x, y, w, h, pad = 0.02) {
@@ -100,7 +100,7 @@ function focusRect(x, y, w, h, pad = 0.02) {
 }
 const RECTS = { kit: [26, 6, 1192, 996], scope: [scope.X, scope.Y, 1400 * scope.S, 545 * scope.S], both: [VB.x, VB.y, VB.w, VB.h] };
 function setView(m) {
-  viewMode = m; try { localStorage.setItem('ett.view', m); } catch (e) { }
+  viewMode = m; if (RECTS[m]) lastFit = m; try { localStorage.setItem('ett.view', m); } catch (e) { }
   for (const [id, k] of [['vKit', 'kit'], ['vBoth', 'both'], ['vScope', 'scope']]) $('#' + id).classList.toggle('on', m === k);
   if (RECTS[m]) focusRect(...RECTS[m], m === 'both' ? 0 : 0.015);
 }
@@ -138,8 +138,10 @@ window.addEventListener('pointerup', () => { if (pan && pan.moved) suppressCtx =
 svg.addEventListener('dblclick', e => { if (e.target.classList.contains('mat')) setView('both'); });
 svg.addEventListener('contextmenu', e => { if (suppressCtx) { e.preventDefault(); suppressCtx = false; return; } if (!e.target.closest('.lead')) e.preventDefault(); });
 // full screen
+// Centre button: after zooming or dragging away, bring back the last fitted view (Kit, Both or Scope)
 function toggleFull() { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen().catch(() => { }); }
-document.addEventListener('fullscreenchange', () => { $('#btnFull').title = document.fullscreenElement ? t('exitFullscreen') : t('fullscreen'); setTimeout(() => { if (RECTS[viewMode]) setView(viewMode); }, 60); });
+function recentre() { setView(RECTS[viewMode] ? viewMode : lastFit); }
+document.addEventListener('fullscreenchange', () => setTimeout(() => { if (RECTS[viewMode]) setView(viewMode); }, 60));
 
 // =============================================== tooltips ===============================================
 const tip = $('#tip');
@@ -300,7 +302,7 @@ if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitRail);
 function applyTexts() {
   document.querySelectorAll('[data-t]').forEach(n => { n.textContent = t(n.dataset.t); });
   document.querySelectorAll('[data-hint]').forEach(n => { n.title = t(n.dataset.hint); });
-  $('#btnFull').title = document.fullscreenElement ? t('exitFullscreen') : t('fullscreen');
+  $('#btnFull').title = t('recentre');
   document.querySelectorAll('[data-lang]').forEach(b => b.classList.toggle('on', b.dataset.lang === getLang()));
   document.querySelectorAll('[data-snd]').forEach(b => b.classList.toggle('on', (b.dataset.snd === '1') === !audio.muted));
   colorsEl.querySelectorAll('.plugsw').forEach(b => b.title = t('colors')[b.dataset.c]);
@@ -318,7 +320,7 @@ function setTraining(on) {
 $('#tGuide').onclick = () => setTraining(!training);
 $('#btnGuide').onclick = () => { const g = $('#guide'); g.classList.toggle('open'); if (g.classList.contains('open')) { if (!training) setTraining(true); renderGuide(); } else drawGhost(); };
 $('#vKit').onclick = () => setView('kit'); $('#vBoth').onclick = () => setView('both'); $('#vScope').onclick = () => setView('scope');
-$('#btnFull').onclick = toggleFull;
+$('#btnFull').onclick = recentre;
 $('#btnSettings').onclick = () => $('#settings').classList.toggle('open');
 document.querySelectorAll('[data-lang]').forEach(b => b.onclick = () => { setLang(b.dataset.lang); applyTexts(); });
 document.querySelectorAll('[data-snd]').forEach(b => b.onclick = () => { audio.ensure(); audio.muted = b.dataset.snd !== '1'; applyTexts(); });

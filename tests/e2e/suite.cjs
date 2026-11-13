@@ -174,18 +174,18 @@ T('LD14', 'Leads', 'Scope probe cables take the colour picked in the rail (repor
     eq(tmp, HEX[c], `drag preview ${c}`); eq(await drawn('CH1'), [HEX[c], HEX[c]], `BNC → socket ${c}`);
   }
   await p.click('#colors .plugsw[data-c="blue"]'); await drag(p, await sock(p, 'master.SINE100'), await bnc('CH2')); eq((await drawn('CH2'))[0], HEX.blue, 'socket → BNC blue');
-  await p.click('#colors .plugsw[data-c="black"]'); await drag(p, await bnc('EXT'), await sock(p, 'adder.OUT')); eq((await drawn('EXT'))[0], '#2a2a2a', 'black probe looks like a coax');
+  await p.click('#colors .plugsw[data-c="black"]'); await drag(p, await bnc('EXT'), await sock(p, 'adder.OUT')); eq((await drawn('EXT'))[0], '#3d4248', 'black probe looks like a coax');
   // right-click menu recolours a probe and marks its colour
   const pm = await app(p, () => { const g = document.querySelector('.lead.probe[data-probe="CH2"] .leadHit'); const q = g.getPointAtLength(g.getTotalLength() * .5), m = g.getScreenCTM(); return { x: q.x * m.a + m.e, y: q.y * m.d + m.f }; });
   await p.mouse.click(pm.x, pm.y, { button: 'right' }); eq(await app(p, () => document.querySelector('.ctx .plugsw.sel').dataset.c), 'blue', 'menu marks current colour');
   await p.click('.ctx .plugsw[data-c="red"]'); eq((await drawn('CH2'))[0], HEX.red, 'menu recolour');
   // saved and restored; black is the default and is not written
   const snap = await app(p, () => __app.snapshot()); eq(snap.probeColor, { CH1: 'green', CH2: 'red' }, 'snapshot colours');
-  await app(p, s => __app.restore(s), snap); eq([(await drawn('CH1'))[0], (await drawn('CH2'))[0], (await drawn('EXT'))[0]], [HEX.green, HEX.red, '#2a2a2a'], 'restored colours');
+  await app(p, s => __app.restore(s), snap); eq([(await drawn('CH1'))[0], (await drawn('CH2'))[0], (await drawn('EXT'))[0]], [HEX.green, HEX.red, '#3d4248'], 'restored colours');
   await p.waitForTimeout(3200); await p.reload(); await p.waitForTimeout(700); eq((await drawn('CH1'))[0], HEX.green, 'colour after reload');
   // a file without colours (old saves and the ready-made setups) keeps black probes; junk colours are ignored
   await app(p, () => __app.restore({ v: 2, leads: [], probes: { CH1: 'master.SINE2', CH2: 'adder.OUT' }, probeColor: { CH2: 'purple', CH1: '__proto__' }, mods: {}, scope: {} }));
-  eq([(await drawn('CH1'))[0], (await drawn('CH2'))[0]], ['#2a2a2a', '#2a2a2a'], 'old/bad files → black');
+  eq([(await drawn('CH1'))[0], (await drawn('CH2'))[0]], ['#3d4248', '#3d4248'], 'old/bad files → black');
   await p.click('#colors .plugsw[data-c="yellow"]'); await drag(p, await bnc('CH1'), await sock(p, 'adder.A')); eq((await drawn('CH1'))[0], HEX.yellow, 'moving a probe takes the picked colour');
 });
 T('LD10', 'Leads', 'Socket tooltip: live readings when connected, "Nothing connected" when not', async p => {
