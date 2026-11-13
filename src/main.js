@@ -3,7 +3,7 @@ import { FS } from './engine/dsp.js';
 import { SOCKETS } from './engine/modules.js';
 import { el } from './ui/svg.js';
 import { Panel, knobReadout } from './ui/panel.js';
-import { Scope, fmtV, fmtF, VDIV, TDIV } from './ui/scope.js';
+import { Scope, fmtV, fmtF, VDIV, TDIV, migrateMeas, fixMeas } from './ui/scope.js';
 import { Wires, LEAD_COLORS } from './ui/wires.js';
 import { Audio } from './ui/audio.js';
 import { SOCKET_NAME, SOCKET_POS, BLOCKS } from './ui/layout.js';
@@ -358,7 +358,9 @@ function restore(s) {
     const merge = (dst, src) => { for (const k in src) { if (!(k in dst)) continue; const a = dst[k], v = src[k];
       if (a && typeof a === 'object' && !Array.isArray(a) && !(a instanceof Float32Array)) { if (v && typeof v === 'object') merge(a, v); }
       else if (a === null || typeof a === typeof v) { if (typeof v !== 'number' || Number.isFinite(v)) dst[k] = v; } } };
-    const d = scope.st; merge(d, s.scope);
+    s.scope.meas = migrateMeas(s.scope.meas); // older files list measurements by their old names
+    const d = scope.st; merge(d, s.scope); fixMeas(d.meas);
+    if (!['R', 'F', 'RF'].includes(d.trig.slope)) d.trig.slope = 'R'; d.hold = Math.max(100e-9, Math.min(1.5, d.hold)); d.disp.bright = Math.max(1, Math.min(100, Math.round(d.disp.bright))); d.upage = 0;
     const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.round(v)));
     for (const c of ['CH1', 'CH2']) { const ch = d.ch[c]; ch.vd = clamp(ch.vd, 0, VDIV.length - 1); ch.pos = Math.max(-10, Math.min(10, ch.pos)); ch.fine = Math.max(0.4, Math.min(2.5, ch.fine)); ch.probe = clamp(ch.probe, 0, 3); }
     d.td = clamp(d.td, 0, TDIV.length - 1); d.ztd = clamp(d.ztd, 0, d.td);

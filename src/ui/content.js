@@ -104,12 +104,14 @@ export const HELP = {
     scope: `<h3>The oscilloscope (UTD2102CEL style)</h3><ul>
 <li><b>Connect:</b> drag from a BNC socket (CH1, CH2, EXT TRIG) to any socket on the kit. Double-click the lead to remove it.</li>
 <li><b>CH1 / CH2:</b> the first press selects the channel and opens its menu; the shared VERTICAL knobs then control it. Press again while its menu is open to turn the channel off.</li>
-<li><b>VERTICAL:</b> SCALE is volts/div and POSITION moves the trace. Click a knob without turning it to reset its position.</li>
-<li><b>HORIZONTAL:</b> SCALE is time/div (12 × 8 divisions on screen); POSITION moves the trace sideways. MENU holds Zoom and XY.</li>
-<li><b>TRIGGER:</b> LEVEL sets the trigger level (click it for 50 %). MENU sets source, slope, Auto/Normal/Single and coupling.</li>
-<li><b>RUN/STOP:</b> freezes the capture. While stopped you can still change time/div and position to look through the captured signal.</li>
-<li><b>MEASURE</b> gives automatic readings, <b>CURSOR</b> gives time or voltage cursors moved with MULTI PURPOSE, <b>MATH</b> gives A+B, A−B, A×B or FFT, <b>AUTO</b> sets everything up, <b>PrtSc</b> saves a picture of the screen.</li></ul>
-<p>The lab manual is written for an analog scope: “Mode DUAL” means CH1 and CH2 both on, “Timebase” is HORIZONTAL SCALE, “Vertical attenuation” is VERTICAL SCALE and “Sweep magnification” is HORIZONTAL MENU → Zoom.</p>`,
+<li><b>VERTICAL:</b> SCALE is volts/div and POSITION moves the trace.</li>
+<li><b>HORIZONTAL:</b> SCALE is time/div (12 × 8 divisions on screen); POSITION moves the trace sideways. <b>HORI MENU</b> has Main, Window (the screen splits: the main time base above with the expanded zone marked, the expanded waveform below) and Hold off (set with the MULTI PURPOSE knob).</li>
+<li><b>TRIGGER:</b> LEVEL sets the trigger level. <b>TRIG MENU</b> sets source (CH1, CH2, EXT, AC Line), slope (Rise, Fall, Rise &amp; Fall), Auto/Normal/Single and coupling. <b>FORCE</b> makes one trigger.</li>
+<li><b>SET TO ZERO:</b> puts the vertical and horizontal positions and the holdoff back to zero and the trigger level at 50 %.</li>
+<li><b>MEASURE:</b> four zones (F1–F4); press a zone to choose its channel, Volt or Time, and the parameter (Pk-Pk, RMS, Freq, Period…). F5 shows all parameters of a channel.</li>
+<li><b>CURSOR</b> gives Voltage, Time or Tracking cursors moved with MULTI PURPOSE (press the knob to switch A, B, A &amp; B). <b>MATH</b> gives +, −, ×, ÷ or FFT, <b>AUTO</b> sets everything up, <b>RUN/STOP</b> freezes the capture, <b>PrtSc</b> saves a picture of the screen.</li>
+<li><b>UTILITY</b> (three pages): Self Cal, Help, Reset, Grid and the frequency counter (Cymometer).</li></ul>
+<p>The lab manual is written for an analog scope: “Mode DUAL” means CH1 and CH2 both on, “Timebase” is HORIZONTAL SCALE, “Vertical attenuation” is VERTICAL SCALE and “Sweep magnification” is HORI MENU → Window.</p>`,
   },
   ar: {
     app: `<h3>طريقة الاستخدام</h3><ul>
@@ -122,11 +124,13 @@ export const HELP = {
     scope: `<h3>راسم الإشارة (على نمط UTD2102CEL)</h3><ul>
 <li><b>التوصيل:</b> اسحب من مقبس BNC (CH1 أو CH2 أو EXT TRIG) إلى أي مقبس على الجهاز. انقر على السلك مرتين لإزالته.</li>
 <li><b>CH1 / CH2:</b> الضغطة الأولى تختار القناة وتفتح قائمتها، ثم تتحكم فيها مقابض VERTICAL المشتركة. وإذا كانت قائمتها مفتوحة، فالضغطة توقف القناة.</li>
-<li><b>VERTICAL:</b> المقبض SCALE يحدد الفولت لكل مربع (Volts/div)، و POSITION يحرّك الإشارة. النقر على المقبض دون تدويره يعيد الموضع إلى الصفر.</li>
-<li><b>HORIZONTAL:</b> المقبض SCALE يحدد الزمن لكل مربع (Time/div)، والشاشة 12 × 8 مربعات. و POSITION يحرّك الإشارة أفقياً. وفي MENU يوجد Zoom و XY.</li>
-<li><b>TRIGGER:</b> المقبض LEVEL يحدد مستوى الزناد (النقر عليه يضبطه على 50%). وفي MENU تختار المصدر والميل (Slope) والوضع Auto/Normal/Single والاقتران.</li>
-<li><b>RUN/STOP:</b> يوقف الالتقاط. وأثناء الإيقاف يمكنك تغيير Time/div والموضع لفحص الإشارة الملتقطة.</li>
-<li><b>MEASURE</b> قياسات تلقائية، و<b>CURSOR</b> مؤشرات للزمن أو الجهد تُحرَّك بالمقبض MULTI PURPOSE، و<b>MATH</b> فيه A+B و A−B و A×B و FFT، و<b>AUTO</b> ضبط تلقائي، و<b>PrtSc</b> يحفظ صورة الشاشة.</li></ul>
-<p>كُتب دليل المعمل لراسم إشارة تماثلي: «Mode DUAL» يعني تشغيل CH1 و CH2 معاً، و«Timebase» هو HORIZONTAL SCALE، و«Vertical attenuation» هو VERTICAL SCALE، و«Sweep magnification» هو HORIZONTAL MENU ثم Zoom.</p>`,
+<li><b>VERTICAL:</b> المقبض SCALE يحدد الفولت لكل مربع (Volts/div)، و POSITION يحرّك الإشارة رأسياً.</li>
+<li><b>HORIZONTAL:</b> المقبض SCALE يحدد الزمن لكل مربع (Time/div)، والشاشة 12 × 8 مربعات، و POSITION يحرّك الإشارة أفقياً. وفي <b>HORI MENU</b> يوجد Main و Window (تنقسم الشاشة: القاعدة الزمنية الرئيسية في الأعلى مع تحديد الجزء المكبَّر، والإشارة المكبَّرة في الأسفل) و Hold off (يُضبط بالمقبض MULTI PURPOSE).</li>
+<li><b>TRIGGER:</b> المقبض LEVEL يحدد مستوى الزناد. وفي <b>TRIG MENU</b> تختار المصدر (CH1 أو CH2 أو EXT أو AC Line) والميل (Rise أو Fall أو Rise &amp; Fall) والوضع Auto/Normal/Single والاقتران. والزر <b>FORCE</b> يُحدث زناداً واحداً.</li>
+<li><b>SET TO ZERO:</b> يعيد الموضع الرأسي والأفقي و Hold off إلى الصفر، ويضبط مستوى الزناد على 50%.</li>
+<li><b>MEASURE:</b> أربع مناطق (F1 إلى F4)؛ اضغط على المنطقة لتختار القناة والنوع (Volt أو Time) والمعامل (Pk-Pk و RMS و Freq و Period وغيرها). والزر F5 يعرض كل المعاملات لقناة واحدة.</li>
+<li><b>CURSOR</b> مؤشرات للجهد أو الزمن أو التتبّع (Tracking) تُحرَّك بالمقبض MULTI PURPOSE (اضغط المقبض للتبديل بين A و B و A &amp; B). و<b>MATH</b> فيه + و − و × و ÷ و FFT، و<b>AUTO</b> ضبط تلقائي، و<b>RUN/STOP</b> يوقف الالتقاط، و<b>PrtSc</b> يحفظ صورة الشاشة.</li>
+<li><b>UTILITY</b> (ثلاث صفحات): Self Cal و Help و Reset و Grid وعدّاد التردد (Cymometer).</li></ul>
+<p>كُتب دليل المعمل لراسم إشارة تماثلي: «Mode DUAL» يعني تشغيل CH1 و CH2 معاً، و«Timebase» هو HORIZONTAL SCALE، و«Vertical attenuation» هو VERTICAL SCALE، و«Sweep magnification» هو HORI MENU ثم Window.</p>`,
   },
 };

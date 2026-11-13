@@ -11,8 +11,28 @@ const HDIV = 12, VDIVS = 8;
 // screen geometry (canvas 800 x 480)
 const GX = 34, GY = 38, GW = 600, GH = 400, PX = GW / HDIV;
 const MX = 652, MW = 144;
+const FULL = { y: GY, h: GH }, TOP = { y: GY, h: 110 }, LOW = { y: GY + 118, h: GH - 118 }; // Window mode: main view above, expanded view below
 
-const MEAS = ['Vpp', 'Vmax', 'Vmin', 'Vamp', 'Vavg', 'Vrms', 'Freq', 'Period', '+Width', '-Width', '+Duty', 'Rise', 'Fall'];
+// measurement parameters as the UTD2000L menus name them: voltage and time groups
+export const MEAS_V = ['Pk-Pk', 'Max', 'Min', 'Amplitude', 'Top', 'Base', 'Mean', 'RMS'];
+export const MEAS_T = ['Freq', 'Period', 'Rise', 'Fall', '+Width', '-Width', '+Duty', '-Duty'];
+const MEAS = [...MEAS_V, ...MEAS_T];
+const OLD_MEAS = { Vpp: 'Pk-Pk', Vmax: 'Max', Vmin: 'Min', Vamp: 'Amplitude', Vavg: 'Mean', Vrms: 'RMS' };
+const HOLD_MIN = 100e-9, HOLD_MAX = 1.5; // holdoff range
+const BRIGHT = [25, 50, 75, 100];
+// Older saved setups store { src, items: ['Vpp', 'Freq', null], all }; turn that into the four measurement zones.
+export function migrateMeas(m) {
+  if (!m || typeof m !== 'object' || !Array.isArray(m.items)) return m;
+  const src = m.src === 'CH2' ? 'CH2' : 'CH1';
+  const zones = [0, 1, 2, 3].map(i => { const k = m.items[i]; const p = OLD_MEAS[k] || k; return MEAS.includes(p) ? { src, p, on: true } : { src, p: i % 2 ? 'Freq' : 'Pk-Pk', on: false }; });
+  return { zones, all: m.all ? src : 'OFF', edit: -1 };
+}
+export function fixMeas(m) { // keep restored zones valid
+  const def = [['CH1', 'Pk-Pk', true], ['CH1', 'Freq', true], ['CH2', 'Pk-Pk', false], ['CH2', 'Freq', false]];
+  if (!Array.isArray(m.zones)) m.zones = [];
+  m.zones = def.map(([src, p, on], i) => { const z = m.zones[i]; return z && typeof z === 'object' && (z.src === 'CH1' || z.src === 'CH2') && MEAS.includes(z.p) ? { src: z.src, p: z.p, on: !!z.on } : { src, p, on }; });
+  if (!['OFF', 'CH1', 'CH2'].includes(m.all)) m.all = 'OFF'; m.edit = -1;
+}
 
 export function fmtV(v) { const a = Math.abs(v); if (a >= 1) return v.toFixed(a >= 10 ? 1 : 2) + 'V'; if (a >= 1e-3) return (v * 1e3).toFixed(a >= 0.1 ? 0 : 1) + 'mV'; return (v * 1e3).toFixed(2) + 'mV'; }
 export function fmtT(t) { const a = Math.abs(t); if (a >= 1) return t.toFixed(2) + 's'; if (a >= 1e-3) return +(t * 1e3).toFixed(3) + 'ms'; if (a >= 1e-6) return +(t * 1e6).toFixed(2) + 'us'; return +(t * 1e9).toFixed(0) + 'ns'; }
@@ -36,12 +56,12 @@ export class Scope {
       ch: { CH1: { on: true, vd: 9, fine: 1, pos: 0, cpl: 'DC', bw: false, finemode: false, probe: 0, inv: false },
         CH2: { on: true, vd: 9, fine: 1, pos: 0, cpl: 'DC', bw: false, finemode: false, probe: 0, inv: false } },
       sel: 'CH1', td: 7, hpos: 0, zoom: false, ztd: 4, zpos: 0,
-      trig: { src: 'CH1', slope: 'R', mode: 'AUTO', cpl: 'DC', level: 0 },
-      run: true, acq: 'Sample', avgN: 16, disp: { type: 'Vectors', persist: 0, fmt: 'YT', grid: 'Dots' },
+      trig: { src: 'CH1', slope: 'R', mode: 'AUTO', cpl: 'DC', level: 0 }, hold: HOLD_MIN,
+      run: true, acq: 'Sample', avgN: 16, samp: 'Real Time', fast: false, disp: { type: 'Vectors', persist: 0, fmt: 'YT', grid: 'Dots', bright: 100 },
       math: { on: false, kind: 'FFT', op: '+', fftSrc: 'CH1', win: 'Hanning', dbdiv: 20, fpos: 0, unit: 'dBVrms', vrd: 7 },
-      meas: { src: 'CH1', items: ['Vpp', 'Freq', null], all: false },
+      meas: { zones: [{ src: 'CH1', p: 'Pk-Pk', on: true }, { src: 'CH1', p: 'Freq', on: true }, { src: 'CH2', p: 'Pk-Pk', on: false }, { src: 'CH2', p: 'Freq', on: false }], all: 'OFF', edit: -1 },
       cur: { type: 'Off', src: 'CH1', act: 'A', a: -3, b: 3 },
-      ref: { on: false, data: null, ch: 'CH1' }, counter: true,
+      ref: { on: false, data: null, ch: 'CH1' }, counter: true, upage: 0,
       menu: 'CH1',
     };
   }
@@ -84,9 +104,9 @@ export class Scope {
     this.knob(978, 208, 22, 'vpos'); this.knob(1150, 208, 22, 'hpos'); this.knob(1330, 212, 22, 'level');
     this.button(1042, 200, 'CH1', 'CH1', 'small'); this.button(1042, 244, 'CH2', 'CH2', 'small'); this.button(978, 256, 'MATH', 'MATH', 'small');
     L(978, 296, '⇔ SCALE', 9.5); this.knob(978, 350, 30, 'vscale');
-    this.button(1150, 256, 'MENU', 'HMENU', 'small'); this.button(1216, 212, 'SET TO\nZERO', 'zero', 'tiny');
+    this.button(1150, 256, 'HORI\nMENU', 'HMENU', 'small'); this.button(1216, 212, 'SET TO\nZERO', 'zero', 'tiny');
     L(1150, 296, '⇔ SCALE', 9.5); this.knob(1150, 350, 30, 'tscale');
-    this.button(1330, 262, 'MENU', 'TMENU', 'small'); this.button(1330, 308, 'FORCE', 'force', 'small'); this.button(1330, 354, 'HELP', 'help', 'small');
+    this.button(1330, 262, 'TRIG\nMENU', 'TMENU', 'small'); this.button(1330, 308, 'FORCE', 'force', 'small'); // no HELP key on the UTD2102CEL: help is in UTILITY
     // BNC
     const bnc = (x, y, label, id, tag) => {
       L(x, y - 34, label, 12);
@@ -109,10 +129,10 @@ export class Scope {
     let shape;
     if (kind === 'round') { shape = el('circle', { r: 21, fill: 'url(#blueBtn)', stroke: '#244a8a', 'stroke-width': 1.5 }, g); }
     else {
-      const w = kind === 'fkey' ? 44 : kind === 'small' ? 60 : kind === 'tiny' ? 54 : 72, h = kind === 'fkey' ? 34 : kind === 'tiny' ? 34 : 30;
+      const w = kind === 'fkey' ? 44 : kind === 'small' ? 60 : kind === 'tiny' ? 54 : 72, h = kind === 'fkey' ? 34 : kind === 'tiny' || label.includes('\n') ? 34 : 30;
       shape = el('rect', { x: -w / 2, y: -h / 2, width: w, height: h, rx: 5, fill: 'url(#btnGrad)', stroke: '#6f6b64', 'stroke-width': 1.3 }, g);
     }
-    { const w = kind === 'round' ? 50 : (kind === 'fkey' ? 44 : kind === 'small' ? 60 : kind === 'tiny' ? 54 : 72) + 10, h = kind === 'round' ? 50 : (kind === 'fkey' || kind === 'tiny' ? 34 : 30) + 10;
+    { const w = kind === 'round' ? 50 : (kind === 'fkey' ? 44 : kind === 'small' ? 60 : kind === 'tiny' ? 54 : 72) + 10, h = kind === 'round' ? 50 : (kind === 'fkey' || kind === 'tiny' || label.includes('\n') ? 34 : 30) + 10;
       el('rect', { x: -w / 2, y: -h / 2, width: w, height: h, fill: 'transparent' }, g); } // larger click target (5 px round the key)
     const lines = label.split('\n');
     lines.forEach((t, i) => el('text', { y: 4 + (i - (lines.length - 1) / 2) * 11, text: t, fill: kind === 'round' ? '#fff' : '#1d1d1d', 'font-size': kind === 'fkey' ? 12 : 10, 'font-weight': 800, 'text-anchor': 'middle' }, g));
@@ -165,11 +185,11 @@ export class Scope {
     } else if (/^F\d$/.test(id)) { const m = this.menuDef(); const it = m && m.items[+id[1]]; if (it && it.f) it.f(); }
     else if (id === 'run') { s.run = !s.run; if (s.run) { this.single = false; this.frozen = null; } else if (this.lastTrigUsed) this.freeze(this.lastTrigUsed); }
     else if (id === 'auto') this.autoset();
-    else if (id === 'zero') { if (s.zoom) s.zpos = 0; else s.hpos = 0; }
+    else if (id === 'zero') { s.ch.CH1.pos = 0; s.ch.CH2.pos = 0; s.math.fpos = 0; s.hpos = 0; s.zpos = 0; s.hold = HOLD_MIN; this.level50(); } // manual: resets vertical and horizontal shift and holdoff, trigger level to 50 %
     else if (id === 'force') this.forceNext = true;
     else if (id === 'prtsc') this.hooks.screenshot(this.cv);
     else if (id === 'help') this.hooks.scopeHelp();
-    else s.menu = s.menu === id ? null : id;
+    else { s.menu = s.menu === id ? null : id; s.meas.edit = -1; if (id === 'UTILITY') s.upage = 0; }
     this.hooks.changed();
   }
   push(id) {
@@ -193,6 +213,9 @@ export class Scope {
     if (id === 'multi') {
       if (s.menu === 'CURSOR') { const k = n * 0.08 * fast; if (s.cur.act !== 'B') s.cur.a += k; if (s.cur.act !== 'A') s.cur.b += k; }
       else if (s.menu === 'ACQUIRE' && s.acq === 'Average') { const L = [2, 4, 8, 16, 32, 64, 128, 256]; s.avgN = L[Math.max(0, Math.min(7, L.indexOf(s.avgN) + n))]; }
+      else if (s.menu === 'HMENU') s.hold = Math.max(HOLD_MIN, Math.min(HOLD_MAX, s.hold * Math.pow(1.25, n * fast)));
+      else if (s.menu === 'DISPLAY') s.disp.bright = Math.max(1, Math.min(100, Math.round(s.disp.bright + n * 5 * fast)));
+      else if (s.menu === 'MEASURE' && s.meas.edit >= 0) { const z = s.meas.zones[s.meas.edit], L = MEAS_V.includes(z.p) ? MEAS_V : MEAS_T; z.p = L[((L.indexOf(z.p) + n) % L.length + L.length) % L.length]; z.on = true; }
     }
     this.hooks.changed();
   }
@@ -213,7 +236,7 @@ export class Scope {
       for (let i = 0; i < n; i += 4) { const v = r[(t - n + i) & RMASK]; if (v > mx) mx = v; if (v < mn) mn = v; sum += v; }
       const c = s.ch[ch]; const pp = (mx - mn) * this.pf(ch);
       if (this.sim.probes[ch] && pp > 0.03) {
-        c.on = true; c.cpl = 'DC'; c.fine = 1; c.finemode = false; c.inv = false;
+        c.on = true; c.cpl = 'DC'; c.fine = 1; c.finemode = false; c.inv = false; c.bw = false;
         let k = 0; while (k < VDIV.length - 1 && VDIV[k] * this.pf(ch) * 5 < pp) k++; c.vd = k;
         c.pos = -((mx + mn) / 2 * this.pf(ch)) / (VDIV[k] * this.pf(ch));
         c.pos = Math.max(-3.5, Math.min(3.5, c.pos));
@@ -221,7 +244,7 @@ export class Scope {
         if (!tf && f >= 50) { tf = f; s.trig.src = ch; s.trig.level = 0; } // AC trigger coupling: 50 % level = 0 V of the AC part
       } else if (!this.sim.probes[ch]) c.on = ch === 'CH1';
     }
-    s.trig.mode = 'AUTO'; s.trig.slope = 'R'; s.trig.cpl = 'AC'; s.hpos = 0;
+    s.trig.mode = 'AUTO'; s.trig.slope = 'R'; s.trig.cpl = 'AC'; s.hpos = 0; s.hold = HOLD_MIN;
     if (tf > 0) { const want = 2.5 / tf / HDIV; let k = 0; while (k < TDIV.length - 1 && TDIV[k] < want) k++; s.td = k; }
     else s.td = 10;
     s.menu = null;
@@ -234,8 +257,9 @@ export class Scope {
   }
 
   // ===================================== menus =====================================
+  // Menus as on the UTD2000L series (UTD2102CEL) user manual: item names, options and their order.
   menuDef() {
-    const s = this.st, cyc = (arr, v) => arr[(arr.indexOf(v) + 1) % arr.length];
+    const s = this.st, cyc = (arr, v) => arr[(arr.indexOf(v) + 1) % arr.length], E = { label: '', value: '' };
     switch (s.menu) {
       case 'CH1': case 'CH2': { const c = s.ch[s.menu]; return { title: s.menu, items: [
         { label: 'Coupling', value: c.cpl, f: () => c.cpl = cyc(['DC', 'AC', 'GND'], c.cpl) },
@@ -247,55 +271,76 @@ export class Scope {
         { label: 'Type', value: 'FFT', f: () => m.kind = 'Math' },
         { label: 'Source', value: m.fftSrc, f: () => m.fftSrc = cyc(['CH1', 'CH2'], m.fftSrc) },
         { label: 'Window', value: m.win, f: () => m.win = cyc(['Hanning', 'Hamming', 'Blackman', 'Rectangle'], m.win) },
-        { label: 'Unit', value: m.unit === 'Vrms' ? 'Vrms' : 'dBVrms', f: () => m.unit = m.unit === 'Vrms' ? 'dBVrms' : 'Vrms' }] : [
+        { label: 'Vertical', value: m.unit === 'Vrms' ? 'Vrms' : 'dBVrms', f: () => m.unit = m.unit === 'Vrms' ? 'dBVrms' : 'Vrms' }, E] : [
         { label: 'Type', value: 'Math', f: () => m.kind = 'FFT' },
-        { label: 'Source A', value: 'CH1' }, { label: 'Operator', value: { '+': 'A+B', '-': 'A-B', '*': 'A×B', '/': 'A÷B' }[m.op], f: () => m.op = cyc(['+', '-', '*', '/'], m.op) },
-        { label: 'Source B', value: 'CH2' }, { label: '', value: '' }] }; }
+        { label: 'Source 1', value: 'CH1' }, { label: 'Operator', value: { '+': '+', '-': '-', '*': '×', '/': '÷' }[m.op], f: () => m.op = cyc(['+', '-', '*', '/'], m.op) },
+        { label: 'Source 2', value: 'CH2' }, E] }; }
       case 'TMENU': { const t = s.trig; return { title: 'TRIGGER', items: [
         { label: 'Type', value: 'Edge' },
-        { label: 'Source', value: { CH1: 'CH1', CH2: 'CH2', EXT: 'EXT', EXT5: 'EXT/5', LINE: 'AC Line' }[t.src], f: () => t.src = cyc(['CH1', 'CH2', 'EXT', 'EXT5', 'LINE'], t.src) },
-        { label: 'Slope', value: t.slope === 'R' ? 'Rising ⟋' : 'Falling ⟍', f: () => t.slope = t.slope === 'R' ? 'F' : 'R' },
+        { label: 'Source', value: { CH1: 'CH1', CH2: 'CH2', EXT: 'EXT', EXT5: 'EXT/5', LINE: 'AC Line' }[t.src], f: () => t.src = cyc(['CH1', 'CH2', 'EXT', 'LINE'], t.src) },
+        { label: 'Slope', value: { R: 'Rise', F: 'Fall', RF: 'Rise & Fall' }[t.slope], f: () => t.slope = cyc(['R', 'F', 'RF'], t.slope) },
         { label: 'Mode', value: { AUTO: 'Auto', NORMAL: 'Normal', SINGLE: 'Single' }[t.mode], f: () => { t.mode = cyc(['AUTO', 'NORMAL', 'SINGLE'], t.mode); this.single = false; s.run = true; } },
         { label: 'Coupling', value: { DC: 'DC', AC: 'AC', HF: 'HF Reject', LF: 'LF Reject' }[t.cpl], f: () => t.cpl = cyc(['DC', 'AC', 'HF', 'LF'], t.cpl) }] }; }
-      case 'HMENU': return { title: 'HORIZONTAL', items: [
+      case 'HMENU': return { title: 'HORI MENU', items: [
         { label: 'Main', value: s.zoom ? '' : '●', f: () => s.zoom = false },
-        { label: 'Zoom', value: s.zoom ? '●' : '', f: () => { s.zoom = true; if (s.ztd >= s.td) s.ztd = Math.max(0, s.td - 2); } },
-        { label: 'Format', value: s.disp.fmt, f: () => s.disp.fmt = s.disp.fmt === 'YT' ? 'XY' : 'YT' }, { label: '', value: '' }, { label: '', value: '' }] };
-      case 'MEASURE': { const m = s.meas; const cy = i => () => { const L = [null, ...MEAS]; m.items[i] = L[(L.indexOf(m.items[i]) + 1) % L.length]; };
+        { label: 'Window', value: s.zoom ? '●' : '', f: () => { s.zoom = true; if (s.ztd >= s.td) s.ztd = Math.max(0, s.td - 2); } },
+        { label: 'Hold off', value: fmtT(s.hold), hint: 'MULTI' }, E, E] };
+      case 'MEASURE': { const m = s.meas;
+        if (m.edit >= 0) { const z = m.zones[m.edit], isV = MEAS_V.includes(z.p); return { title: `MEASURE ${m.edit + 1}`, items: [
+          { label: 'Source', value: z.src, f: () => { z.src = cyc(['CH1', 'CH2'], z.src); z.on = true; } },
+          { label: 'Type', value: isV ? 'Volt' : 'Time', f: () => { z.p = isV ? MEAS_T[0] : MEAS_V[0]; z.on = true; } },
+          { label: 'Parameter', value: z.p, hint: 'MULTI', f: () => { z.p = cyc(isV ? MEAS_V : MEAS_T, z.p); z.on = true; } },
+          { label: 'Display', value: z.on ? 'ON' : 'OFF', f: () => z.on = !z.on },
+          { label: 'Back', value: '', f: () => m.edit = -1 }] }; }
+        const r = { CH1: this.measure('CH1'), CH2: this.measure('CH2') };
         return { title: 'MEASURE', items: [
-          { label: 'Source', value: m.src, f: () => m.src = cyc(['CH1', 'CH2'], m.src) },
-          { label: 'Param 1', value: m.items[0] || 'OFF', f: cy(0) }, { label: 'Param 2', value: m.items[1] || 'OFF', f: cy(1) }, { label: 'Param 3', value: m.items[2] || 'OFF', f: cy(2) },
-          { label: 'All Param', value: m.all ? 'ON' : 'OFF', f: () => m.all = !m.all }] }; }
+          ...m.zones.map((z, i) => ({ label: z.on ? `${z.src} ${z.p}` : `Zone ${i + 1}`, value: z.on ? (r[z.src] ? this.fmtMeas(z.p, r[z.src][z.p]) : '****') : 'OFF', f: () => m.edit = i })),
+          { label: 'All Param', value: m.all, f: () => m.all = cyc(['OFF', 'CH1', 'CH2'], m.all) }] }; }
       case 'CURSOR': { const c = s.cur; const r = this.cursorVals(); return { title: 'CURSOR', items: [
-        { label: 'Type', value: c.type, f: () => c.type = cyc(['Off', 'Voltage', 'Time'], c.type) },
+        { label: 'Type', value: c.type === 'Track' ? 'Tracking' : c.type, f: () => c.type = cyc(['Off', 'Voltage', 'Time', 'Track'], c.type) },
         { label: 'Source', value: c.src, f: () => c.src = cyc(['CH1', 'CH2'], c.src) },
-        { label: 'Active', value: c.act === 'AB' ? 'A & B' : c.act, f: () => c.act = cyc(['A', 'B', 'AB'], c.act) },
+        { label: 'Select', value: c.act === 'AB' ? 'A & B' : c.act, f: () => c.act = cyc(['A', 'B', 'AB'], c.act) },
         { label: r ? r.l1 : '', value: r ? r.v1 : '' }, { label: r ? r.l2 : '', value: r ? r.v2 : '' }] }; }
       case 'ACQUIRE': return { title: 'ACQUIRE', items: [
         { label: 'Mode', value: s.acq, f: () => { s.acq = cyc(['Sample', 'Peak', 'Average'], s.acq); this.avgBuf = {}; } },
         { label: 'Averages', value: s.acq === 'Average' ? String(s.avgN) : '--', f: () => { const L = [2, 4, 8, 16, 32, 64, 128, 256]; s.avgN = L[(L.indexOf(s.avgN) + 1) % 8]; } },
-        { label: 'Sampling', value: 'Real Time' }, { label: 'Sa Rate', value: fmtF(this.saRate()).replace('Hz', 'Sa/s') }, { label: '', value: '' }] };
+        { label: 'Sampling', value: s.samp, f: () => s.samp = s.samp === 'Real Time' ? 'Equ-Time' : 'Real Time' },
+        { label: 'FastACQ', value: s.fast ? 'ON' : 'OFF', f: () => s.fast = !s.fast }, E] };
       case 'DISPLAY': return { title: 'DISPLAY', items: [
-        { label: 'Type', value: s.disp.type, f: () => s.disp.type = cyc(['Vectors', 'Dots'], s.disp.type) },
-        { label: 'Persist', value: ['OFF', '1s', '2s', '5s', 'Infinite'][s.disp.persist], f: () => { s.disp.persist = (s.disp.persist + 1) % 5; this.pcx.clearRect(0, 0, GW, GH); } },
+        { label: 'Type', value: s.disp.type === 'Dots' ? 'Dots' : 'Vector', f: () => s.disp.type = cyc(['Vectors', 'Dots'], s.disp.type) },
         { label: 'Format', value: s.disp.fmt, f: () => s.disp.fmt = s.disp.fmt === 'YT' ? 'XY' : 'YT' },
-        { label: 'Grid', value: s.disp.grid, f: () => s.disp.grid = cyc(['Dots', 'Lines', 'Off'], s.disp.grid) }, { label: 'Clear', value: '', f: () => this.pcx.clearRect(0, 0, GW, GH) }] };
+        { label: 'Persist', value: ['Close', '1s', '2s', '5s', 'Infinite'][s.disp.persist], f: () => { s.disp.persist = (s.disp.persist + 1) % 5; this.pcx.clearRect(0, 0, GW, GH); } },
+        { label: 'Brightness', value: s.disp.bright + '%', hint: 'MULTI', f: () => s.disp.bright = BRIGHT.find(b => b > s.disp.bright) || BRIGHT[0] }, E] };
       case 'STORAGE': { const r = s.ref; return { title: 'STORAGE', items: [
         { label: 'Save Image', value: 'PNG', f: () => this.hooks.screenshot(this.cv) },
         { label: 'Ref Source', value: r.ch, f: () => r.ch = cyc(['CH1', 'CH2'], r.ch) },
         { label: 'Save Ref', value: '', f: () => { const f = this.frame[r.ch]; if (f) { r.data = { y: Float32Array.from(f.y), lo: f.lo && Float32Array.from(f.lo), hi: f.hi && Float32Array.from(f.hi), vd: this.vd(r.ch), pos: s.ch[r.ch].pos }; r.on = true; } } },
-        { label: 'Show Ref', value: r.on ? 'ON' : 'OFF', f: () => r.on = !r.on && !!r.data }, { label: '', value: '' }] }; }
-      case 'UTILITY': return { title: 'UTILITY', items: [
-        { label: 'Counter', value: s.counter ? 'ON' : 'OFF', f: () => s.counter = !s.counter },
-        { label: 'Self Cal', value: '', f: () => { this.calibrating = performance.now(); } },
-        { label: 'Default', value: 'Setup', f: () => { this.reset(); this.avgBuf = {}; } },
-        { label: 'Language', value: 'English' }, { label: 'System', value: 'Info' }] };
+        { label: 'Show Ref', value: r.on ? 'ON' : 'OFF', f: () => r.on = !r.on && !!r.data }, E] }; }
+      case 'UTILITY': { const next = () => s.upage = (s.upage + 1) % 3, pg = `${s.upage + 1}/3`;
+        if (s.upage === 1) return { title: 'UTILITY', items: [
+          { label: 'Reset', value: 'Default', f: () => { this.reset(); this.avgBuf = {}; this.st.menu = 'UTILITY'; this.st.upage = 1; } },
+          { label: 'Grid', value: s.disp.grid, f: () => s.disp.grid = cyc(['Dots', 'Lines', 'Off'], s.disp.grid) }, E, E,
+          { label: 'Next Page', value: pg, f: next }] };
+        if (s.upage === 2) return { title: 'UTILITY', items: [
+          { label: 'Cymometer', value: s.counter ? 'ON' : 'OFF', f: () => s.counter = !s.counter }, E, E, E,
+          { label: 'First Page', value: pg, f: next }] };
+        return { title: 'UTILITY', items: [
+          { label: 'Self Cal', value: '', f: () => { this.calibrating = performance.now(); } },
+          { label: 'Language', value: 'English' },
+          { label: 'Help', value: '', f: () => this.hooks.scopeHelp() }, E,
+          { label: 'Next Page', value: pg, f: next }] }; }
     }
     return null;
   }
+  trackAt(xDiv) { // tracking cursor: the waveform value at a horizontal position (divisions from the centre)
+    const c = this.st.cur, f = this.frame[c.src]; if (!f) return NaN; const N = f.y.length, i = Math.max(0, Math.min(N - 1, Math.round((GW / 2 + xDiv * PX) / GW * N)));
+    return f.lo && f.hi ? (f.lo[i] + f.hi[i]) / 2 : f.y[i];
+  }
   cursorVals() {
     const c = this.st.cur; if (c.type === 'Off') return null;
-    if (c.type === 'Time') { const td = this.st.zoom ? TDIV[this.st.ztd] : this.tdiv(); const dt = (c.b - c.a) * td; return { l1: 'ΔT', v1: fmtT(Math.abs(dt)), l2: '1/ΔT', v2: dt ? fmtF(1 / Math.abs(dt)) : '****', A: c.a * td, B: c.b * td }; }
+    const td = this.st.zoom ? TDIV[this.st.ztd] : this.tdiv();
+    if (c.type === 'Time') { const dt = (c.b - c.a) * td; return { l1: 'ΔT', v1: fmtT(Math.abs(dt)), l2: '1/ΔT', v2: dt ? fmtF(1 / Math.abs(dt)) : '****', A: c.a * td, B: c.b * td }; }
+    if (c.type === 'Track') { const va = this.trackAt(c.a), vb = this.trackAt(c.b), dt = (c.b - c.a) * td; return { l1: 'ΔT', v1: fmtT(Math.abs(dt)), l2: 'ΔV', v2: isFinite(va - vb) ? fmtV(Math.abs(vb - va)) : '****', A: c.a * td, B: c.b * td, VA: va, VB: vb }; }
     const vd = this.vd(c.src), p = this.st.ch[c.src].pos; return { l1: 'ΔV', v1: fmtV(Math.abs((c.b - c.a) * vd)), l2: 'A / B', v2: `${fmtV((c.a - p) * vd)}`, A: (c.a - p) * vd, B: (c.b - p) * vd };
   }
   saRate() { const W = HDIV * (this.st.zoom ? TDIV[this.st.ztd] : this.tdiv()); return Math.min(1e9, 2500 / W * 4); }
@@ -317,18 +362,19 @@ export class Scope {
     const tmax = now - need - 2, len = Math.min(RING - W * 1.5 - need - 10, Math.max(4 * W, 120000, 0) | 0);
     const t0 = tmax - Math.min(len, 1500000);
     const vd = tr.src === 'CH1' || tr.src === 'CH2' ? this.vd(tr.src) : 0.5;
-    const L = tr.level, h = Math.max(0.12 * vd, 0.004); const rising = tr.slope === 'R';
+    const L = tr.level, h = Math.max(0.12 * vd, 0.004); const doR = tr.slope !== 'F', doF = tr.slope !== 'R';
+    const hold = Math.max(1, Math.round(s.hold * FS)); let lastT = -Infinity; // holdoff: no new trigger within this many samples of the last one
     let mean = 0;
     if (tr.cpl === 'AC' || tr.cpl === 'LF') { const n = 48000; const st = Math.max(1, n / 2000 | 0); let c = 0; for (let i = 0; i < n; i += st) { mean += this.srcVal(tr.src, tmax - i); c++; } mean /= c; }
-    let armed = false, found = -1, frac = 0, prev = 0;
+    let armR = false, armF = false, found = -1, frac = 0, pR = 0, pF = 0;
     const hf = tr.cpl === 'HF'; let acc = 0; const K = 24;
     for (let i = t0; i <= tmax; i++) {
       let v = this.srcVal(tr.src, i) - mean;
       if (hf) { acc += v - this.srcVal(tr.src, i - K) + mean; v = acc / K; }
-      const x = rising ? v - L : L - v;
-      if (x < -h) armed = true;
-      else if (armed && x >= 0 && i > t0) { found = i; frac = prev < 0 ? (-prev) / (x - prev) : 0; armed = false; }
-      prev = x;
+      const xr = v - L, xf = L - v;
+      if (doR) { if (xr < -h) armR = true; else if (armR && xr >= 0 && i > t0) { armR = false; if (i - lastT >= hold) { found = lastT = i; frac = pR < 0 ? (-pR) / (xr - pR) : 0; } } }
+      if (doF) { if (xf < -h) armF = true; else if (armF && xf >= 0 && i > t0) { armF = false; if (i - lastT >= hold) { found = lastT = i; frac = pF < 0 ? (-pF) / (xf - pF) : 0; } } }
+      pR = xr; pF = xf;
     }
     return found >= 0 ? { t: found - 1, frac } : null;
   }
@@ -359,16 +405,19 @@ export class Scope {
     const W = HDIV * tdiv * FS; const centre = trig.t + trig.frac + (s.hpos + (s.zoom ? s.zpos : 0)) * FS;
     const start = centre - W / 2;
     this.view = { start, W, tdiv, trig };
+    const measured = new Set([...s.meas.zones.filter(z => z.on).map(z => z.src), s.meas.all, s.cur.type === 'Track' ? s.cur.src : '']);
+    const Wm = HDIV * this.tdiv() * FS, startM = trig.t + trig.frac + s.hpos * FS - Wm / 2; this.mainFrame = { CH1: null, CH2: null };
     for (const ch of ['CH1', 'CH2']) {
-      const c = s.ch[ch]; if (!c.on && !(s.math.on && (s.math.kind === 'Math' || s.math.fftSrc === ch)) && !(s.meas.src === ch)) { this.frame[ch] = null; continue; }
+      const c = s.ch[ch]; if (!c.on && !(s.math.on && (s.math.kind === 'Math' || s.math.fftSrc === ch)) && !measured.has(ch)) { this.frame[ch] = null; continue; }
       this.frame[ch] = this.extract(ch, start, W);
+      if (s.zoom && c.on) this.mainFrame[ch] = this.extract(ch, startM, Wm, true); // Window mode: the upper part shows the main time base
     }
     if (s.math.on && s.math.kind === 'FFT') this.fft = this.computeFFT(s.math.fftSrc, trig);
   }
   chanMean(ch) { // AC coupling: remove the DC level of the last 0.1 s
     const r = this.ring(ch), t = this.now(), n = 48000; let m = 0, c = 0; for (let i = 0; i < n; i += 37) { m += r[(t - i) & RMASK]; c++; } return m / c;
   }
-  extract(ch, start, W) {
+  extract(ch, start, W, noAvg = false) {
     const s = this.st, c = s.ch[ch], r = this.ring(ch), pf = this.pf(ch) * (c.inv ? -1 : 1);
     const off = c.cpl === 'AC' ? this.chanMean(ch) : 0, gnd = c.cpl === 'GND';
     const N = GW; const out = { y: new Float32Array(N), lo: null, hi: null, raw: null, rawStart: start };
@@ -401,7 +450,7 @@ export class Scope {
     }
     if (bw) { const a = 0.6; let p = out.y[0]; for (let x = 0; x < N; x++) { p = a * p + (1 - a) * out.y[x]; out.y[x] = p; } }
     // averaging
-    if (s.acq === 'Average') {
+    if (s.acq === 'Average' && !noAvg) {
       const k = ch + s.td + s.vd; let A = this.avgBuf[ch];
       if (!A || A.key !== k) A = this.avgBuf[ch] = { key: k, y: Float32Array.from(out.y), n: 1 };
       else { A.n = Math.min(A.n + 1, s.avgN); for (let x = 0; x < N; x++) A.y[x] += (out.y[x] - A.y[x]) / A.n; }
@@ -443,8 +492,20 @@ export class Scope {
       const life = [0, 1, 2, 5, 1e9][s.disp.persist]; if (life < 1e8) { this.pcx.globalCompositeOperation = 'destination-out'; this.pcx.fillStyle = `rgba(0,0,0,${Math.min(1, 1 / (30 * life))})`; this.pcx.fillRect(0, 0, GW, GH); this.pcx.globalCompositeOperation = 'source-over'; }
       g.drawImage(this.pcv, GX, GY);
     }
-    this.drawGrid(g);
-    g.save(); g.beginPath(); g.rect(GX, GY, GW, GH); g.clip();
+    const split = s.zoom && s.disp.fmt === 'YT' && !(s.math.on && s.math.kind === 'FFT');
+    if (split) { // Window mode: main time base above with the expanded zone marked, expanded waveform below
+      g.fillStyle = '#000'; g.fillRect(GX - 2, GY - 2, GW + 4, GH + 4);
+      this.drawGrid(g, TOP); this.pane = TOP;
+      g.save(); g.beginPath(); g.rect(GX, TOP.y, GW, TOP.h); g.clip();
+      for (const ch of ['CH2', 'CH1']) if (s.ch[ch].on && this.mainFrame && this.mainFrame[ch]) this.drawTrace(g, this.mainFrame[ch], this.vd(ch), s.ch[ch].pos, COL[ch], 0.9, 0, 0, 1.1);
+      const frac = TDIV[s.ztd] / this.tdiv(), zc = GX + GW / 2 + (s.zpos / (HDIV * this.tdiv())) * GW, zw = Math.max(2, frac * GW);
+      g.fillStyle = 'rgba(255,255,255,.16)'; g.fillRect(zc - zw / 2, TOP.y, zw, TOP.h); g.strokeStyle = '#fff'; g.lineWidth = 1; g.strokeRect(zc - zw / 2 + .5, TOP.y + .5, zw - 1, TOP.h - 1);
+      g.restore();
+      g.fillStyle = '#2c7fe3'; g.fillRect(GX - 2, TOP.y + TOP.h + 1, GW + 4, LOW.y - TOP.y - TOP.h - 2);
+      this.drawGrid(g, LOW); this.pane = LOW;
+    } else { this.pane = FULL; this.drawGrid(g); }
+    const P = this.pane;
+    g.save(); g.beginPath(); g.rect(GX, P.y, GW, P.h); g.clip();
     const v = this.view;
     if (this.calibrating && performance.now() - this.calibrating < 3000) { g.fillStyle = '#fff'; g.font = 'bold 22px Arial'; g.textAlign = 'center'; g.fillText('Self Calibrating...', GX + GW / 2, GY + GH / 2); }
     else if (s.disp.fmt === 'XY') this.drawXY(g);
@@ -453,34 +514,36 @@ export class Scope {
       if (s.math.on && s.math.kind === 'Math') this.drawMath(g);
       for (const ch of ['CH2', 'CH1']) if (s.ch[ch].on && this.frame[ch]) {
         this.drawTrace(g, this.frame[ch], this.vd(ch), s.ch[ch].pos, COL[ch]);
-        if (s.disp.persist) this.drawTrace(this.pcx, this.frame[ch], this.vd(ch), s.ch[ch].pos, COL[ch], 0.5, -GX, -GY);
+        if (s.disp.persist && !split) this.drawTrace(this.pcx, this.frame[ch], this.vd(ch), s.ch[ch].pos, COL[ch], 0.5, -GX, -GY);
       }
       if (s.math.on && s.math.kind === 'FFT' && this.fft) this.drawFFT(g);
       this.drawCursors(g);
     }
     g.restore();
     this.drawMarkers(g); this.drawBars(g); this.drawMenu(g);
-    if (s.meas.all) this.drawAllMeas(g); else this.drawMeas(g);
+    if (s.meas.all !== 'OFF') this.drawAllMeas(g); else if (s.menu !== 'MEASURE') this.drawMeas(g);
     if (this.levelShow && performance.now() - this.levelShow < 1500) this.drawLevelLine(g);
+    this.pane = FULL;
   }
-  drawGrid(g) {
-    const s = this.st; if (s.disp.grid === 'Off') return;
+  drawGrid(g, P = FULL) {
+    const s = this.st; if (s.disp.grid === 'Off') { g.strokeStyle = '#9a9a9a'; g.lineWidth = 1; g.strokeRect(GX - .5, P.y - .5, GW + 1, P.h + 1); return; }
+    const py = P.h / VDIVS;
     g.fillStyle = '#6b6b6b'; g.strokeStyle = '#555';
-    if (s.disp.grid === 'Lines') { g.lineWidth = 1; g.beginPath(); for (let i = 0; i <= HDIV; i++) { g.moveTo(GX + i * PX + .5, GY); g.lineTo(GX + i * PX + .5, GY + GH); } for (let j = 0; j <= VDIVS; j++) { g.moveTo(GX, GY + j * PX + .5); g.lineTo(GX + GW, GY + j * PX + .5); } g.stroke(); }
-    else { for (let i = 0; i <= HDIV; i++) for (let y = 0; y <= GH; y += 5) g.fillRect(GX + i * PX, GY + y, 1, 1); for (let j = 0; j <= VDIVS; j++) for (let x = 0; x <= GW; x += 5) g.fillRect(GX + x, GY + j * PX, 1, 1); }
+    if (s.disp.grid === 'Lines') { g.lineWidth = 1; g.beginPath(); for (let i = 0; i <= HDIV; i++) { g.moveTo(GX + i * PX + .5, P.y); g.lineTo(GX + i * PX + .5, P.y + P.h); } for (let j = 0; j <= VDIVS; j++) { g.moveTo(GX, P.y + Math.round(j * py) + .5); g.lineTo(GX + GW, P.y + Math.round(j * py) + .5); } g.stroke(); }
+    else { for (let i = 0; i <= HDIV; i++) for (let y = 0; y <= P.h; y += 5) g.fillRect(GX + i * PX, P.y + y, 1, 1); for (let j = 0; j <= VDIVS; j++) for (let x = 0; x <= GW; x += 5) g.fillRect(GX + x, P.y + Math.round(j * py), 1, 1); }
     g.fillStyle = '#8a8a8a';
-    for (let x = 0; x <= GW; x += 10) { g.fillRect(GX + x, GY + GH / 2 - 3, 1, 7); }
-    for (let y = 0; y <= GH; y += 10) { g.fillRect(GX + GW / 2 - 3, GY + y, 7, 1); }
-    g.strokeStyle = '#9a9a9a'; g.lineWidth = 1; g.strokeRect(GX - .5, GY - .5, GW + 1, GH + 1);
+    for (let x = 0; x <= GW; x += 10) { g.fillRect(GX + x, P.y + P.h / 2 - 3, 1, 7); }
+    for (let y = 0; y <= P.h; y += py / 5) { g.fillRect(GX + GW / 2 - 3, P.y + Math.round(y), 7, 1); }
+    g.strokeStyle = '#9a9a9a'; g.lineWidth = 1; g.strokeRect(GX - .5, P.y - .5, GW + 1, P.h + 1);
   }
-  ypix(v, vd, pos) { return GY + GH / 2 - (v / vd + pos) * PX; }
-  drawTrace(g, f, vd, pos, col, alpha = 1, ox = 0, oy = 0) {
-    const s = this.st; g.save(); g.translate(ox, oy); g.globalAlpha = alpha; g.strokeStyle = col; g.fillStyle = col; g.lineWidth = 1.6;
+  ypix(v, vd, pos) { const P = this.pane || FULL; return P.y + P.h / 2 - (v / vd + pos) * P.h / VDIVS; }
+  drawTrace(g, f, vd, pos, col, alpha = 1, ox = 0, oy = 0, lw = 1.6) {
+    const s = this.st; g.save(); g.translate(ox, oy); g.globalAlpha = alpha * (0.25 + 0.75 * s.disp.bright / 100); g.strokeStyle = col; g.fillStyle = col; g.lineWidth = lw;
     const N = f.y.length, X = x => GX + x * GW / N;
     if (f.lo && f.hi) {
       g.beginPath();
       for (let x = 0; x < N; x++) { const a = this.ypix(f.hi[x], vd, pos), b = this.ypix(f.lo[x], vd, pos); g.moveTo(X(x) + .5, a - .8); g.lineTo(X(x) + .5, b + .8); if (x > 0 && s.disp.type === 'Vectors') { const pa = this.ypix(f.hi[x - 1], vd, pos), pb = this.ypix(f.lo[x - 1], vd, pos); if (pb < a) { g.moveTo(X(x) + .5, pb); g.lineTo(X(x) + .5, a); } if (pa > b) { g.moveTo(X(x) + .5, b); g.lineTo(X(x) + .5, pa); } } }
-      g.lineWidth = 1.3; g.stroke();
+      g.lineWidth = Math.min(1.3, lw); g.stroke();
     } else if (s.disp.type === 'Dots') { for (let x = 0; x < N; x += 3) g.fillRect(X(x), this.ypix(f.y[x], vd, pos) - 1, 2, 2); }
     else { g.beginPath(); for (let x = 0; x < N; x++) { const y = this.ypix(f.y[x], vd, pos); if (x === 0) g.moveTo(X(x), y); else g.lineTo(X(x), y); } g.stroke(); }
     g.restore();
@@ -510,17 +573,21 @@ export class Scope {
     g.stroke();
   }
   drawCursors(g) {
-    const c = this.st.cur; if (c.type === 'Off') return;
-    g.setLineDash([4, 3]); g.strokeStyle = '#ff8c2a'; g.lineWidth = 1;
+    const c = this.st.cur; if (c.type === 'Off') return; const P = this.pane || FULL;
+    const r = this.cursorVals(); g.setLineDash([4, 3]); g.strokeStyle = '#ff8c2a'; g.lineWidth = 1;
     for (const [k, v] of [['A', c.a], ['B', c.b]]) {
       g.beginPath();
-      if (c.type === 'Time') { const x = GX + GW / 2 + v * PX; g.moveTo(x, GY); g.lineTo(x, GY + GH); }
-      else { const y = GY + GH / 2 - v * PX; g.moveTo(GX, y); g.lineTo(GX + GW, y); }
-      g.stroke(); g.fillStyle = '#ff8c2a'; g.font = '11px Arial'; g.fillText(k, c.type === 'Time' ? GX + GW / 2 + v * PX + 3 : GX + 4, c.type === 'Time' ? GY + 12 : GY + GH / 2 - v * PX - 3);
+      if (c.type === 'Time' || c.type === 'Track') { const x = GX + GW / 2 + v * PX; g.moveTo(x, P.y); g.lineTo(x, P.y + P.h); }
+      else { const y = P.y + P.h / 2 - v * P.h / VDIVS; g.moveTo(GX, y); g.lineTo(GX + GW, y); }
+      g.stroke();
+      if (c.type === 'Track') { const vv = k === 'A' ? r.VA : r.VB; if (isFinite(vv)) { const y = this.ypix(vv, this.vd(c.src), this.st.ch[c.src].pos); g.beginPath(); g.moveTo(GX, y); g.lineTo(GX + GW, y); g.stroke(); } }
+      g.fillStyle = '#ff8c2a'; g.font = '11px Arial'; g.fillText(k, c.type !== 'Voltage' ? GX + GW / 2 + v * PX + 3 : GX + 4, c.type !== 'Voltage' ? P.y + 12 : P.y + P.h / 2 - v * P.h / VDIVS - 3);
     }
     g.setLineDash([]);
-    const r = this.cursorVals(); g.fillStyle = '#ffb36b'; g.font = '12px Arial'; g.textAlign = 'left';
-    g.fillText(`A: ${c.type === 'Time' ? fmtT(r.A) : fmtV(r.A)}   B: ${c.type === 'Time' ? fmtT(r.B) : fmtV(r.B)}   ${r.l1}: ${r.v1}`, GX + 6, GY + GH - 8);
+    g.fillStyle = '#ffb36b'; g.font = '12px Arial'; g.textAlign = 'left';
+    const txt = c.type === 'Track' ? `A: ${fmtT(r.A)}, ${isFinite(r.VA) ? fmtV(r.VA) : '****'}   B: ${fmtT(r.B)}, ${isFinite(r.VB) ? fmtV(r.VB) : '****'}`
+      : `A: ${c.type === 'Time' ? fmtT(r.A) : fmtV(r.A)}   B: ${c.type === 'Time' ? fmtT(r.B) : fmtV(r.B)}   ${r.l1}: ${r.v1}`;
+    g.fillText(txt, GX + 6, P.y + P.h - 8);
   }
   drawLevelLine(g) {
     const s = this.st, src = s.trig.src; if (src !== 'CH1' && src !== 'CH2') return;
@@ -529,15 +596,15 @@ export class Scope {
   drawMarkers(g) {
     const s = this.st;
     for (const ch of ['CH1', 'CH2']) {
-      if (!s.ch[ch].on) continue; let y = GY + GH / 2 - s.ch[ch].pos * PX; const clipped = y < GY || y > GY + GH; y = Math.max(GY, Math.min(GY + GH, y));
+      if (!s.ch[ch].on) continue; const P = this.pane || FULL; let y = P.y + P.h / 2 - s.ch[ch].pos * P.h / VDIVS; const clipped = y < P.y || y > P.y + P.h; y = Math.max(P.y, Math.min(P.y + P.h, y));
       g.fillStyle = COL[ch]; g.beginPath(); g.moveTo(GX - 16, y - 7); g.lineTo(GX - 6, y - 7); g.lineTo(GX - 1, y); g.lineTo(GX - 6, y + 7); g.lineTo(GX - 16, y + 7); g.closePath(); g.fill();
       g.fillStyle = '#000'; g.font = 'bold 11px Arial'; g.textAlign = 'center'; g.fillText(ch[2], GX - 10, y + 4); if (clipped) { g.fillStyle = COL[ch]; }
     }
     // trigger position (top) and level (right)
-    const tx = GX + GW / 2 - (s.hpos / this.tdiv()) * PX * (s.zoom ? this.tdiv() / TDIV[s.ztd] : 1);
+    const tx = GX + GW / 2 - (s.hpos / this.tdiv()) * PX; // trigger point on the main time base
     g.fillStyle = '#ff9e3d'; const cx = Math.max(GX, Math.min(GX + GW, tx)); g.beginPath(); g.moveTo(cx - 6, GY - 12); g.lineTo(cx + 6, GY - 12); g.lineTo(cx, GY - 3); g.fill();
     const src = s.trig.src;
-    if (src === 'CH1' || src === 'CH2') { let y = this.ypix(s.trig.level, this.vd(src), s.ch[src].pos); y = Math.max(GY, Math.min(GY + GH, y)); g.fillStyle = COL[src]; g.beginPath(); g.moveTo(GX + GW + 14, y - 6); g.lineTo(GX + GW + 14, y + 6); g.lineTo(GX + GW + 3, y); g.fill(); g.fillStyle = '#000'; }
+    if (src === 'CH1' || src === 'CH2') { const P = this.pane || FULL; let y = this.ypix(s.trig.level, this.vd(src), s.ch[src].pos); y = Math.max(P.y, Math.min(P.y + P.h, y)); g.fillStyle = COL[src]; g.beginPath(); g.moveTo(GX + GW + 14, y - 6); g.lineTo(GX + GW + 14, y + 6); g.lineTo(GX + GW + 3, y); g.fill(); g.fillStyle = '#000'; }
   }
   drawBars(g) {
     const s = this.st; g.textAlign = 'left';
@@ -547,10 +614,9 @@ export class Scope {
     g.fillStyle = stc[status] || '#2bd14a'; g.fillRect(8, 6, 58, 22); g.fillStyle = '#000'; g.font = 'bold 13px Arial'; g.textAlign = 'center'; g.fillText(status, 37, 22);
     g.textAlign = 'left'; g.fillStyle = '#fff'; g.font = '13px Arial';
     g.fillText(`H Pos: ${fmtT(s.hpos)}`, 250, 22);
-    if (s.zoom) { g.fillStyle = '#ffd34d'; g.fillText(`ZOOM ${fmtDiv(TDIV[s.ztd])}`, 92, 22); }
-    else { g.fillText(s.acq === 'Average' ? `Avg ${s.avgN}` : s.acq, 92, 22); }
-    // zoom overview strip
-    if (s.zoom) { const w = 120, x0 = 430; g.strokeStyle = '#fff'; g.strokeRect(x0, 10, w, 14); const frac = TDIV[s.ztd] / this.tdiv(); const cx = x0 + w / 2 + (s.zpos / (HDIV * this.tdiv())) * w; g.fillStyle = 'rgba(255,211,77,.7)'; g.fillRect(cx - frac * w / 2, 11, Math.max(2, frac * w), 12); }
+    g.fillText(s.acq === 'Average' ? `Average ${s.avgN}` : s.acq, 92, 22);
+    if (s.zoom) { g.fillStyle = '#ffd34d'; g.fillText(`Window ${fmtDiv(TDIV[s.ztd])}`, 400, 22); }
+    g.fillStyle = '#fff'; g.textAlign = 'right'; g.fillText(fmtF(this.saRate()).replace('Hz', 'Sa/s'), GX + GW, 22); g.textAlign = 'left';
     // bottom bar
     const y = 466; g.font = 'bold 13px Arial';
     const chBox = (ch, x) => {
@@ -562,7 +628,7 @@ export class Scope {
     chBox('CH1', 34); chBox('CH2', 168);
     g.fillStyle = '#0d2a5e'; g.fillRect(302, y - 15, 110, 20); g.fillStyle = '#fff'; g.fillText(`M ${fmtDiv(this.tdiv())}`, 310, y);
     const tr = s.trig; const src = { CH1: '1', CH2: '2', EXT: 'EXT', EXT5: 'EXT/5', LINE: 'AC' }[tr.src];
-    g.fillStyle = '#0d2a5e'; g.fillRect(418, y - 15, 122, 20); g.fillStyle = '#ff9e3d'; g.fillText(`${src} ${tr.slope === 'R' ? '⟋' : '⟍'} ${fmtV(tr.level)}`, 424, y);
+    g.fillStyle = '#0d2a5e'; g.fillRect(418, y - 15, 122, 20); g.fillStyle = '#ff9e3d'; g.fillText(`${src} ${{ R: '⟋', F: '⟍', RF: '⟋⟍' }[tr.slope] || '⟋'} ${fmtV(tr.level)}`, 424, y);
     if (s.counter) { const f = this.counterF(); g.fillStyle = '#0d2a5e'; g.fillRect(546, y - 15, 90, 20); g.fillStyle = '#fff'; g.font = '12px Arial'; g.fillText(fmtF(f), 550, y); }
     if (s.math.on && s.math.kind === 'FFT' && this.fftInfo) { g.fillStyle = COL.MATH; g.font = '12px Arial'; g.fillText(this.fftInfo, GX + 6, GY + 16); }
   }
@@ -581,8 +647,9 @@ export class Scope {
       const it = m.items[i]; const y = 38 + i * 87;
       g.fillStyle = grad; g.fillRect(x, y, w, 82); g.strokeStyle = '#8fc0ff'; g.strokeRect(x + .5, y + .5, w - 1, 81);
       if (!it || (!it.label && !it.value)) continue;
-      g.fillStyle = '#fff'; g.font = 'bold 15px Arial'; g.fillText(it.label, x + w / 2, y + 28);
-      if (it.value !== '') { g.fillStyle = '#123f8f'; g.fillRect(x + 12, y + 42, w - 24, 26); g.fillStyle = '#fff'; g.font = '15px Arial'; g.fillText(it.value, x + w / 2, y + 61); }
+      g.fillStyle = '#fff'; g.font = it.label.length > 12 ? 'bold 13px Arial' : 'bold 15px Arial'; g.fillText(it.label, x + w / 2, y + 28);
+      if (it.value !== '') { g.fillStyle = '#123f8f'; g.fillRect(x + 12, y + 42, w - 24, 26); g.fillStyle = '#fff'; g.font = it.value.length > 11 ? '13px Arial' : '15px Arial'; g.fillText(it.value, x + w / 2, y + 61); }
+      if (it.hint) { g.fillStyle = '#cfe3ff'; g.font = '11px Arial'; g.fillText('↻ MULTI', x + w / 2, y + 78); }
     }
   }
   measure(ch) {
@@ -603,20 +670,22 @@ export class Scope {
       for (let i = 1; i < n; i++) { if (rising && a[i - 1] < L && a[i] >= L) { for (let j = i; j < n; j++) if (a[j] >= Hh) return (j - i) * dt; return NaN; } if (!rising && a[i - 1] > Hh && a[i] <= Hh) { for (let j = i; j < n; j++) if (a[j] <= L) return (j - i) * dt; return NaN; } }
       return NaN;
     };
-    return { Vpp: mx - mn, Vmax: mx, Vmin: mn, Vamp: top - base, Vavg: sum / n, Vrms: Math.sqrt(sq / n), Freq: 1 / per, Period: per, '+Width': pw, '-Width': nw, '+Duty': pw / per * 100, Rise: edge(0, 0, true), Fall: edge(0, 0, false) };
+    return { 'Pk-Pk': mx - mn, Max: mx, Min: mn, Amplitude: top - base, Top: top, Base: base, Mean: sum / n, RMS: Math.sqrt(sq / n), Freq: 1 / per, Period: per, '+Width': pw, '-Width': nw, '+Duty': pw / per * 100, '-Duty': nw / per * 100, Rise: edge(0, 0, true), Fall: edge(0, 0, false) };
   }
-  fmtMeas(k, v) { if (v === undefined || !isFinite(v)) return '****'; if (k === 'Freq') return fmtF(v); if (k === '+Duty') return v.toFixed(1) + '%'; if (['Period', '+Width', '-Width', 'Rise', 'Fall'].includes(k)) return fmtT(v); return fmtV(v); }
-  drawMeas(g) {
-    const m = this.st.meas, items = m.items.filter(Boolean); if (!items.length) return; const r = this.measure(m.src); if (!r) return;
+  fmtMeas(k, v) { if (v === undefined || !isFinite(v)) return '****'; if (k === 'Freq') return fmtF(v); if (k === '+Duty' || k === '-Duty') return v.toFixed(1) + '%'; if (['Period', '+Width', '-Width', 'Rise', 'Fall'].includes(k)) return fmtT(v); return fmtV(v); }
+  drawMeas(g) { // measurement zones, shown along the bottom of the screen while the MEASURE menu is closed
+    const zs = this.st.meas.zones.filter(z => z.on); if (!zs.length) return; const r = { CH1: this.measure('CH1'), CH2: this.measure('CH2') };
     g.font = '13px Arial'; g.textAlign = 'left'; let x = GX + 4; const y = GY + GH - 26;
-    for (const k of items) { const t = `${m.src[2]}: ${k}=${this.fmtMeas(k, r[k])}`; const w = g.measureText(t).width + 12; g.fillStyle = 'rgba(10,30,70,.85)'; g.fillRect(x, y, w, 20); g.fillStyle = COL[m.src]; g.fillText(t, x + 6, y + 15); x += w + 6; }
+    for (const z of zs) { const t = `${z.src}: ${z.p}=${r[z.src] ? this.fmtMeas(z.p, r[z.src][z.p]) : '****'}`; const w = g.measureText(t).width + 12; if (x + w > GX + GW) break; g.fillStyle = 'rgba(10,30,70,.85)'; g.fillRect(x, y, w, 20); g.fillStyle = COL[z.src]; g.fillText(t, x + 6, y + 15); x += w + 6; }
   }
   drawAllMeas(g) {
-    const m = this.st.meas, r = this.measure(m.src); if (!r) return;
-    g.fillStyle = 'rgba(8,24,60,.92)'; g.fillRect(GX + 40, GY + 40, GW - 80, GH - 80); g.strokeStyle = '#7fb0ff'; g.strokeRect(GX + 40, GY + 40, GW - 80, GH - 80);
-    g.fillStyle = COL[m.src]; g.font = 'bold 14px Arial'; g.textAlign = 'left'; g.fillText(`All Parameters — ${m.src}`, GX + 56, GY + 64);
-    g.font = '13px Arial'; g.fillStyle = '#fff';
-    MEAS.forEach((k, i) => { const col = i % 2, row = Math.floor(i / 2); g.fillText(`${k}: ${this.fmtMeas(k, r[k])}`, GX + 56 + col * 250, GY + 92 + row * 26); });
+    const src = this.st.meas.all, r = this.measure(src); if (!r) return;
+    g.fillStyle = 'rgba(8,24,60,.92)'; g.fillRect(GX + 30, GY + 30, GW - 60, GH - 60); g.strokeStyle = '#7fb0ff'; g.strokeRect(GX + 30, GY + 30, GW - 60, GH - 60);
+    g.fillStyle = COL[src]; g.font = 'bold 14px Arial'; g.textAlign = 'left'; g.fillText(`All Parameters  ${src}`, GX + 46, GY + 54);
+    g.font = '13px Arial'; g.fillStyle = '#9fc4ff'; g.fillText('Volt', GX + 46, GY + 80); g.fillText('Time', GX + 46 + 260, GY + 80);
+    g.fillStyle = '#fff';
+    MEAS_V.forEach((k, i) => g.fillText(`${k}: ${this.fmtMeas(k, r[k])}`, GX + 46, GY + 104 + i * 30));
+    MEAS_T.forEach((k, i) => g.fillText(`${k}: ${this.fmtMeas(k, r[k])}`, GX + 46 + 260, GY + 104 + i * 30));
   }
 }
 

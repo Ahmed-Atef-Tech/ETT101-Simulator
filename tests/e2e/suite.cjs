@@ -256,10 +256,10 @@ T('MD05', 'Modules', 'Guidance off hides info buttons and tooltips; setting pers
 });
 
 // ================================================================== 4. scope
-const SCOPE_BTNS = ['CH1', 'CH2', 'MATH', 'MEASURE', 'ACQUIRE', 'STORAGE', 'CURSOR', 'DISPLAY', 'UTILITY', 'HMENU', 'TMENU', 'run', 'auto', 'zero', 'force', 'prtsc', 'help'];
+const SCOPE_BTNS = ['CH1', 'CH2', 'MATH', 'MEASURE', 'ACQUIRE', 'STORAGE', 'CURSOR', 'DISPLAY', 'UTILITY', 'HMENU', 'TMENU', 'run', 'auto', 'zero', 'force', 'prtsc'];
 T('SC01', 'Scope', 'Every front-panel key can be clicked (hit areas) without errors', async p => {
   await p.click('#vScope'); await p.waitForTimeout(150);
-  const n = await app(p, () => document.querySelectorAll('.sbtn').length); eq(n, 22, 'scope keys');
+  const n = await app(p, () => document.querySelectorAll('.sbtn').length); eq(n, 21, 'scope keys (no HELP key on the UTD2102CEL)');
   for (let i = 0; i < n; i++) { const c = await app(p, i => { const r = document.querySelectorAll('.sbtn')[i].getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; }, i); await p.mouse.click(c.x, c.y); await p.waitForTimeout(25); if (await app(p, () => document.querySelector('#modal').classList.contains('open'))) await p.keyboard.press('Escape'); }
 });
 T('SC02', 'Scope', 'Every menu: each soft key cycles all its values (3 full rounds) on a live signal', async p => {
@@ -297,8 +297,8 @@ T('SC06', 'Scope', 'FFT, XY, cursors, measurements and counter give finite readi
   await loadSetup(p, 'Term1/01-Exp1-AM-Modulation'); await p.waitForTimeout(300);
   await app(p, () => { const s = __app.scope; s.press('MATH'); }); await p.waitForTimeout(300);
   await app(p, () => { const s = __app.scope; s.press('F3'); }); await p.waitForTimeout(200); // Vrms
-  await app(p, () => { const s = __app.scope; s.press('MATH'); s.press('HMENU'); s.press('F2'); }); await p.waitForTimeout(300); // XY
-  await app(p, () => { const s = __app.scope; s.press('F2'); s.press('CURSOR'); s.press('F0'); for (let i = 0; i < 10; i++) s.turn('multi', 1); }); await p.waitForTimeout(200);
+  await app(p, () => { const s = __app.scope; s.press('MATH'); s.press('DISPLAY'); s.press('F1'); }); await p.waitForTimeout(300); // XY
+  await app(p, () => { const s = __app.scope; s.press('F1'); s.press('CURSOR'); s.press('F0'); for (let i = 0; i < 10; i++) s.turn('multi', 1); }); await p.waitForTimeout(200);
   const cv = await app(p, () => __app.scope.cursorVals()); ok(cv && !/NaN|Infinity/.test(JSON.stringify(cv)), 'cursor values ' + JSON.stringify(cv));
   await app(p, () => { const s = __app.scope; s.press('F0'); const c = s.cursorVals(); window.__tc = c; }); ok(!/NaN/.test(JSON.stringify(await app(p, () => window.__tc))), 'time cursor');
   await app(p, () => { const s = __app.scope; s.press('MEASURE'); s.press('F4'); s.press('UTILITY'); s.press('F0'); }); await p.waitForTimeout(700);
@@ -310,9 +310,26 @@ T('SC07', 'Scope', 'Screenshot key saves a PNG; Storage ref save/show', async p 
   await app(p, () => { const s = __app.scope; s.press('STORAGE'); s.press('F2'); }); ok(await app(p, () => __app.scope.st.ref.on && !!__app.scope.st.ref.data), 'Save Ref shows the ref');
   await app(p, () => __app.scope.press('F3')); ok(!(await app(p, () => __app.scope.st.ref.on)), 'Show Ref toggles it off'); await p.waitForTimeout(200);
 });
-T('SC08', 'Scope', 'Scope help opens from the HELP key and from Settings', async p => {
-  await app(p, () => __app.scope.press('help')); ok(await app(p, () => document.querySelector('#modal').classList.contains('open')), 'help key'); await p.keyboard.press('Escape');
+T('SC08', 'Scope', 'Scope help opens from UTILITY and from Settings', async p => {
+  await app(p, () => { const s = __app.scope; s.press('UTILITY'); s.press('F2'); }); ok(await app(p, () => document.querySelector('#modal').classList.contains('open')), 'help key'); await p.keyboard.press('Escape');
   await p.click('#btnSettings'); await p.click('#btnScopeHelp'); ok(await app(p, () => document.querySelector('#modal').classList.contains('open')), 'settings help');
+});
+
+T('SC09', 'Scope', 'Menus follow the UTD2102CEL manual: SET TO ZERO, Window split, holdoff, Rise & Fall, measurement zones, tracking cursor, old files', async p => {
+  await loadSetup(p, 'Term1/01-Exp1-AM-Modulation'); await p.waitForTimeout(300);
+  const z = await app(p, () => __app.scope.st.meas.zones); eq([z[0].src + ' ' + z[0].p, z[1].p, z[0].on], ['CH2 Pk-Pk', 'Freq', true], 'old file: Vpp/Freq become CH2 Pk-Pk and Freq');
+  await app(p, () => { const s = __app.scope; s.turn('vpos', 5, 3); s.turn('hpos', 5, 3); s.press('HMENU'); for (let i = 0; i < 20; i++) s.turn('multi', 1); });
+  ok(await app(p, () => __app.scope.st.hold > 1e-6), 'MULTI sets holdoff in HORI MENU');
+  await app(p, () => __app.scope.press('zero')); const st = await app(p, () => { const s = __app.scope.st; return [s.ch.CH1.pos, s.hpos, s.hold]; }); eq(st, [0, 0, 100e-9], 'SET TO ZERO resets positions and holdoff');
+  await app(p, () => { const s = __app.scope; s.press('F1'); }); await p.waitForTimeout(300); ok(await app(p, () => __app.scope.st.zoom && !!__app.scope.mainFrame.CH1), 'Window splits the screen (main view kept)');
+  await app(p, () => { const s = __app.scope; s.press('F0'); s.press('TMENU'); s.press('F2'); s.press('F2'); }); eq(await app(p, () => __app.scope.st.trig.slope), 'RF', 'Rise & Fall'); await p.waitForTimeout(300);
+  eq(await app(p, () => __app.scope.status), "Trig'd", 'triggers on both edges');
+  await app(p, () => { const s = __app.scope; s.press('MEASURE'); s.press('F2'); s.press('F1'); s.press('F2'); s.press('F4'); });
+  const m = await app(p, () => __app.scope.menuDef().items.map(i => i.label)); eq(m[2], 'CH2 Period', 'zone 3 set to CH2 Time Period');
+  const r = await app(p, () => __app.scope.measure('CH1')); ok(isFinite(r['Pk-Pk']) && isFinite(r.RMS) && 'Top' in r && '-Duty' in r, 'manual parameter names');
+  await app(p, () => { const s = __app.scope; s.press('CURSOR'); s.press('F0'); s.press('F0'); s.press('F0'); s.press('F1'); }); await p.waitForTimeout(200);
+  const c = await app(p, () => __app.scope.cursorVals()); ok(c && isFinite(c.VA) && isFinite(c.VB), 'tracking cursor reads the trace ' + JSON.stringify(c));
+  eq(await finite(p), [], 'non-finite');
 });
 
 // ================================================================== 5. rail panels
