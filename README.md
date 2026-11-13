@@ -37,6 +37,8 @@ Experiment files: unzip the file, then in the app press **OPEN SETUP** and choos
 
 **[Expected results for every experiment](docs/results/README.md)**: the block diagram, the wiring on the kit, the oscilloscope screen, and what the lab book expects next to what the simulator shows, for all 69 experiments.
 
+**[Oscilloscope verification](docs/scope-check.md)**: every function of the simulated UTD2102CEL checked with known signals against the instrument's manual and specifications.
+
 Reference: the course lab books Electrical Testing (6), ELC414 (Term 1) and Electrical Testing (7), ELC424 (Term 2) are adapted from Barry Duncan, *Experiments in Modern Analog and Digital Telecommunications* (Emona Telecoms-Trainer 101 Lab Manual, Volume 1) and *Further Experiments in Modern Analog and Digital Telecommunications* (Volume 2), Emona Instruments Pty Ltd. Term 1 Exp 1–7 = Emona Vol. 1 Exp 4–10; Term 2 = Emona Vol. 1 Exp 11–13 and 15–19, and Vol. 2 Exp 6, 8, 9, 16 and 17.
 
 ---
@@ -61,6 +63,7 @@ node build.mjs       # just build dist/index.html (open it in a browser)
 npm test             # setup and book checks (the simulation against the lab books)
 npm run test:e2e     # interface tests in Chromium (needs Playwright)
 npm run test:monkey  # 3000 random actions looking for errors
+npm run test:scope   # oscilloscope checks against the UTD2102CEL manual (writes docs/scope-check.md)
 ```
 
 ## Repository layout

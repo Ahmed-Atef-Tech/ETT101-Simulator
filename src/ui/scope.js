@@ -4,8 +4,10 @@ import { FS } from '../engine/dsp.js';
 import { RING, RMASK } from '../engine/sim.js';
 
 export const VDIV = [0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20]; // 1 mV/div .. 20 V/div (UTD2000 manual)
-export const TDIV = [0.5e-6, 1e-6, 2e-6, 5e-6, 10e-6, 20e-6, 50e-6, 100e-6, 200e-6, 500e-6, 1e-3, 2e-3, 5e-3, 10e-3, 20e-3, 50e-3];
+// 2 ns/div (UTD2102CEL spec) .. 50 ms/div (the slowest the simulation keeps in memory; the real scope goes to 50 s/div)
+export const TDIV = [2e-9, 5e-9, 10e-9, 20e-9, 50e-9, 100e-9, 200e-9, 0.5e-6, 1e-6, 2e-6, 5e-6, 10e-6, 20e-6, 50e-6, 100e-6, 200e-6, 500e-6, 1e-3, 2e-3, 5e-3, 10e-3, 20e-3, 50e-3];
 const PROBES = [1, 10, 100, 1000];
+export const TD_OLD = 7; // files saved before the 2-200 ns steps were added store time/div indices 7 lower (no tdVer)
 const COL = { CH1: '#f6e51d', CH2: '#3fd6f7', MATH: '#e070f5', REF: '#ffffff' };
 const HDIV = 12, VDIVS = 8;
 // screen geometry (canvas 800 x 480)
@@ -37,7 +39,8 @@ export function fixMeas(m) { // keep restored zones valid
 export function fmtV(v) { const a = Math.abs(v); if (a >= 1) return v.toFixed(a >= 10 ? 1 : 2) + 'V'; if (a >= 1e-3) return (v * 1e3).toFixed(a >= 0.1 ? 0 : 1) + 'mV'; return (v * 1e3).toFixed(2) + 'mV'; }
 export function fmtT(t) { const a = Math.abs(t); if (a >= 1) return t.toFixed(2) + 's'; if (a >= 1e-3) return +(t * 1e3).toFixed(3) + 'ms'; if (a >= 1e-6) return +(t * 1e6).toFixed(2) + 'us'; return +(t * 1e9).toFixed(0) + 'ns'; }
 export function fmtF(f) { if (!isFinite(f) || f <= 0) return '****'; if (f >= 1e6) return (f / 1e6).toFixed(4) + 'MHz'; if (f >= 1e3) return (f / 1e3).toFixed(3) + 'kHz'; return f.toFixed(2) + 'Hz'; }
-const fmtDiv = t => { if (t >= 1e-3) return (t * 1e3) + 'ms'; if (t >= 1e-6) return +(t * 1e6).toFixed(2) + 'us'; return (t * 1e9) + 'ns'; };
+const fmtDiv = t => { if (t >= 1e-3) return +(t * 1e3).toFixed(2) + 'ms'; if (t >= 1e-6) return +(t * 1e6).toFixed(2) + 'us'; return +(t * 1e9).toFixed(0) + 'ns'; };
+export function fmtF6(f) { if (!isFinite(f) || f <= 0) return '****'; const [v, u] = f >= 1e6 ? [f / 1e6, 'MHz'] : f >= 1e3 ? [f / 1e3, 'kHz'] : [f, 'Hz']; return v.toFixed(Math.max(0, 5 - Math.floor(Math.log10(v)))) + u; } // counter: 6 digits
 const fmtVd = v => v >= 1 ? v.toFixed(2) + 'V' : (v * 1e3).toFixed(0) + 'mV';
 
 export class Scope {
@@ -55,7 +58,7 @@ export class Scope {
     this.st = {
       ch: { CH1: { on: true, vd: 9, fine: 1, pos: 0, cpl: 'DC', bw: false, finemode: false, probe: 0, inv: false },
         CH2: { on: true, vd: 9, fine: 1, pos: 0, cpl: 'DC', bw: false, finemode: false, probe: 0, inv: false } },
-      sel: 'CH1', td: 7, hpos: 0, zoom: false, ztd: 4, zpos: 0,
+      sel: 'CH1', td: 14, tdVer: 2, hpos: 0, zoom: false, ztd: 11, zpos: 0,
       trig: { src: 'CH1', slope: 'R', mode: 'AUTO', cpl: 'DC', level: 0 }, hold: HOLD_MIN,
       run: true, acq: 'Sample', avgN: 16, samp: 'Real Time', fast: false, disp: { type: 'Vectors', persist: 0, fmt: 'YT', grid: 'Dots', bright: 100 },
       math: { on: false, kind: 'FFT', op: '+', fftSrc: 'CH1', win: 'Hanning', dbdiv: 20, fpos: 0, unit: 'dBVrms', vrd: 7 },
@@ -209,7 +212,7 @@ export class Scope {
     if (id === 'vpos') { if (s.sel === 'MATH') s.math.fpos += n * 0.1 * fast; else { const c = s.ch[s.sel]; c.pos = Math.max(-10, Math.min(10, Math.round((c.pos + n * 0.1 * fast) * 50) / 50)); } }
     if (id === 'tscale') { if (s.zoom) s.ztd = Math.max(0, Math.min(s.td, s.ztd - n)); else { s.td = Math.max(0, Math.min(TDIV.length - 1, s.td - n)); if (s.ztd > s.td) s.ztd = s.td; } }
     if (id === 'hpos') { if (s.zoom) { const half = 6 * TDIV[s.td] - 6 * TDIV[s.ztd]; s.zpos = Math.max(-half, Math.min(half, s.zpos - n * fast * TDIV[s.ztd] / 5)); } else { s.hpos -= n * fast * this.tdiv() / 5; const lim = 0.35; s.hpos = Math.max(-lim, Math.min(lim, s.hpos)); if (Math.abs(s.hpos) < this.tdiv() / 50) s.hpos = 0; } }
-    if (id === 'level') { const src = s.trig.src; const vd = src === 'CH1' || src === 'CH2' ? this.vd(src) : 0.2; s.trig.level += n * vd * 0.05 * fast; this.levelShow = performance.now(); }
+    if (id === 'level') { const src = s.trig.src, isCh = src === 'CH1' || src === 'CH2'; const vd = isCh ? this.vd(src) : 0.2; s.trig.level += n * vd * 0.05 * fast; if (isCh) { const c = -s.ch[src].pos * vd; s.trig.level = Math.max(c - 8 * vd, Math.min(c + 8 * vd, s.trig.level)); } this.levelShow = performance.now(); } // ±8 div from the screen centre (manual)
     if (id === 'multi') {
       if (s.menu === 'CURSOR') { const k = n * 0.08 * fast; if (s.cur.act !== 'B') s.cur.a += k; if (s.cur.act !== 'A') s.cur.b += k; }
       else if (s.menu === 'ACQUIRE' && s.acq === 'Average') { const L = [2, 4, 8, 16, 32, 64, 128, 256]; s.avgN = L[Math.max(0, Math.min(7, L.indexOf(s.avgN) + n))]; }
@@ -448,7 +451,7 @@ export class Scope {
         out.y[x] = acc / ws + noise();
       }
     }
-    if (bw) { const a = 0.6; let p = out.y[0]; for (let x = 0; x < N; x++) { p = a * p + (1 - a) * out.y[x]; out.y[x] = p; } }
+    if (bw) { const a = Math.exp(-(W / N / FS) * 2 * Math.PI * 20e6); if (a > 1e-6) { let p = out.y[0]; for (let x = 0; x < N; x++) { p = a * p + (1 - a) * out.y[x]; out.y[x] = p; } } } // 20 MHz limit: only visible at ns/div sweeps
     // averaging
     if (s.acq === 'Average' && !noAvg) {
       const k = ch + s.td + s.vd; let A = this.avgBuf[ch];
@@ -461,7 +464,7 @@ export class Scope {
   computeFFT(ch, trig) {
     const s = this.st, c = s.ch[ch], r = this.ring(ch), pf = this.pf(ch);
     // integer decimation (a fractional step makes the sample spacing jitter, which puts spurs ~35 dB down across the span)
-    const N = 4096, dec = Math.max(1, Math.round(HDIV * this.tdiv() * FS / N)), W = dec * N, end = Math.floor(trig.t + W / 2 + s.hpos * FS), start = end - W;
+    const N = 1024, dec = Math.max(1, Math.round(HDIV * this.tdiv() * FS / N)), W = dec * N, end = Math.floor(trig.t + W / 2 + s.hpos * FS), start = end - W;
     const x = new Float64Array(N), st = Math.max(1, Math.floor(dec / 64));
     for (let i = 0; i < N; i++) { const a = start + i * dec; let acc = 0, cnt = 0; for (let j = a; j < a + dec; j += st) { acc += r[j & RMASK]; cnt++; } x[i] = acc / cnt * pf; }
     const wf = { Hanning: i => 0.5 - 0.5 * Math.cos(2 * Math.PI * i / N), Hamming: i => 0.54 - 0.46 * Math.cos(2 * Math.PI * i / N), Blackman: i => 0.42 - 0.5 * Math.cos(2 * Math.PI * i / N) + 0.08 * Math.cos(4 * Math.PI * i / N), Rectangle: () => 1 }[s.math.win];
@@ -629,7 +632,7 @@ export class Scope {
     g.fillStyle = '#0d2a5e'; g.fillRect(302, y - 15, 110, 20); g.fillStyle = '#fff'; g.fillText(`M ${fmtDiv(this.tdiv())}`, 310, y);
     const tr = s.trig; const src = { CH1: '1', CH2: '2', EXT: 'EXT', EXT5: 'EXT/5', LINE: 'AC' }[tr.src];
     g.fillStyle = '#0d2a5e'; g.fillRect(418, y - 15, 122, 20); g.fillStyle = '#ff9e3d'; g.fillText(`${src} ${{ R: '⟋', F: '⟍', RF: '⟋⟍' }[tr.slope] || '⟋'} ${fmtV(tr.level)}`, 424, y);
-    if (s.counter) { const f = this.counterF(); g.fillStyle = '#0d2a5e'; g.fillRect(546, y - 15, 90, 20); g.fillStyle = '#fff'; g.font = '12px Arial'; g.fillText(fmtF(f), 550, y); }
+    if (s.counter) { const f = this.counterF(); g.fillStyle = '#0d2a5e'; g.fillRect(546, y - 15, 90, 20); g.fillStyle = '#fff'; g.font = '12px Arial'; g.fillText(fmtF6(f), 550, y); }
     if (s.math.on && s.math.kind === 'FFT' && this.fftInfo) { g.fillStyle = COL.MATH; g.font = '12px Arial'; g.fillText(this.fftInfo, GX + 6, GY + 16); }
   }
   counterF() {
@@ -664,6 +667,7 @@ export class Scope {
     for (let i = 1; i < n; i++) { if (!stt && a[i] > mid + hy) { stt = 1; ups.push(i); } else if (stt && a[i] < mid - hy) { stt = 0; dns.push(i); } }
     const dt = f.rawDt; let per = NaN, pw = NaN, nw = NaN;
     if (ups.length >= 2) per = (ups[ups.length - 1] - ups[0]) / (ups.length - 1) * dt;
+    else if (dns.length >= 2) per = (dns[dns.length - 1] - dns[0]) / (dns.length - 1) * dt; // one full cycle between two falling edges is enough
     if (ups.length && dns.length) { const u = ups[0]; const d = dns.find(x => x > u); if (d) pw = (d - u) * dt; const d0 = dns[0]; const u2 = ups.find(x => x > d0); if (u2) nw = (u2 - d0) * dt; }
     const edge = (lo, hi, rising) => { // 10-90 %
       const L = base + 0.1 * (top - base), Hh = base + 0.9 * (top - base);

@@ -275,7 +275,7 @@ T('SC03', 'Scope', 'V/div, Time/div and positions stop at their limits', async p
   const s = () => app(p, () => { const st = __app.scope.st; return [st.ch.CH1.vd, st.td, st.ch.CH1.pos]; });
   await app(p, () => { for (let i = 0; i < 40; i++) { __app.scope.turn('vscale', 1); __app.scope.turn('tscale', 1); __app.scope.turn('vpos', 1, 3); } });
   const hi = await s(); await app(p, () => { for (let i = 0; i < 80; i++) { __app.scope.turn('vscale', -1); __app.scope.turn('tscale', -1); __app.scope.turn('vpos', -1, 3); } }); const lo = await s();
-  eq([hi[0], lo[0]], [0, 13], 'V/div index range (1 mV .. 20 V)'); eq([hi[1], lo[1]], [0, 15], 'Time/div index range'); ok(hi[2] <= 10 && lo[2] >= -10, 'position clamp');
+  eq([hi[0], lo[0]], [0, 13], 'V/div index range (1 mV .. 20 V)'); eq([hi[1], lo[1]], [0, 22], 'Time/div index range (2 ns .. 50 ms)'); ok(hi[2] <= 10 && lo[2] >= -10, 'position clamp');
 });
 T('SC04', 'Scope', 'RUN/STOP freezes the trace; SINGLE captures once', async p => {
   await loadSetup(p, 'Term1/01-Exp1-AM-Modulation'); await p.waitForTimeout(300);
@@ -395,7 +395,7 @@ T('RL04', 'Rail', 'Load experiment loads all 68 exactly as their files', async p
   for (const f of all) {
     await loadSetup(p, f); const file = JSON.parse(fs.readFileSync(path.join(dir, f + '.ett.json'), 'utf8'));
     const got = await app(p, () => ({ leads: __app.sim.leads.map(l => l.a + '-' + l.b).sort(), probes: __app.sim.probes, td: __app.scope.st.td }));
-    if (JSON.stringify(got.leads) !== JSON.stringify(file.leads.map(l => l.a + '-' + l.b).sort()) || got.probes.CH1 !== (file.probes.CH1 || null) || got.td !== (file.scope.td ?? 7)) bad.push(f);
+    if (JSON.stringify(got.leads) !== JSON.stringify(file.leads.map(l => l.a + '-' + l.b).sort()) || got.probes.CH1 !== (file.probes.CH1 || null) || got.td !== (file.scope.tdVer ? file.scope.td : (file.scope.td ?? 7) + 7)) bad.push(f); // older files: time/div index + 7
   }
   eq(bad, [], 'setups that load differently from their file'); eq(await finite(p), [], 'non-finite');
 });
@@ -423,6 +423,12 @@ T('RL08', 'Rail', 'Report a bug: empty → error; filled → WhatsApp with detai
   ok(u.startsWith('https://wa.me/201019876314?text='), 'number'); ok(/scope frozen/.test(msg) && /Leads \(4\)/.test(msg) && /AM signal/.test(msg) && /v\d+\.\d+\.\d+/.test(msg), 'details: ' + msg.slice(0, 200));
   await p.click('#btnBug'); await p.fill('#bugWhat', 'second'); await p.uncheck('#bugAttach'); await p.click('#bugForm .send');
   ok(!/Leads/.test(decodeURIComponent((await app(p, () => window.__opened[1])).split('text=')[1])), 'details sent while unticked');
+  // the same button sends a feature suggestion
+  await p.click('#btnBug'); await p.click('.bugKind [data-kind="idea"]'); eq(await app(p, () => document.querySelector('#bugTitle').textContent), 'Suggest a feature', 'suggestion title');
+  ok(!(await app(p, () => document.querySelector('#bugAttach').checked)), 'no wiring details by default for a suggestion');
+  await p.fill('#bugWhat', 'add a pulse trigger'); await p.fill('#bugSteps', 'for Exp 6'); await p.click('#bugForm .send');
+  const m3 = decodeURIComponent((await app(p, () => window.__opened[2])).split('text=')[1]); ok(/^💡 Suggestion/.test(m3) && /add a pulse trigger/.test(m3) && /Why it helps: for Exp 6/.test(m3), 'suggestion message: ' + m3);
+  await p.click('#btnBug'); eq(await app(p, () => document.querySelector('.bugKind .on').dataset.kind), 'idea', 'remembers the last choice'); await p.click('.bugKind [data-kind="bug"]'); await p.click('#bugX');
 });
 T('RL09', 'Rail', 'Report a bug: blocked window → link and Copy instead; Esc and backdrop close', async p => {
   await p.evaluate(() => { window.open = () => null; });
@@ -466,7 +472,7 @@ T('PS04', 'Saving', 'Bad files are refused or cleaned, never crash', async p => 
   await put(JSON.stringify({ leads: [{ a: 'nope.X', b: 'adder.A' }, { a: 'master.SINE2', b: 'adder.A', color: 'purple', bend: ['x', 2] }], probes: { CH1: 'nope', CH2: 'adder.OUT' }, mods: { ghost: { a: 1 }, adder: { G: 5 } }, probeBend: { CH2: [1, NaN] }, scope: { ch: { CH1: { vd: 999 } }, td: -4 } }));
   const st = await app(p, () => ({ leads: __app.sim.leads.map(l => [l.a, l.b, l.color, !!l.bend]), p1: __app.sim.probes.CH1, p2: __app.sim.probes.CH2, G: __app.sim.mods.adder.p.G, pb: __app.wires.probeBend, vd: __app.scope.st.ch.CH1.vd, td: __app.scope.st.td }));
   eq(st.leads, [['master.SINE2', 'adder.A', 'red', false]], 'leads cleaned'); eq([st.p1, st.p2], [null, 'adder.OUT'], 'probes'); ok(st.G >= 0 && st.G <= 1, 'knob clamped ' + st.G);
-  eq(st.pb, {}, 'bad probe shape kept'); ok(st.vd >= 0 && st.vd <= 13 && st.td >= 0 && st.td <= 15, `scope indexes kept out of range: vd ${st.vd} td ${st.td}`);
+  eq(st.pb, {}, 'bad probe shape kept'); ok(st.vd >= 0 && st.vd <= 13 && st.td >= 0 && st.td <= 22, `scope indexes kept out of range: vd ${st.vd} td ${st.td}`);
   await p.waitForTimeout(300); eq(await finite(p), [], 'non-finite');
 });
 T('PS05', 'Saving', 'Broken autosave or blocked storage: the app still starts and works', async p => {
@@ -480,7 +486,7 @@ T('PS05', 'Saving', 'Broken autosave or blocked storage: the app still starts an
 T('PS06', 'Saving', 'A setup never inherits settings from the one loaded before it', async p => {
   await app(p, () => { const s = __app.scope; s.press('MATH'); for (let i = 0; i < 6; i++) s.turn('tscale', 1); __app.panel.setKnob('vco', 'FREQ', 0.9); });
   await app(p, () => __app.restore({ leads: [{ a: 'master.SINE2', b: 'adder.A', color: 'red' }], probes: {}, mods: {}, scope: { ch: { CH1: { vd: 9 } } }, v: 2 }));
-  eq(await app(p, () => [__app.scope.st.math.on, __app.scope.st.td, __app.sim.mods.vco.p.FREQ]), [false, 7, 0.5], 'leftover settings');
+  eq(await app(p, () => [__app.scope.st.math.on, __app.scope.st.td, __app.sim.mods.vco.p.FREQ]), [false, 14, 0.5], 'leftover settings');
 });
 T('PS08', 'Saving', 'A setup starts from power-on module state (hidden latches and filters do not carry over)', async p => {
   // the SERIAL TO PARALLEL bit-pair phase left by QPSK used to spoil the delta-modulator SNDR null (62 mV -> 904 mV)

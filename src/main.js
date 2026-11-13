@@ -3,7 +3,7 @@ import { FS } from './engine/dsp.js';
 import { SOCKETS } from './engine/modules.js';
 import { el } from './ui/svg.js';
 import { Panel, knobReadout } from './ui/panel.js';
-import { Scope, fmtV, fmtF, VDIV, TDIV, migrateMeas, fixMeas } from './ui/scope.js';
+import { Scope, fmtV, fmtF, VDIV, TDIV, TD_OLD, migrateMeas, fixMeas } from './ui/scope.js';
 import { Wires, LEAD_COLORS } from './ui/wires.js';
 import { Audio } from './ui/audio.js';
 import { SOCKET_NAME, SOCKET_POS, BLOCKS } from './ui/layout.js';
@@ -299,7 +299,7 @@ function fitRail() {
 }
 window.addEventListener('resize', fitRail);
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitRail);
-function applyTexts() {
+function applyTexts() { if (typeof setBugKind === "function" && $("#bugTitle")) setBugKind(bugKind);
   document.querySelectorAll('[data-t]').forEach(n => { n.textContent = t(n.dataset.t); });
   document.querySelectorAll('[data-hint]').forEach(n => { n.title = t(n.dataset.hint); });
   $('#btnFull').title = t('recentre');
@@ -359,6 +359,7 @@ function restore(s) {
       if (a && typeof a === 'object' && !Array.isArray(a) && !(a instanceof Float32Array)) { if (v && typeof v === 'object') merge(a, v); }
       else if (a === null || typeof a === typeof v) { if (typeof v !== 'number' || Number.isFinite(v)) dst[k] = v; } } };
     s.scope.meas = migrateMeas(s.scope.meas); // older files list measurements by their old names
+    if (!('tdVer' in s.scope)) { for (const k of ['td', 'ztd']) if (typeof s.scope[k] === 'number') s.scope[k] += TD_OLD; } // time/div list grew at the fast end
     const d = scope.st; merge(d, s.scope); fixMeas(d.meas);
     if (!['R', 'F', 'RF'].includes(d.trig.slope)) d.trig.slope = 'R'; d.hold = Math.max(100e-9, Math.min(1.5, d.hold)); d.disp.bright = Math.max(1, Math.min(100, Math.round(d.disp.bright))); d.upage = 0;
     const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.round(v)));
@@ -392,7 +393,15 @@ function setupText() {
   ];
   return lines.join('\n');
 }
-function openBug() { closeMenus(); $('#settings').classList.remove('open'); $('#bugErr').textContent = ''; $('#bugFallback').classList.remove('show'); $('#bugWhat').removeAttribute('aria-invalid'); $('#bugDlg').classList.add('open'); setTimeout(() => $('#bugWhat').focus(), 30); }
+let bugKind = 'bug'; // 'bug' = report a problem, 'idea' = suggest a feature (same button, same WhatsApp route)
+function setBugKind(k) {
+  bugKind = k; const idea = k === 'idea';
+  document.querySelectorAll('.bugKind button').forEach(b => b.classList.toggle('on', b.dataset.kind === k));
+  $('#bugTitle').textContent = t(idea ? 'ideaTitle' : 'bugTitle'); $('#bugWhatL').textContent = t(idea ? 'ideaWhat' : 'bugWhat'); $('#bugStepsL').textContent = t(idea ? 'ideaWhy' : 'bugSteps');
+  $('#bugAttach').checked = !idea; $('#bugErr').textContent = ''; $('#bugWhat').removeAttribute('aria-invalid');
+}
+document.querySelectorAll('.bugKind button').forEach(b => b.onclick = () => { setBugKind(b.dataset.kind); $('#bugWhat').focus(); });
+function openBug() { setBugKind(bugKind); closeMenus(); $('#settings').classList.remove('open'); $('#bugErr').textContent = ''; $('#bugFallback').classList.remove('show'); $('#bugWhat').removeAttribute('aria-invalid'); $('#bugDlg').classList.add('open'); setTimeout(() => $('#bugWhat').focus(), 30); }
 function closeBug() { $('#bugDlg').classList.remove('open'); }
 $('#btnBug').onclick = openBug; $('#bugX').onclick = closeBug;
 $('#bugDlg').addEventListener('pointerdown', e => { if (e.target.id === 'bugDlg') closeBug(); });
@@ -400,13 +409,14 @@ $('#bugWhat').addEventListener('input', () => { if ($('#bugWhat').value.trim()) 
 $('#bugForm').onsubmit = e => {
   e.preventDefault();
   const what = $('#bugWhat').value.trim(), steps = $('#bugSteps').value.trim();
-  if (!what) { $('#bugErr').textContent = t('bugEmpty'); $('#bugWhat').setAttribute('aria-invalid', 'true'); $('#bugWhat').focus(); return; }
-  let msg = `🐞 Bug report — ETT-101 Simulator v${APP_VERSION}\n\n${what}`;
-  if (steps) msg += `\n\nBefore it: ${steps}`;
+  const idea = bugKind === 'idea';
+  if (!what) { $('#bugErr').textContent = t(idea ? 'ideaEmpty' : 'bugEmpty'); $('#bugWhat').setAttribute('aria-invalid', 'true'); $('#bugWhat').focus(); return; }
+  let msg = `${idea ? '💡 Suggestion' : '🐞 Bug report'} — ETT-101 Simulator v${APP_VERSION}\n\n${what}`;
+  if (steps) msg += `\n\n${idea ? 'Why it helps' : 'Before it'}: ${steps}`;
   if ($('#bugAttach').checked) msg += `\n\n— Details —\nDevice: ${deviceText()}\nLanguage: ${getLang()}\n${setupText()}`;
   if (msg.length > 3500) msg = msg.slice(0, 3500) + '…';
   const url = `https://wa.me/${BUG_PHONE}?text=${encodeURIComponent(msg)}`;
-  if (openLink(url)) { $('#bugWhat').value = ''; $('#bugSteps').value = ''; closeBug(); toast(t('bugOpened')); return; }
+  if (openLink(url)) { $('#bugWhat').value = ''; $('#bugSteps').value = ''; closeBug(); toast(t(idea ? 'ideaOpened' : 'bugOpened')); return; }
   // could not open a window: keep the form and offer the link and the text instead
   $('#bugLink').href = url; $('#bugCopy').onclick = () => copyText(msg); $('#bugFallback').classList.add('show');
 };
