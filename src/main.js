@@ -250,7 +250,7 @@ function renderGuide() {
     let lastGroup = null;
     const secs = SECTIONS.map(sec => {
       const items = sec.ids.map(id => SHEET_BY_ID[id]).filter(Boolean)
-        .map(x => `<li><button data-e="${x.id}"><span>${trb(x.title)}</span><span class="src">${trb(x.src)}</span></button></li>`).join('');
+        .map(x => `<li><button data-e="${x.id}"><span>${trb(x.title)}</span>${x.src ? `<span class="src">${trb(x.src)}</span>` : ''}</button></li>`).join('');
       const list = `<ol class="explist">${items}</ol>`;
       if (!sec.group) { lastGroup = null; return `<h3>${trb(sec)}</h3>${list}`; }
       const grp = sec.group.en !== lastGroup ? `<h3>${trb(sec.group)}</h3>` : ''; lastGroup = sec.group.en;
@@ -264,7 +264,7 @@ function renderGuide() {
       ...Object.entries(st.p || {}).map(([ch, s]) => [probeOk(ch, s), `<bdi>${ch}</bdi> → <bdi>${SOCKET_NAME[s]}</bdi>`])];
     g.innerHTML = head(t('guideTitle')) + `
       <button class="crumb" id="gBack">${t('back')}</button>
-      <div class="expTitle">${trb(exp.title)}<span class="src">${trb(exp.src)}</span></div>
+      <div class="expTitle">${trb(exp.title)}${exp.src ? `<span class="src">${trb(exp.src)}</span>` : ''}</div>
       <div class="stepbar">${exp.steps.map((s, i) => `<button data-i="${i}" class="${i === stepI ? 'cur' : ''} ${stepDone(s) ? 'done' : ''}" title="${t('step')} ${i + 1}">${i + 1}</button>`).join('')}</div>
       <div class="stepHead">${trb(st.head)}</div>
       <ol class="acts">${st.acts.map(([n, en, ar]) => `<li class="${n == null ? 'note' : ''}"><span class="n">${n ?? ''}</span><span class="a">${trb({ en, ar })}</span></li>`).join('')}</ol>

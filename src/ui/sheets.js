@@ -13,8 +13,6 @@ const S = (head, acts, more = {}) => ({ head, acts, ...more });
 const Q = (en, ar) => ({ en, ar });
 const B = (n, f) => A(n, `Build the set-up in Figure ${f} (the connections are listed below).`, `نفِّذ التوصيل الموضّح في الشكل ${f} (التوصيلات مذكورة أسفل الخطوات).`);
 const M = (n, f) => A(n, `Change the set-up as in Figure ${f} (the connections are listed below).`, `عدِّل التوصيل كما في الشكل ${f} (التوصيلات مذكورة أسفل الخطوات).`);
-const T1 = n => ({ en: `Term 1 · Exp ${n}`, ar: `الترم الأول · التجربة ${n}` });
-const T2 = n => ({ en: `Term 2 · Exp ${n}`, ar: `الترم الثاني · التجربة ${n}` });
 const X = (en, ar) => ({ en: `Extra · ${en}`, ar: `إضافية · ${ar}` });
 
 // Short phrases used in many sheets
@@ -36,7 +34,7 @@ const P = {
 
 const RAW = [
   // ================================================================== Term 1 (Electrical Testing (6); Emona Vol.1 Exp 4–10)
-  { id: 'exp1', src: T1(1), title: { en: 'AM modulation', ar: 'AM Modulation' }, steps: [
+  { id: 'exp1', title: { en: 'AM modulation', ar: 'AM Modulation' }, steps: [
     S(H('A'), [A(3, 'Set CH1 coupling to DC.', 'اضبط اقتران CH1 على DC.'),
       A(4, 'Turn the ADDER G and g knobs fully anticlockwise.', 'أدِر المقبضين G و g في ADDER عكس اتجاه عقارب الساعة حتى النهاية.'),
       A(5, 'Turn the VARIABLE DCV knob almost fully anticlockwise.', 'أدِر مقبض VARIABLE DCV عكس اتجاه عقارب الساعة حتى قرب النهاية.')]),
@@ -66,7 +64,7 @@ const RAW = [
       A(30, 'Draw both waveforms.', 'ارسم الإشارتين.')],
       { q: Q('What is the problem with an over-modulated AM signal? What is the largest m without over-modulation?', 'ما المشكلة في إشارة AM ذات التعديل الزائد؟ وما أكبر قيمة لـ m دون تعديل زائد؟') }),
   ] },
-  { id: 'exp2', src: T1(2), title: { en: 'DSBSC modulation', ar: 'DSBSC Modulation' }, steps: [
+  { id: 'exp2', title: { en: 'DSBSC modulation', ar: 'DSBSC Modulation' }, steps: [
     S(H('A', 4), [B(3, 4)], { c: [['master.SINE100', 'mult1.XAC'], ['master.SINE2', 'mult1.YAC']], p: { CH1: 'master.SINE2', CH2: 'mult1.KXY' } }),
     S(H('A'), [P.twoCyc(4), A(5, 'Turn both channels on.', 'شغّل القناتين معاً.'),
       A(6, 'Set CH1 to 1 V/div and CH2 to 2 V/div.', 'اضبط CH1 على 1V/div و CH2 على 2V/div.'),
@@ -83,7 +81,7 @@ const RAW = [
     S(H('C'), [A(17, 'Set the BUFFER gain to about half its travel (a little more if nothing changes).', 'اضبط GAIN في BUFFER على منتصف المدى تقريباً (أو أكثر قليلاً إذا لم يتغيّر شيء).'),
       A(18, 'Draw the new, overloaded DSBSC signal.', 'ارسم إشارة DSBSC الجديدة بعد التحميل الزائد.')]),
   ] },
-  { id: 'exp3', src: T1(3), title: { en: 'AM demodulation', ar: 'AM Demodulation' }, steps: [
+  { id: 'exp3', title: { en: 'AM demodulation', ar: 'AM Demodulation' }, steps: [
     S(H('A'), [A(3, 'Set CH1 coupling to DC.', 'اضبط اقتران CH1 على DC.'),
       A(4, 'Turn the ADDER G and g knobs fully anticlockwise.', 'أدِر المقبضين G و g في ADDER عكس اتجاه عقارب الساعة حتى النهاية.'),
       A(5, 'Turn the VARIABLE DCV knob almost fully anticlockwise.', 'أدِر مقبض VARIABLE DCV عكس اتجاه عقارب الساعة حتى قرب النهاية.')]),
@@ -106,7 +104,7 @@ const RAW = [
       A(26, 'Raise the gain to a comfortable level.', 'ارفع GAIN إلى مستوى صوت مريح.'),
       A(27, 'Talk, sing or hum while you watch and listen.', 'تكلّم أو غنِّ أو دندن وأنت تراقب وتستمع.')]),
   ] },
-  { id: 'exp4', src: T1(4), title: { en: 'DSBSC demodulation', ar: 'DSBSC Demodulation' }, steps: [
+  { id: 'exp4', title: { en: 'DSBSC demodulation', ar: 'DSBSC Demodulation' }, steps: [
     S(H('A', 2), [B(3, 2)], { c: [['master.SINE100', 'mult1.XAC'], ['master.SINE2', 'mult1.YAC']], p: { CH1: 'master.SINE2', CH2: 'mult1.KXY' } }),
     S(H('A'), [P.twoCyc(4), A(5, 'Turn both channels on.', 'شغّل القناتين معاً.'),
       A(6, 'Draw the message and the DSBSC signal, leaving room for a third.', 'ارسم الرسالة وإشارة DSBSC، واترك مكاناً لإشارة ثالثة.')]),
@@ -128,7 +126,7 @@ const RAW = [
     S(H('D'), [A(39, 'Move the leads on 2kHz SINE to the SPEECH output.', 'انقل الأسلاك من 2kHz SINE إلى مخرج SPEECH.'),
       A(40, 'Talk while you turn the VCO FREQ, and listen.', 'تكلّم وأنت تدير FREQ في VCO، واستمع.')]),
   ] },
-  { id: 'exp5', src: T1(5), title: { en: 'SSBSC modulation and demodulation', ar: 'SSBSC Modulation & Demodulation' }, steps: [
+  { id: 'exp5', title: { en: 'SSBSC modulation and demodulation', ar: 'SSBSC Modulation & Demodulation' }, steps: [
     S(H('A', 3), [B(4, 3),
       A(5, 'Set the timebase to show two cycles of the two messages.', 'اضبط القاعدة الزمنية لتظهر دورتان من الرسالتين.'),
       A(6, 'Set the PHASE SHIFTER PHASE CHANGE switch to 180°.', 'اضبط مفتاح PHASE CHANGE في PHASE SHIFTER على 180°.'),
@@ -159,7 +157,7 @@ const RAW = [
       A(31, 'Compare the original and the recovered message.', 'قارن الرسالة الأصلية بالرسالة المسترجعة.')],
       { c: [['adder.OUT', 'mult3.XDC'], ['master.SINE100', 'mult3.YDC'], ['mult3.KXY', 'tlpf.IN']], p: { CH1: 'master.SINE2', CH2: 'tlpf.OUT' }, q: Q('What is the relationship between the original and the recovered message?', 'ما العلاقة بين الرسالة الأصلية والرسالة المسترجعة؟') }),
   ] },
-  { id: 'exp6', src: T1(6), title: { en: 'FM modulation', ar: 'FM Modulation' }, steps: [
+  { id: 'exp6', title: { en: 'FM modulation', ar: 'FM Modulation' }, steps: [
     S(H('A', 2), [A(3, 'Set the VCO GAIN to about two thirds of its travel (2 o\'clock).', 'اضبط GAIN في VCO على ثلثي المدى تقريباً (عند الساعة 2).'),
       A(4, 'Set the VCO FREQ to the middle.', 'اضبط FREQ في VCO على المنتصف.'),
       A(5, 'Set the VCO RANGE to LO.', 'اضبط RANGE في VCO على LO.'), B(6, 2)], { p: { CH1: 'vco.SINE' } }),
@@ -185,7 +183,7 @@ const RAW = [
       A(27, 'Use the SPEECH output as the message.', 'استخدم مخرج SPEECH رسالةً.'),
       A(28, 'Note how the FM signal looks.', 'لاحظ شكل إشارة FM.')]),
   ] },
-  { id: 'exp7', src: T1(7), title: { en: 'FM demodulation (zero crossing)', ar: 'FM Demodulation (ZCD)' }, steps: [
+  { id: 'exp7', title: { en: 'FM demodulation (zero crossing)', ar: 'FM Demodulation (ZCD)' }, steps: [
     S(H('A', 3), [A(3, 'Turn the VCO GAIN fully clockwise.', 'أدِر GAIN في VCO مع اتجاه عقارب الساعة حتى النهاية.'),
       A(4, 'Set the VCO FREQ to the middle.', 'اضبط FREQ في VCO على المنتصف.'),
       A(5, 'Set the VCO RANGE to LO.', 'اضبط RANGE في VCO على LO.'), B(6, 3),
@@ -232,7 +230,7 @@ const RAW = [
   ] },
 
   // ================================================================== Term 2 (Electrical Testing (7))
-  { id: 's11', src: T2(1), title: { en: 'Sampling and reconstruction', ar: 'Sampling and Reconstruction' }, steps: [
+  { id: 's11', title: { en: 'Sampling and reconstruction', ar: 'Sampling and Reconstruction' }, steps: [
     S(H('A', 2), [B(2, 2)], { w: 'Term2/01-Exp11-A-Natural-Sampling' }),
     S(H('A'), [A(3, 'Trigger on CH1.', 'اجعل الزناد (Trigger) على CH1.'), P.twoCyc(4, '2kHz SINE', '2kHz SINE'),
       A(5, 'Turn both channels on.', 'شغّل القناتين معاً.'),
@@ -258,7 +256,7 @@ const RAW = [
       A(29, 'Work out the frequency.', 'احسب التردد.')],
       { p: { CH1: 'vco.DIG' }, q: Q('Why is the real minimum sampling rate higher than the theoretical one?', 'لماذا يكون أقل معدل فعلي لأخذ العينات أعلى من القيمة النظرية؟') }),
   ] },
-  { id: 's12', src: T2(2), title: { en: 'PCM encoding', ar: 'PCM Encoding' }, steps: [
+  { id: 's12', title: { en: 'PCM encoding', ar: 'PCM Encoding' }, steps: [
     S(H('A', 1), [A(3, 'Set the PCM ENCODER MODE switch to PCM.', 'اضبط مفتاح MODE في PCM ENCODER على PCM.'), B(4, 1),
       A(null, 'The encoder is clocked by 8kHz DIGITAL and its input is 0 V (GND).', 'إشارة الساعة للمُشفِّر من 8kHz DIGITAL، ودخله 0V (GND).')],
       { c: [['master.DIG8', 'pcmenc.CLK'], ['vdc.GND', 'pcmenc.IN1']], p: { CH1: 'pcmenc.FS' } }),
@@ -285,7 +283,7 @@ const RAW = [
       A(null, 'Take the set-up apart, then build Figure 9 (the connections are listed below).', 'فكّ التوصيل، ثم نفِّذ الشكل 9 (التوصيلات مذكورة أسفل الخطوات).'),
       A(null, 'Watch PCM DATA: the code changes from frame to frame.', 'راقب PCM DATA: يتغيّر الرمز من إطار إلى آخر.')], { w: 'Term2/02-Exp12-D-PCM-Sinewave' }),
   ] },
-  { id: 's13', src: T2(3), title: { en: 'PCM decoding', ar: 'PCM Decoding' }, steps: [
+  { id: 's13', title: { en: 'PCM decoding', ar: 'PCM Decoding' }, steps: [
     S(H('A', 1), [A(3, 'Set the PCM ENCODER MODE switch to PCM.', 'اضبط مفتاح MODE في PCM ENCODER على PCM.'), B(4, 1),
       A(5, 'Set the trigger slope to −.', 'اضبط ميل الزناد (Slope) على −.'),
       A(6, 'Set the timebase to show one FS pulse (about 10 µs/div).', 'اضبط القاعدة الزمنية لتظهر نبضة FS واحدة (حوالي 10µs/div).'),
@@ -317,7 +315,7 @@ const RAW = [
       A(41, 'Compare the two sounds: they should be very similar.', 'قارن الصوتين: يجب أن يكونا متشابهين جداً.')],
       { c: [['tlpf.OUT', 'buffer.IN']], q: Q('The two signals look and sound the same. Why is the rebuilt message still not a perfect copy?', 'الإشارتان متشابهتان في الشكل والصوت. فلماذا لا تكون الرسالة المسترجعة نسخة مطابقة تماماً؟') }),
   ] },
-  { id: 's15', src: T2(4), title: { en: 'Amplitude Shift Keying (ASK)', ar: 'Amplitude Shift Keying (ASK)' }, steps: [
+  { id: 's15', title: { en: 'Amplitude Shift Keying (ASK)', ar: 'Amplitude Shift Keying (ASK)' }, steps: [
     S(H('A', 2), [A(3, 'Trigger on EXT.', 'اجعل الزناد (Trigger) على EXT.'),
       A(4, 'Set the trigger coupling to HF REJ.', 'اضبط اقتران الزناد على HF REJ.'), P.dc2(5), P.tb(6, '1 ms/div'), B(7, 2)], { w: 'Term2/04-Exp15-A-ASK-Generation' }),
     S(H('A'), [A(8, 'Turn both channels on.', 'شغّل القناتين معاً.'),
@@ -336,7 +334,7 @@ const RAW = [
       A(21, 'Compare the signals. If they differ, adjust VDC until they match.', 'قارن الإشارتين. إذا اختلفتا، عدِّل VDC حتى تتطابقا.')],
       { w: 'Term2/04-Exp15-C-ASK-Comparator', q: Q('How does the comparator turn the slow edges of the recovered data into sharp ones?', 'كيف يحوّل المقارن (comparator) الحواف البطيئة في البيانات إلى حواف حادّة؟') }),
   ] },
-  { id: 's16', src: T2(5), title: { en: 'Frequency Shift Keying (FSK)', ar: 'Frequency Shift Keying (FSK)' }, steps: [
+  { id: 's16', title: { en: 'Frequency Shift Keying (FSK)', ar: 'Frequency Shift Keying (FSK)' }, steps: [
     S(H('A', 2), [P.extHf(3), P.dc2(5),
       A(6, 'Set the VCO GAIN to half its travel.', 'اضبط GAIN في VCO على منتصف المدى.'),
       A(7, 'Set the VCO FREQ to a quarter of its travel (9 o\'clock).', 'اضبط FREQ في VCO على ربع المدى (عند الساعة 9).'),
@@ -357,7 +355,7 @@ const RAW = [
       A(null, 'Adjust VDC until the data is restored. It comes out inverted, because the filter passes the logic-0 tone.', 'عدِّل VDC حتى تعود البيانات. ستظهر مقلوبة، لأن المرشِّح يمرّر نغمة المنطق 0.')],
       { w: 'Term2/05-Exp16-C-FSK-Envelope-and-Comparator' }),
   ] },
-  { id: 's17', src: T2(6), title: { en: 'Binary Phase Shift Keying (BPSK)', ar: 'Binary Phase Shift Keying (BPSK)' }, steps: [
+  { id: 's17', title: { en: 'Binary Phase Shift Keying (BPSK)', ar: 'Binary Phase Shift Keying (BPSK)' }, steps: [
     S(H('A', 2), [P.extHf(3), P.dc2(5), P.tb(6, '0.1 ms/div'), P.seq00(7), B(8, 2)], { w: 'Term2/06-Exp17-A-BPSK-Generation' }),
     S(H('A'), [A(9, 'Turn both channels on.', 'شغّل القناتين معاً.'),
       A(10, 'Turn on Zoom (HORIZONTAL MENU → Zoom).', 'فعِّل التكبير (HORIZONTAL MENU ثم Zoom).'),
@@ -373,7 +371,7 @@ const RAW = [
     S(H('C', 6), [M(19, 6), A(null, 'Set VDC to the middle (about 0 V) as the comparator reference.', 'اضبط VDC على المنتصف (حوالي 0V) ليكون الجهد المرجعي للمقارن.')],
       { w: 'Term2/06-Exp17-C-BPSK-Comparator' }),
   ] },
-  { id: 's18', src: T2(7), title: { en: 'Quadrature Phase Shift Keying (QPSK)', ar: 'Quadrature Phase Shift Keying (QPSK)' }, steps: [
+  { id: 's18', title: { en: 'Quadrature Phase Shift Keying (QPSK)', ar: 'Quadrature Phase Shift Keying (QPSK)' }, steps: [
     S(H('A', 3), [P.extHf(3), P.dc2(5), P.tb(6, '0.5 ms/div'),
       A(7, 'Set the DIVIDER to ÷2 (left switch up, right switch down).', 'اضبط DIVIDER على القسمة على 2 (المفتاح الأيسر لأعلى والأيمن لأسفل).'), B(8, 3),
       A(9, 'Turn both channels on.', 'شغّل القناتين معاً.'),
@@ -419,7 +417,7 @@ const RAW = [
       A(47, 'Adjust PHASE ADJUST until X2 is recovered.', 'عدِّل PHASE ADJUST حتى يعود X2.')],
       { p: { CH1: 's2p.X2' }, q: Q('What is the new phase relationship between the local carrier and the two transmitter carriers?', 'ما علاقة الطور الجديدة بين الحامل المحلي وحاملَي المُرسِل؟') }),
   ] },
-  { id: 's19', src: T2(8), title: { en: 'DSSS modulation and demodulation', ar: 'DSSS Modulation & Demodulation' }, steps: [
+  { id: 's19', title: { en: 'DSSS modulation and demodulation', ar: 'DSSS Modulation & Demodulation' }, steps: [
     S(H('A', 1), [A(3, 'Set the trigger coupling to HF REJ.', 'اضبط اقتران الزناد على HF REJ.'), P.seq00(4), B(5, 1)], { w: 'Term2/08-Exp19-A-DSSS-Generation' }),
     S(H('A'), [P.twoCyc(6, '2kHz SINE', '2kHz SINE'),
       A(7, 'Turn both channels on.', 'شغّل القناتين معاً.'),
@@ -453,7 +451,7 @@ const RAW = [
       A(44, 'Then move it to NOISE 0 dB.', 'ثم انقله إلى NOISE 0dB.'),
       A(45, 'Compare again: the message is still only a little affected.', 'قارن مرة أخرى: الرسالة لا تزال تتأثر قليلاً فقط.')], { w: 'Term2/08-Exp19-D-DSSS-Noise' }),
   ] },
-  { id: 'v2e6', src: T2(9), title: { en: 'Pulse width modulation and demodulation', ar: 'PWM Modulation & Demodulation' }, steps: [
+  { id: 'v2e6', title: { en: 'Pulse width modulation and demodulation', ar: 'PWM Modulation & Demodulation' }, steps: [
     S(H('A', 4), [A(2, 'Turn the TWIN PULSE WIDTH fully anticlockwise.', 'أدِر WIDTH في TWIN PULSE عكس اتجاه عقارب الساعة حتى النهاية.'),
       A(3, 'Turn the TWIN PULSE DELAY fully anticlockwise.', 'أدِر DELAY في TWIN PULSE عكس اتجاه عقارب الساعة حتى النهاية.'), B(4, 4), P.tb(6, '100 µs/div'),
       A(7, 'Turn both channels on.', 'شغّل القناتين معاً.'),
@@ -503,7 +501,7 @@ const RAW = [
       A(71, 'Vary G and watch that line.', 'غيِّر G وراقب ذلك الخط.')],
       { q: Q('Why does changing the size of the message change the size of its copy in the PWM signal?', 'لماذا يؤدي تغيير حجم الرسالة إلى تغيير حجم نسختها في إشارة PWM؟') }),
   ] },
-  { id: 'v2e8', src: T2(10), title: { en: 'Carrier acquisition using the PLL', ar: 'Carrier Acquisition (PLL)' }, steps: [
+  { id: 'v2e8', title: { en: 'Carrier acquisition using the PLL', ar: 'Carrier Acquisition (PLL)' }, steps: [
     S(H('A', 3), [P.tlpfGainMid(2), P.fcMax(3), B(4, 3),
       A(7, 'Check that the TUNEABLE LPF output is an 8.33 kHz sinewave.', 'تأكّد أن خرج TUNEABLE LPF موجة جيبية 8.33kHz.'),
       A(8, 'Set GAIN for a 4 Vp-p output.', 'اضبط GAIN ليكون الخرج 4Vp-p.')], { c: [['master.DIG8', 'tlpf.IN']], p: { CH1: 'tlpf.OUT' } }),
@@ -523,7 +521,7 @@ const RAW = [
       A(24, 'Compare the two signals: the VCO should now be locked.', 'قارن الإشارتين: يجب أن يكون VCO مُقفَلاً (locked) الآن.'),
       A(25, 'Unplug and replug the VCO IN lead to prove the lock.', 'افصل سلك VCO IN وأعِد توصيله لتتأكد من القفل.')], { w: 'Term2/10-Exp8-Vol2-B-PLL-Lock' }),
   ] },
-  { id: 'v2e9', src: T2(11), title: { en: 'Signal-to-noise ratio', ar: 'Signal-to-Noise Ratio' }, steps: [
+  { id: 'v2e9', title: { en: 'Signal-to-noise ratio', ar: 'Signal-to-Noise Ratio' }, steps: [
     S(H('A', 1), [P.seq00(2), B(3, 1),
       A(6, 'Watch the ADDER output: digital data with noise on it.', 'راقب خرج ADDER: بيانات رقمية فوقها ضوضاء.')], { w: 'Term2/11-Exp9-Vol2-A-Noisy-Data' }),
     S(H('A'), [A(7, 'Move the lead from NOISE −20 dB to −6 dB.', 'انقل السلك من NOISE −20dB إلى −6dB.'),
@@ -546,7 +544,7 @@ const RAW = [
       A(32, 'Repeat with 0 dB of noise and fill Table 2.', 'كرّر مع ضوضاء 0dB واملأ الجدول 2.')],
       { q: Q('What is the SNR (as a ratio) telling you, and why are the two SNRs almost the same?', 'ماذا تخبرك قيمة SNR (كنسبة)؟ ولماذا تكون القيمتان المحسوبتان متقاربتين جداً؟') }),
   ] },
-  { id: 'v2e16', src: T2(12), title: { en: 'Delta modulation and demodulation', ar: 'Delta Modulation & Demodulation' }, steps: [
+  { id: 'v2e16', title: { en: 'Delta modulation and demodulation', ar: 'Delta Modulation & Demodulation' }, steps: [
     S(H('A', 3), [A(2, 'Set the ADDER G and g to 12 o\'clock.', 'اضبط G و g في ADDER عند الساعة 12.'), B(3, 3)],
       { c: [['master.SINE2', 'adder.A'], ['util.RC', 'adder.B'], ['adder.OUT', 'util.REF'], ['gnd2', 'util.CIN'], ['util.COMP', 's2p.SERIAL'], ['master.DIG100', 's2p.CLK'], ['s2p.X1', 'util.RC_IN']] }),
     S(H('A', '5–6'), [A(4, 'Put CH1 on 2kHz SINE (Figure 5).', 'ضع CH1 على 2kHz SINE (الشكل 5).'),
@@ -592,7 +590,7 @@ const RAW = [
       A(49, 'Work out the SNDR, then convert it to dB.', 'احسب SNDR، ثم حوّلها إلى ديسيبل.')],
       { w: 'Term2/12-Exp16-Vol2-D-Delta-SNDR', q: Q('What would happen to the SNDR with a cheaper filter (a less steep slope)? Why?', 'ماذا يحدث لـ SNDR عند استخدام مرشِّح أرخص (ميله أقل حدّة)؟ ولماذا؟') }),
   ] },
-  { id: 'v2e17', src: T2(13), title: { en: 'Delta-sigma modulation and demodulation', ar: 'Delta-Sigma Modulation & Demodulation' }, steps: [
+  { id: 'v2e17', title: { en: 'Delta-sigma modulation and demodulation', ar: 'Delta-Sigma Modulation & Demodulation' }, steps: [
     S(H('A', 3), [A(2, 'Set the ADDER G and g to 12 o\'clock.', 'اضبط G و g في ADDER عند الساعة 12.'), B(3, 3)],
       { c: [['master.SINE2', 'adder.A'], ['s2p.X1', 'adder.B'], ['adder.OUT', 'util.RC_IN'], ['util.RC', 'util.REF'], ['gnd2', 'util.CIN'], ['util.COMP', 's2p.SERIAL'], ['master.DIG100', 's2p.CLK']] }),
     S(H('A', '5–6'), [A(4, 'Put CH1 on 2kHz SINE (Figure 5).', 'ضع CH1 على 2kHz SINE (الشكل 5).'),

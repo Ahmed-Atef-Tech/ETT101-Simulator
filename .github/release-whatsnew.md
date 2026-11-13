@@ -1,2 +1,2 @@
-- The top toolbar keeps the same layout in Arabic and English: same order, from left to right, with only the labels translated.
-- يحافظ شريط الأدوات العلوي على الترتيب نفسه بالعربية والإنجليزية، من اليسار إلى اليمين، مع ترجمة النصوص فقط.
+- The Lab sheets no longer show Term 1 / Term 2: experiments are listed by topic only (Analog and Digital communication). The extra experiments still say which Emona manual they come from.
+- لم تعد أوراق التجارب تذكر الترم الأول والثاني: تُعرض التجارب حسب الموضوع فقط (الاتصالات التماثلية والرقمية). وما زالت التجارب الإضافية تذكر دليل Emona الذي أُخذت منه.

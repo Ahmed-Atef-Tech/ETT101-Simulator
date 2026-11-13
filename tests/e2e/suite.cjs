@@ -334,7 +334,7 @@ T('RL11', 'Rail', 'Lab sheets: grouped by topic, every sheet listed once, every 
   await p.click('#btnGuide');
   const heads = await app(p, () => [...document.querySelectorAll('.sheetList h3, .sheetList h4')].map(h => h.textContent));
   ok(heads.includes('Analog communication') && heads.includes('Digital communication') && heads.includes('Digital modulation') && heads.filter(h => h === 'Digital communication').length === 1, 'section headings ' + heads.join(' | '));
-  ok(await app(p, () => /Term 2 · Exp 4/.test(document.querySelector('.explist [data-e="s15"]').textContent)), 'source tag');
+  ok(await app(p, () => !/Term|الترم/.test(document.querySelector('.sheetList').textContent) && /Vol\.1 Exp 3/.test(document.querySelector('.explist [data-e="x3"]').textContent)), 'no term labels; extra sheets keep their source');
   await p.click('#gClose'); await p.click('#btnLib');
   for (const tab of ['t1', 't2', 'x']) {
     await p.click(`.ltab[data-tab="${tab}"]`);
