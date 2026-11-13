@@ -1,3 +1,4 @@
+- **Welcome guide:** on first start, a short guide points at each part of the screen with arrows and drawings, including how to zoom with Ctrl + mouse wheel. Skip it any time; Settings → Show the welcome guide shows it again.
 - **Suggestions:** the Report button now has two choices, Problem and Suggestion. Pick Suggestion to send an idea for a new feature to the developer on WhatsApp.
 - **Oscilloscope checked against its specifications** (58 checks with known signals, see docs/scope-check.md on GitHub). Fixes from these checks:
   - Time/div now goes down to 2 ns/div, as on the UTD2102CEL.
@@ -6,6 +7,7 @@
   - The frequency counter (Cymometer) shows 6 digits.
   - FFT uses 1024 points, as in the manual.
   - Period and Freq are measured even when the screen shows little more than one cycle.
+- **الدليل التعريفي:** عند التشغيل الأول يظهر دليل قصير يشير بالأسهم والرسوم إلى كل جزء من الشاشة، ومنه طريقة التكبير بـ Ctrl مع عجلة الفأرة. يمكنك تخطّيه في أي وقت، وتعرضه مرة أخرى من الإعدادات ثم «عرض الدليل التعريفي».
 - **الاقتراحات:** أصبح في زر الإبلاغ خياران: مشكلة واقتراح. اختر «اقتراح» لإرسال فكرة لميزة جديدة إلى المطوّر عبر واتساب.
 - **فُحص راسم الإشارة مقارنةً بمواصفاته** (58 اختباراً بإشارات معروفة، انظر docs/scope-check.md على GitHub). والإصلاحات الناتجة عنها:
   - أصبح أقل زمن لكل مربع 2ns/div كما في UTD2102CEL.

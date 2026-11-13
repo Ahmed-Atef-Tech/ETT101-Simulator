@@ -26,7 +26,7 @@ const f = (v, d = 3) => Number.isFinite(v) ? +v.toPrecision(d + 1) : String(v);
   const p = await (await browser.newContext({ viewport: { width: 1600, height: 900 } })).newPage();
   const errs = []; p.on('pageerror', e => errs.push(e.message));
   await p.goto(URL); await p.waitForFunction(() => window.__app && window.__app.sim);
-  await p.evaluate(() => { localStorage.clear(); localStorage.setItem('ett.notice', '1'); }); await p.reload(); await p.waitForFunction(() => window.__app);
+  await p.evaluate(() => { localStorage.clear(); localStorage.setItem('ett.notice', '1'); localStorage.setItem('ett.tour', '1'); }); await p.reload(); await p.waitForFunction(() => window.__app);
   const app = (fn, arg) => p.evaluate(fn, arg);
   const wait = ms => p.waitForTimeout(ms);
   // load a set-up: probes, leads, knob settings and scope settings (time/div index in today's list)

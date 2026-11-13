@@ -9,6 +9,7 @@ import { Audio } from './ui/audio.js';
 import { SOCKET_NAME, SOCKET_POS, BLOCKS } from './ui/layout.js';
 import { MODULE_INFO, HELP_LINKS, HELP, NOTICE } from './ui/content.js';
 import { SHEETS, SECTIONS } from './ui/sheets.js';
+import { startTour, tourOpen, endTour } from './ui/tour.js';
 import { t, tr, trb, bidi, getLang, setLang } from './ui/i18n.js';
 import { initLibrary } from './ui/library.js';
 
@@ -223,7 +224,8 @@ function showModal(title, html, link) {
   const yt = $('#modalYT'); yt.style.display = link === false ? 'none' : ''; yt.disabled = !link; yt.querySelector('span').textContent = link ? t('watch') : t('videoSoon'); yt.onclick = link ? () => openLink(link) : null;
   $('#modal').classList.add('open');
 }
-const closeModal = () => $('#modal').classList.remove('open');
+let afterModal = null; // something to show once the open message is closed (the welcome guide after the first-start notice)
+const closeModal = () => { const was = $('#modal').classList.contains('open'); $('#modal').classList.remove('open'); if (was && afterModal) { const f = afterModal; afterModal = null; setTimeout(f, 250); } };
 $('#modalClose').onclick = closeModal; $('#modalX').onclick = closeModal;
 $('#modal').addEventListener('pointerdown', e => { if (e.target.id === 'modal') closeModal(); });
 function showInfo(id) {
@@ -448,7 +450,11 @@ window.addEventListener('keydown', e => { if (e.ctrlKey && ['+', '=', '-', '0'].
 document.addEventListener('pointerdown', () => audio.ensure(), { once: true });
 
 setLang(getLang()); applyTexts(); setTraining(training); wires.render();
-{ let seen = false; try { seen = localStorage.getItem('ett.notice') === '1'; localStorage.setItem('ett.notice', '1'); } catch (e) { } if (!seen) showAbout(); }
+// first start: the beta notice, then the welcome guide (shown once; Settings shows it again)
+function runTour() { $('#settings').classList.remove('open'); closeMenus(); library.close(); if (RECTS[viewMode] && viewMode !== 'both') setView('both'); startTour(() => { try { localStorage.setItem('ett.tour', '1'); } catch (e) { } }); }
+$('#btnTour').onclick = runTour;
+{ let seen = false, toured = false; try { seen = localStorage.getItem('ett.notice') === '1'; toured = localStorage.getItem('ett.tour') === '1'; localStorage.setItem('ett.notice', '1'); } catch (e) { toured = true; }
+  if (!seen) { showAbout(); if (!toured) afterModal = runTour; } else if (!toured) setTimeout(runTour, 500); }
 requestAnimationFrame(() => setView(viewMode));
 
 // =============================================== main loop ===============================================
@@ -469,4 +475,4 @@ function loop(now) {
 }
 requestAnimationFrame(loop);
 window.__sim = sim; window.__perf = () => loadAvg;
-window.__app = { sim, wires, scope, panel, restore, snapshot, setView, sheets: ALL_SHEETS, sections: SECTIONS, setLang: l => { setLang(l); applyTexts(); } };
+window.__app = { sim, wires, scope, panel, restore, snapshot, setView, tour: { start: runTour, open: tourOpen, end: endTour }, sheets: ALL_SHEETS, sections: SECTIONS, setLang: l => { setLang(l); applyTexts(); } };
