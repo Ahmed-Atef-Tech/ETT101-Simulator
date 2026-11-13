@@ -358,6 +358,18 @@ T('WS08', 'Workspace', 'Welcome guide: after the first-start notice, every step 
   await p.keyboard.press('Escape'); ok(!(await app(p, () => __app.tour.open())), 'Esc closes it'); await app(p, () => __app.setLang('en'));
 });
 
+T('SC10', 'Scope', 'The scope screen stays sharp when the bench is zoomed in (drawn at the size it is shown)', async p => {
+  await loadSetup(p, 'Term1/01-Exp1-AM-Modulation'); await p.keyboard.press('3'); await p.waitForTimeout(400);
+  const k0 = await app(p, () => __app.scope.k);
+  const c = await app(p, () => { const r = __app.scope.cv.getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; });
+  await p.mouse.move(c.x, c.y); for (let i = 0; i < 6; i++) { await p.keyboard.down('Control'); await p.mouse.wheel(0, -300); await p.keyboard.up('Control'); await p.waitForTimeout(40); }
+  await p.waitForTimeout(500);
+  const z = await app(p, () => ({ k: __app.scope.k, w: __app.scope.cv.width, shown: __app.scope.cv.getBoundingClientRect().width }));
+  ok(z.k > k0 && z.w === 800 * z.k && (z.w >= Math.min(2400, z.shown * 0.98)), 'canvas follows the zoom: ' + JSON.stringify({ k0, ...z }));
+  await p.keyboard.press('3'); await p.waitForTimeout(500); ok(await app(p, () => __app.scope.k) <= Math.max(k0, 1.5), 'back to normal resolution');
+  eq(await finite(p), [], 'non-finite');
+});
+
 // ================================================================== 5. rail panels
 T('RL01', 'Rail', 'Lab sheets: every experiment, every step, prev/next, step buttons, show wiring', async p => {
   await p.click('#btnGuide'); const n = await app(p, () => document.querySelectorAll('.explist [data-e]').length); eq(n, 24, 'lab sheets in the list (7 Term 1 + 13 Term 2 + 4 extra)');

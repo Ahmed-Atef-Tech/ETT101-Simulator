@@ -93,7 +93,9 @@ function drawHeadphones() {
 // =============================================== views: kit / both / scope / free zoom ===============================================
 let view = { ...VB }, viewMode = 'both', lastFit = 'both';
 try { const v = localStorage.getItem('ett.view'); if (v) viewMode = v; } catch (e) { }
-function applyView() { svg.setAttribute('viewBox', `${view.x} ${view.y} ${view.w} ${view.h}`); }
+let resT = 0; // after the zoom settles, redraw the scope screen at the resolution it is shown at
+function fitScopeRes() { const r = scope.cv.getBoundingClientRect(); if (r.width) scope.setRes(r.width * (window.devicePixelRatio || 1) / 800); }
+function applyView() { svg.setAttribute('viewBox', `${view.x} ${view.y} ${view.w} ${view.h}`); clearTimeout(resT); resT = setTimeout(fitScopeRes, 150); }
 function focusRect(x, y, w, h, pad = 0.02) {
   const r = svg.getBoundingClientRect(), a = r.width / r.height; x -= w * pad; y -= h * pad; w *= 1 + 2 * pad; h *= 1 + 2 * pad;
   let vw = w, vh = h; if (vw / vh < a) vw = vh * a; else vh = vw / a;

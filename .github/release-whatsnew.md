@@ -1,4 +1,4 @@
-- Welcome guide: each step now frames its part of the screen by itself, even if you had zoomed in or moved around. The oscilloscope step shows the whole scope with the card underneath, and the wiring step shows the whole kit with the card beside it. Your own view comes back when the guide closes.
-- The guide's drawings now move: a mouse pointer drags the lead from one socket to the other while the lead is drawn behind it.
-- الدليل التعريفي: كل خطوة تضبط الآن عرض الجزء الذي تشرحه تلقائياً، حتى لو كنت قد كبّرت الشاشة أو حرّكتها. خطوة راسم الإشارة تعرضه كاملاً والبطاقة أسفله، وخطوة التوصيل تعرض الجهاز كاملاً والبطاقة بجانبه. ويعود عرضك كما كان عند إغلاق الدليل.
-- أصبحت رسوم الدليل متحركة: مؤشر الفأرة يسحب السلك من مقبس إلى آخر والسلك يُرسم خلفه.
+- The oscilloscope screen stays sharp when you zoom in: it is now redrawn at the size it is shown on your screen (up to 3× the real 800 × 480), instead of stretching a small picture.
+- Waveforms are drawn as one smooth shape, so the trace has no steps or gaps between columns when zoomed in.
+- أصبحت شاشة راسم الإشارة واضحة عند التكبير: تُرسم الآن بالحجم الذي تظهر به على شاشتك (حتى 3 أضعاف دقة 800 × 480 الحقيقية) بدلاً من تكبير صورة صغيرة.
+- تُرسم الإشارات الآن كشكل واحد ناعم، فلا تظهر درجات أو فراغات في الخط عند التكبير.

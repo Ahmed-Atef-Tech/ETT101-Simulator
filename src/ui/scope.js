@@ -90,6 +90,7 @@ export class Scope {
     const cv = document.createElement('canvas'); cv.width = 800; cv.height = 480; cv.style.width = '728px'; cv.style.height = '424px'; cv.style.display = 'block';
     fo.appendChild(cv); this.cv = cv; this.cx = cv.getContext('2d');
     this.pcv = document.createElement('canvas'); this.pcv.width = GW; this.pcv.height = GH; this.pcx = this.pcv.getContext('2d');
+    this.k = 1; this.W = 800; this.H = 480; // the screen is drawn in 800 x 480 units (the real LCD) at k device pixels per unit
     // PrtSc + F keys
     this.button(872, 92, 'PrtSc', 'prtsc', 'round');
     for (let i = 0; i < 5; i++) this.button(872, 160 + i * 66, 'F' + (i + 1), 'F' + i, 'fkey');
@@ -126,6 +127,14 @@ export class Scope {
     L(1356, 492, 'PROBE COMP', 7.5); L(1356, 502, '≈3V 1kHz', 7.5);
   }
   setPlugged() { }
+  // draw the screen at the size it is shown (bench zoom x display density) so it stays sharp when zoomed in
+  setRes(k) {
+    k = Math.max(1, Math.min(3, Math.ceil(k * 2) / 2)); if (k === this.k) return; this.k = k;
+    const keep = document.createElement('canvas'); keep.width = this.pcv.width; keep.height = this.pcv.height; keep.getContext('2d').drawImage(this.pcv, 0, 0);
+    this.cv.width = 800 * k; this.cv.height = 480 * k; this.cx.setTransform(k, 0, 0, k, 0, 0);
+    this.pcv.width = GW * k; this.pcv.height = GH * k; this.pcx.setTransform(k, 0, 0, k, 0, 0); this.pcx.drawImage(keep, 0, 0, GW, GH); // persistence survives
+    this.render();
+  }
 
   button(x, y, label, id, kind) {
     const g = el('g', { class: 'sbtn', transform: `translate(${x},${y})` }, this.g);
@@ -423,7 +432,7 @@ export class Scope {
   extract(ch, start, W, noAvg = false) {
     const s = this.st, c = s.ch[ch], r = this.ring(ch), pf = this.pf(ch) * (c.inv ? -1 : 1);
     const off = c.cpl === 'AC' ? this.chanMean(ch) : 0, gnd = c.cpl === 'GND';
-    const N = GW; const out = { y: new Float32Array(N), lo: null, hi: null, raw: null, rawStart: start };
+    const N = GW; const out = { y: new Float32Array(N), lo: null, hi: null, raw: null, rawStart: start }; // 600 columns, like the 12 div of the real LCD
     let seed = 12345 + (ch === 'CH2' ? 777 : 0); const rnd = this.frozen ? () => ((seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff) : Math.random;
     const noise = () => (rnd() + rnd() + rnd() - 1.5) * 0.004 * this.vd(ch);
     const samp = i => gnd ? 0 : (r[i & RMASK] - off) * pf;
@@ -454,7 +463,7 @@ export class Scope {
     if (bw) { const a = Math.exp(-(W / N / FS) * 2 * Math.PI * 20e6); if (a > 1e-6) { let p = out.y[0]; for (let x = 0; x < N; x++) { p = a * p + (1 - a) * out.y[x]; out.y[x] = p; } } } // 20 MHz limit: only visible at ns/div sweeps
     // averaging
     if (s.acq === 'Average' && !noAvg) {
-      const k = ch + s.td + s.vd; let A = this.avgBuf[ch];
+      const k = ch + s.td + s.ch[ch].vd; let A = this.avgBuf[ch];
       if (!A || A.key !== k) A = this.avgBuf[ch] = { key: k, y: Float32Array.from(out.y), n: 1 };
       else { A.n = Math.min(A.n + 1, s.avgN); for (let x = 0; x < N; x++) A.y[x] += (out.y[x] - A.y[x]) / A.n; }
       out.y = Float32Array.from(A.y); out.lo = out.hi = null;
@@ -493,7 +502,7 @@ export class Scope {
     // persistence layer
     if (s.disp.persist) {
       const life = [0, 1, 2, 5, 1e9][s.disp.persist]; if (life < 1e8) { this.pcx.globalCompositeOperation = 'destination-out'; this.pcx.fillStyle = `rgba(0,0,0,${Math.min(1, 1 / (30 * life))})`; this.pcx.fillRect(0, 0, GW, GH); this.pcx.globalCompositeOperation = 'source-over'; }
-      g.drawImage(this.pcv, GX, GY);
+      g.drawImage(this.pcv, GX, GY, GW, GH);
     }
     const split = s.zoom && s.disp.fmt === 'YT' && !(s.math.on && s.math.kind === 'FFT');
     if (split) { // Window mode: main time base above with the expanded zone marked, expanded waveform below
@@ -543,12 +552,17 @@ export class Scope {
   drawTrace(g, f, vd, pos, col, alpha = 1, ox = 0, oy = 0, lw = 1.6) {
     const s = this.st; g.save(); g.translate(ox, oy); g.globalAlpha = alpha * (0.25 + 0.75 * s.disp.bright / 100); g.strokeStyle = col; g.fillStyle = col; g.lineWidth = lw;
     const N = f.y.length, X = x => GX + x * GW / N;
-    if (f.lo && f.hi) {
+    if (f.lo && f.hi && s.disp.type === 'Vectors') { // min/max columns drawn as one band: smooth at any zoom, no gaps between columns
+      g.lineJoin = 'round'; g.lineCap = 'round'; g.beginPath();
+      for (let x = 0; x < N; x++) { const a = this.ypix(f.hi[x], vd, pos); if (x === 0) g.moveTo(X(x), a); else g.lineTo(X(x), a); }
+      for (let x = N - 1; x >= 0; x--) g.lineTo(X(x), this.ypix(f.lo[x], vd, pos));
+      g.closePath(); g.fill(); g.lineWidth = Math.min(1.3, lw); g.stroke();
+    } else if (f.lo && f.hi) {
       g.beginPath();
       for (let x = 0; x < N; x++) { const a = this.ypix(f.hi[x], vd, pos), b = this.ypix(f.lo[x], vd, pos); g.moveTo(X(x) + .5, a - .8); g.lineTo(X(x) + .5, b + .8); if (x > 0 && s.disp.type === 'Vectors') { const pa = this.ypix(f.hi[x - 1], vd, pos), pb = this.ypix(f.lo[x - 1], vd, pos); if (pb < a) { g.moveTo(X(x) + .5, pb); g.lineTo(X(x) + .5, a); } if (pa > b) { g.moveTo(X(x) + .5, b); g.lineTo(X(x) + .5, pa); } } }
       g.lineWidth = Math.min(1.3, lw); g.stroke();
-    } else if (s.disp.type === 'Dots') { for (let x = 0; x < N; x += 3) g.fillRect(X(x), this.ypix(f.y[x], vd, pos) - 1, 2, 2); }
-    else { g.beginPath(); for (let x = 0; x < N; x++) { const y = this.ypix(f.y[x], vd, pos); if (x === 0) g.moveTo(X(x), y); else g.lineTo(X(x), y); } g.stroke(); }
+    } else if (s.disp.type === 'Dots') { const st = Math.max(1, Math.round(3 * N / GW)); for (let x = 0; x < N; x += st) g.fillRect(X(x), this.ypix(f.y[x], vd, pos) - 1, 2, 2); }
+    else { g.lineJoin = 'round'; g.lineCap = 'round'; g.beginPath(); for (let x = 0; x < N; x++) { const y = this.ypix(f.y[x], vd, pos); if (x === 0) g.moveTo(X(x), y); else g.lineTo(X(x), y); } g.stroke(); }
     g.restore();
   }
   drawMath(g) {

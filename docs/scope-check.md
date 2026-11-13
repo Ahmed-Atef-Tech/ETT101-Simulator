@@ -35,12 +35,12 @@ Every function of the simulated UTD2102CEL checked with known signals from the k
 | ✅ | Vertical | Probe 10X: V/div and readings ×10 | [S] | 10 V/div, Pk-Pk 40 V | 10 V/div, 40 V |
 | ✅ | Vertical | Invert flips the trace (trigger on CH2) | [M] | same samples, opposite sign | -9.633 → 9.633 |
 | ✅ | Vertical | DC coupling keeps the DC level | [M] | Mean −1.00 V ±0.05 | -1 V |
-| ✅ | Vertical | AC coupling removes the DC level | [M] | Mean 0 V ±0.05, Pk-Pk 4 V | 0.01445 V, 4 V |
+| ✅ | Vertical | AC coupling removes the DC level | [M] | Mean 0 V ±0.05, Pk-Pk 4 V | 0.01154 V, 4 V |
 | ✅ | Vertical | GND coupling shows 0 V | [M] | Pk-Pk ≈ 0, Mean 0 | 0 V, 0 V |
-| ✅ | Vertical | BW Limit 20 MHz leaves 100 kHz alone (2 µs/div) | [M] | height change < 3 % | 4.004 → 4.006 V |
-| ✅ | Vertical | BW Limit 20 MHz leaves 100 kHz alone (100 µs/div) | [M] | height change < 3 % | 4.009 → 4.01 V |
+| ✅ | Vertical | BW Limit 20 MHz leaves 100 kHz alone (2 µs/div) | [M] | height change < 3 % | 4.006 → 4.006 V |
+| ✅ | Vertical | BW Limit 20 MHz leaves 100 kHz alone (100 µs/div) | [M] | height change < 3 % | 4.008 → 4.009 V |
 | ✅ | Horizontal | 100 kHz period at 5 µs/div | [K] | 10.00 µs ±0.2 % | 10 µs |
-| ✅ | Horizontal | One 10 µs cycle is 2 div (100 px) at 5 µs/div | [K] | 100 px ±1 | 100.3 px |
+| ✅ | Horizontal | One 10 µs cycle is 2 div (100 px) at 5 µs/div | [K] | 100 px ±1 | 100 px |
 | ✅ | Horizontal | Window (zoom): split screen, period still 10 µs | [M] | main view kept, 10.00 µs | split, 10 µs |
 | ✅ | Horizontal | 2 ns/div shows a finite interpolated trace | [S] | finite | finite |
 | ✅ | Trigger | Rising edge, level 0 V: trace crosses 0 V going up at the trigger point | [M] | |v| < 0.08 V, rising, Trig'd | 0.02181 V, rising, Trig'd |
@@ -50,7 +50,7 @@ Every function of the simulated UTD2102CEL checked with known signals from the k
 | ✅ | Trigger | Auto mode, level above the signal: free-runs | [M] | Auto | Auto |
 | ✅ | Trigger | FORCE makes one trigger | [M] | Trig'd once | Ready |
 | ✅ | Trigger | Single: captures once, then stops | [M] | Stop | Stop, stopped |
-| ✅ | Trigger | Rise & Fall: triggers on either edge | [M] | 0 V crossing at the trigger point | 0.02181 V, Trig'd |
+| ✅ | Trigger | Rise & Fall: triggers on either edge | [M] | 0 V crossing at the trigger point | -0.02181 V, Trig'd |
 | ✅ | Trigger | Level range ±8 div from the centre | [M] | ±8.0 V at 1 V/div | -8 … 8 V |
 | ✅ | Trigger | EXT trigger (2 kHz DIGITAL) holds the sine still | [M] | same value at the trigger point frame to frame | 0.01909 / 0.01909 V, Trig'd |
 | ✅ | Trigger | Holdoff 300 µs on an 8.3 kHz square still triggers on an edge | [M] | Trig'd, rising edge at the centre | Trig'd, rising |
@@ -59,14 +59,14 @@ Every function of the simulated UTD2102CEL checked with known signals from the k
 | ✅ | Measure | Top / Base / Amplitude | [K] | 5 V / 0 V / 5 V ±3 % | 4.961 / 0.03906 / 4.922 V |
 | ✅ | Cursor | Time cursors 4.8 div apart at 100 µs/div | [M] | ΔT 480 µs, 1/ΔT 2.083 kHz | ΔT 480us, 1/ΔT 2.083kHz |
 | ✅ | Cursor | Voltage cursors 4 div apart at 1 V/div | [M] | ΔV 4.00 V | ΔV 4.00V |
-| ✅ | Cursor | Tracking cursor reads the trace | [M] | A ≈ 0 V, B ≈ 2 V (2·sin(2π·f·120 µs)) | A 0.02353 V, B 2 V |
+| ✅ | Cursor | Tracking cursor reads the trace | [M] | A ≈ 0 V, B ≈ 2 V (2·sin(2π·f·120 µs)) | A 0.02265 V, B 2.001 V |
 | ✅ | Math | A + B, A − B, A × B, A ÷ B operators exist and run | [M][S] | 4 operators | + - * / |
 | ✅ | Math | FFT length | [M] | 1024 points | 1024 points |
 | ✅ | Math | FFT peak of the 2 kHz sine | [K] | 2083.3 Hz ± 1 bin | 2130.7 Hz (bin 426.1 Hz) |
 | ✅ | Math | FFT level of a 2 V peak sine (Hanning) | [T] | +3.01 dBVrms ±1.5 dB | 2.94 dBVrms |
 | ✅ | Math | FFT windows | [M] | Hanning, Hamming, Blackman, Rectangle | Hanning, Hamming, Blackman, Rectangle |
 | ✅ | XY | Sine on X, cosine on Y draws a circle | [M] phase error ±3° | radius 2.0 V everywhere (±3 %) | 2 … 2 V |
-| ✅ | Acquire | Average (16) reduces the display noise | [M] | less than half the noise of Sample | 2.353 → 0.5371 mV |
+| ✅ | Acquire | Average (16) reduces the display noise | [M] | less than half the noise of Sample | 2.567 → 0.4601 mV |
 | ✅ | Acquire | Peak detect shows the full 0–5 V of a 100 kHz square at 50 ms/div | [M] | Peak: every column 0–5 V; Sample: single dots | Sample 0 % of columns, Peak 100 % |
 | ✅ | Counter | Cymometer on 2 kHz SINE | [S] 6 digits | 2083.333 Hz ±0.05 % | 2083.333 Hz |
 | ✅ | AUTO | AUTO on 2 kHz SINE: fits the screen, shows a few cycles, edge trigger on CH1 | [M] | 4 Vp-p in 4–8 div, 2–6 cycles, CH1 Auto Rise, YT | 1 V/div (4 div), 2.5 cycles, CH1 AUTO R, YT |

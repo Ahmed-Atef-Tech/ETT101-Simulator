@@ -53,7 +53,7 @@ const f = (v, d = 3) => Number.isFinite(v) ? +v.toPrecision(d + 1) : String(v);
   check('Horizontal', 'Fastest time/div', '[S]', '2 ns/div', `${f(ranges.tmin * 1e9)} ns/div`, near(ranges.tmin, 2e-9, 1e-15));
   check('Horizontal', 'Slowest time/div', '[S] 50 s/div', '50 ms/div (simulation limit, see notes)', `${f(ranges.tmax * 1e3)} ms/div`, near(ranges.tmax, 50e-3, 1e-9));
   check('Horizontal', 'Holdoff range', '[M]', '100 ns – 1.5 s', `${f(ranges.hmin * 1e9)} ns – ${f(ranges.hmax)} s`, near(ranges.hmin, 100e-9, 1e-12) && near(ranges.hmax, 1.5, 1e-9));
-  const grid = await app(() => { const s = __app.scope; return { w: s.cv.width, h: s.cv.height }; });
+  const grid = await app(() => { const s = __app.scope; return { w: s.W, h: s.H }; });
   check('Display', 'Screen resolution and divisions', '[M]', '800 × 480, 12 × 8 div', `${grid.w} × ${grid.h}, 12 × 8 div`, grid.w === 800 && grid.h === 480);
 
   // ------------------------------------------------------------------ vertical accuracy on the 2 kHz sine [K][M][T]
