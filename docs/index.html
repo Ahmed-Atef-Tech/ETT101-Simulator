@@ -297,7 +297,7 @@ html[lang="en"] [data-ar] { display: none !important; }
   const REPO = 'Ahmed-Atef-Tech/ETT101-Simulator';
   // The buttons download this version straight away, even if the GitHub API is slow, blocked or
   // rate-limited. The release workflow bumps it after every release; the API then swaps in anything newer.
-  const FALLBACK = '0.32.2';
+  const FALLBACK = '0.33.0';
   const direct = (v, f) => `https://github.com/${REPO}/releases/download/v${v}/${f}`;
   const $ = id => document.getElementById(id);
   const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) { } } };
