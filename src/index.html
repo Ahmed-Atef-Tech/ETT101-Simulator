@@ -235,6 +235,7 @@ html[lang="ar"] .rintro, html[lang="ar"] .lnote { line-height: 1.85; }
 .dlgWrap.open { display: grid; place-items: center; }
 .dlg { width: min(520px, calc(100vw - 32px)); padding: 16px 22px 18px; user-select: text; }
 .fl { display: block; font-size: 15px; font-weight: 600; margin: 10px 0 5px; }
+.bugKind { margin: 4px 0 2px; } .bugKind button { padding: 6px 16px; font-size: 14.5px; }
 .dlg textarea { width: 100%; resize: vertical; border: 1px solid #9aa3a7; border-radius: 4px; padding: 8px 10px; font: inherit; font-size: 15px; line-height: 1.5; color: var(--ink); background: #fff; }
 .dlg textarea:focus-visible { outline: 2px solid var(--probe); outline-offset: 0; border-color: var(--ink); }
 .dlg textarea[aria-invalid="true"] { border-color: var(--warn); }
@@ -288,9 +289,10 @@ html[lang="ar"] .rintro, html[lang="ar"] .lnote { line-height: 1.85; }
 <div id="modal"><article id="modalBox" class="sheet"><div class="sheetHead"><h2 id="modalTitle" dir="ltr"></h2><button class="x" id="modalX" aria-label="Close">✕</button></div><div id="modalBody"></div>
   <div class="mfoot"><button class="video" id="modalYT"><svg viewBox="0 0 16 16"><path d="M5 3.5v9l7.5-4.5z" fill="currentColor"/></svg><span></span></button><button class="video" id="modalClose" data-t="close"></button></div></article></div>
 <div id="bugDlg" class="dlgWrap" role="dialog" aria-modal="true" aria-labelledby="bugTitle"><form class="sheet dlg" id="bugForm">
-  <div class="sheetHead"><h2 id="bugTitle" data-t="bugTitle"></h2><button class="x" type="button" id="bugX" aria-label="Close">✕</button></div>
-  <label class="fl" for="bugWhat" data-t="bugWhat"></label><textarea id="bugWhat" rows="4" maxlength="1200"></textarea><p class="ferr" id="bugErr" aria-live="polite"></p>
-  <label class="fl" for="bugSteps" data-t="bugSteps"></label><textarea id="bugSteps" rows="2" maxlength="600"></textarea>
+  <div class="sheetHead"><h2 id="bugTitle"></h2><button class="x" type="button" id="bugX" aria-label="Close">✕</button></div>
+  <div class="seg bugKind" role="group"><button type="button" data-kind="bug" data-t="bugKindBug"></button><button type="button" data-kind="idea" data-t="bugKindIdea"></button></div>
+  <label class="fl" for="bugWhat" id="bugWhatL"></label><textarea id="bugWhat" rows="4" maxlength="1200"></textarea><p class="ferr" id="bugErr" aria-live="polite"></p>
+  <label class="fl" for="bugSteps" id="bugStepsL"></label><textarea id="bugSteps" rows="2" maxlength="600"></textarea>
   <label class="fchk"><input type="checkbox" id="bugAttach" checked> <span data-t="bugAttach"></span></label>
   <p class="small" data-t="bugNote"></p>
   <div class="bugFallback" id="bugFallback" aria-live="polite"><span data-t="bugBlocked"></span> <b dir="ltr">+20 101 987 6314</b>

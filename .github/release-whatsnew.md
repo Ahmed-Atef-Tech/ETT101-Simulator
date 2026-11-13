@@ -1,13 +1,16 @@
-Oscilloscope menus and keys now follow the UTD2102CEL user manual:
-- Keys: HORI MENU and TRIG MENU as on the real panel. There is no HELP key on this model, so scope help is in UTILITY. SET TO ZERO resets the vertical and horizontal positions and the holdoff, and sets the trigger level to 50 %.
-- HORI MENU: Main, Window and Hold off. Window splits the screen: the main time base above with the expanded zone marked, the expanded waveform below. Hold off is set with the MULTI PURPOSE knob.
-- TRIG MENU: Source CH1, CH2, EXT, AC Line; Slope Rise, Fall, Rise & Fall.
-- MEASURE: four measurement zones (F1–F4), each with its own channel, Volt or Time, and parameter, using the manual's names (Pk-Pk, Max, Min, Amplitude, Top, Base, Mean, RMS, Freq, Period, Rise, Fall, ±Width, ±Duty). F5 shows all parameters.
-- CURSOR: Voltage, Time and Tracking. ACQUIRE: Sampling and FastACQ. DISPLAY: Type, Format, Persist and Brightness. UTILITY: three pages (Self Cal, Help, Reset, Grid, Cymometer).
-
-أصبحت قوائم راسم الإشارة وأزراره مطابقة لدليل مستخدم UTD2102CEL:
-- الأزرار: HORI MENU و TRIG MENU كما في الجهاز الحقيقي. لا يوجد زر HELP في هذا الطراز، لذلك أصبحت المساعدة داخل UTILITY. والزر SET TO ZERO يعيد الموضع الرأسي والأفقي و Hold off إلى الصفر، ويضبط مستوى الزناد على 50%.
-- HORI MENU: فيه Main و Window و Hold off. عند اختيار Window تنقسم الشاشة: القاعدة الزمنية الرئيسية في الأعلى مع تحديد الجزء المكبَّر، والإشارة المكبَّرة في الأسفل. ويُضبط Hold off بالمقبض MULTI PURPOSE.
-- TRIG MENU: المصدر CH1 أو CH2 أو EXT أو AC Line، والميل Rise أو Fall أو Rise & Fall.
-- MEASURE: أربع مناطق قياس (F1 إلى F4)، لكل منها قناة ونوع (Volt أو Time) ومعامل بأسماء الدليل (Pk-Pk و Max و Min و Amplitude و Top و Base و Mean و RMS و Freq و Period و Rise و Fall و ±Width و ±Duty). والزر F5 يعرض كل المعاملات.
-- CURSOR: جهد وزمن وتتبّع (Tracking). و ACQUIRE: فيه Sampling و FastACQ. و DISPLAY: فيه Type و Format و Persist و Brightness. و UTILITY: ثلاث صفحات (Self Cal و Help و Reset و Grid و Cymometer).
+- **Suggestions:** the Report button now has two choices, Problem and Suggestion. Pick Suggestion to send an idea for a new feature to the developer on WhatsApp.
+- **Oscilloscope checked against its specifications** (58 checks with known signals, see docs/scope-check.md on GitHub). Fixes from these checks:
+  - Time/div now goes down to 2 ns/div, as on the UTD2102CEL.
+  - The 20 MHz bandwidth limit (BW Limit) no longer smooths kHz signals at slow sweeps; it only affects the ns/div range, like the real 20 MHz filter.
+  - Trigger level is kept within ±8 divisions of the screen centre, as in the manual.
+  - The frequency counter (Cymometer) shows 6 digits.
+  - FFT uses 1024 points, as in the manual.
+  - Period and Freq are measured even when the screen shows little more than one cycle.
+- **الاقتراحات:** أصبح في زر الإبلاغ خياران: مشكلة واقتراح. اختر «اقتراح» لإرسال فكرة لميزة جديدة إلى المطوّر عبر واتساب.
+- **فُحص راسم الإشارة مقارنةً بمواصفاته** (58 اختباراً بإشارات معروفة، انظر docs/scope-check.md على GitHub). والإصلاحات الناتجة عنها:
+  - أصبح أقل زمن لكل مربع 2ns/div كما في UTD2102CEL.
+  - مرشِّح عرض النطاق 20MHz (BW Limit) لم يعد يُنعّم إشارات الكيلوهرتز عند القواعد الزمنية البطيئة؛ أثره الآن في نطاق النانوثانية فقط، مثل المرشِّح الحقيقي.
+  - يبقى مستوى الزناد في حدود ±8 مربعات من منتصف الشاشة كما في الدليل.
+  - يعرض عدّاد التردد (Cymometer) ستة أرقام.
+  - يستخدم FFT عدد 1024 نقطة كما في الدليل.
+  - يُقاس Period و Freq حتى عندما تعرض الشاشة دورة واحدة تقريباً.
