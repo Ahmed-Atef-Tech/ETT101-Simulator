@@ -270,10 +270,6 @@ html[lang="ar"] #tour .tourCard p { line-height: 1.85; }
 #tour .tourNav button { min-width: 84px; padding: 7px 14px; font-size: 14.5px; border-radius: 4px; border: 1px solid #9aa3a7; background: #fff; cursor: pointer; }
 #tour .tourNav button.primary { background: var(--ink); color: #fff; border-color: var(--ink); }
 #tour button:focus-visible { outline: 2px solid var(--probe); outline-offset: 2px; }
-#tour .tDraw { stroke-dasharray: 100; animation: tDraw 2.4s ease-in-out infinite; }
-@keyframes tDraw { 0% { stroke-dashoffset: 100; } 55%, 100% { stroke-dashoffset: 0; } }
-#tour .tHand { animation: tHand 2.4s ease-in-out infinite; }
-@keyframes tHand { 0% { transform: translate(70px, 52px); } 55%, 100% { transform: translate(240px, 70px); } }
 #tour .tWheel { animation: tWheel .9s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
 @keyframes tWheel { 0%, 100% { transform: translateY(-3px); } 50% { transform: translateY(3px); } }
 #tour .tUp { animation: tBob 1.2s ease-in-out infinite; } #tour .tDown { animation: tBob 1.2s ease-in-out infinite reverse; }
@@ -282,7 +278,6 @@ html[lang="ar"] #tour .tourCard p { line-height: 1.85; }
 @keyframes tPress { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(4px); } }
 #tour .tWave { animation: tBob 2s ease-in-out infinite; }
 #tour.still *, #tour.still .tourCard { animation: none !important; transition: none !important; }
-#tour.still .tDraw { stroke-dashoffset: 0; } #tour.still .tHand { transform: translate(240px, 70px); }
 @media (prefers-reduced-motion: reduce) { #tour * { animation: none !important; transition: none !important; } }
 </style>
 </head>

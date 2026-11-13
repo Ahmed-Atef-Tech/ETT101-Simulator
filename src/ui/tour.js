@@ -3,6 +3,19 @@
 import { t, getLang, trb } from './i18n.js';
 
 const A = (en, ar) => ({ en, ar });
+// a lead being pulled from one socket to another by the mouse pointer: the lead draws in behind the plug, then a click
+const LOOP = '3.2s', KT = '0;0.62;1';
+function dragArt({ bg, from, to, path, end, color, dark, width }) {
+  const motion = `<animateMotion dur="${LOOP}" repeatCount="indefinite" path="${path}" keyPoints="0;1;1" keyTimes="${KT}" calcMode="linear"/>`;
+  return `<svg viewBox="0 0 320 120" class="tArt" aria-hidden="true">${bg}${from}${to}
+    <path d="${path}" fill="none" stroke="${dark}" stroke-width="${width + 2.5}" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" data-final="0"><animate attributeName="stroke-dashoffset" values="100;0;0" keyTimes="${KT}" dur="${LOOP}" repeatCount="indefinite"/></path>
+    <path d="${path}" fill="none" stroke="${color}" stroke-width="${width}" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" data-final="0"><animate attributeName="stroke-dashoffset" values="100;0;0" keyTimes="${KT}" dur="${LOOP}" repeatCount="indefinite"/></path>
+    <circle cx="${end[0]}" cy="${end[1]}" r="10" fill="none" stroke="#f2c21b" stroke-width="3" opacity="0"><animate attributeName="r" values="10;10;22" keyTimes="0;0.64;0.9" dur="${LOOP}" repeatCount="indefinite"/><animate attributeName="opacity" values="0;0;1;0" keyTimes="0;0.63;0.66;0.9" dur="${LOOP}" repeatCount="indefinite"/></circle>
+    <g data-end="${end[0]} ${end[1]}"><circle r="9" fill="${color}" stroke="${dark}" stroke-width="3"/>${motion}</g>
+    <g data-end="${end[0]} ${end[1]}"><g transform="translate(3 3)"><path d="M0 0 l0 24 l6.5 -5.5 l4.5 10 l4.5 -2 l-4.5 -10 l8.5 -0.5 z" fill="#fff" stroke="#111" stroke-width="2" stroke-linejoin="round"/></g>${motion}</g>
+  </svg>`;
+}
+
 // ---------------------------------------------------------------- drawings (inline SVG, theme colours of the app)
 const ART = {
   welcome: `<svg viewBox="0 0 320 120" class="tArt" aria-hidden="true">
@@ -13,21 +26,14 @@ const ART = {
     <path class="tWave" d="M192 58 q 9 -18 17.5 0 t 17.5 0 t 17.5 0 t 17.5 0" fill="none" stroke="#f6e51d" stroke-width="2.5"/>
     <circle cx="284" cy="44" r="8" fill="#cfcac1" stroke="#8c877f"/><circle cx="284" cy="72" r="8" fill="#cfcac1" stroke="#8c877f"/><rect x="272" y="90" width="24" height="8" rx="2" fill="#58e070"/>
   </svg>`,
-  drag: `<svg viewBox="0 0 320 120" class="tArt" aria-hidden="true">
-    <rect x="10" y="10" width="300" height="100" rx="10" fill="#16191c"/>
-    <circle cx="70" cy="52" r="13" fill="#f2c21b" stroke="#7a5d00" stroke-width="3"/><circle cx="70" cy="52" r="5" fill="#2b2b2b"/>
-    <circle cx="240" cy="70" r="13" fill="#d9d9d9" stroke="#666" stroke-width="3"/><circle cx="240" cy="70" r="5" fill="#2b2b2b"/>
-    <path class="tDraw" d="M70 52 C 110 120, 190 120, 240 70" fill="none" stroke="#d3261f" stroke-width="6" stroke-linecap="round" pathLength="100"/>
-    <g class="tHand"><path d="M0 0 l0 26 l7 -6 l5 11 l5 -2 l-5 -11 l9 -1 z" fill="#fff" stroke="#111" stroke-width="2" stroke-linejoin="round"/></g>
-    <text x="70" y="26" fill="#cfd5d8" font-size="13" text-anchor="middle" font-family="sans-serif">1</text><text x="240" y="44" fill="#cfd5d8" font-size="13" text-anchor="middle" font-family="sans-serif">2</text>
-  </svg>`,
-  probe: `<svg viewBox="0 0 320 120" class="tArt" aria-hidden="true">
-    <rect x="10" y="12" width="130" height="96" rx="10" fill="#e9e5dc" stroke="#9c978d" stroke-width="2"/>
-    <circle cx="75" cy="64" r="22" fill="#cfcac1" stroke="#6b6b6b" stroke-width="3"/><circle cx="75" cy="64" r="13" fill="#3a3a3a" stroke="#f6e51d" stroke-width="3"/><circle cx="75" cy="64" r="3.5" fill="#d4b45a"/>
-    <text x="75" y="32" font-size="13" font-weight="700" text-anchor="middle" fill="#2a2a2a" font-family="sans-serif">CH1</text>
-    <rect x="180" y="24" width="128" height="80" rx="8" fill="#16191c"/><circle cx="250" cy="64" r="12" fill="#f2c21b" stroke="#7a5d00" stroke-width="3"/><circle cx="250" cy="64" r="4.5" fill="#2b2b2b"/>
-    <path class="tDraw" d="M75 64 C 120 130, 200 130, 250 64" fill="none" stroke="#3d4248" stroke-width="7" stroke-linecap="round" pathLength="100"/>
-  </svg>`,
+  drag: dragArt({ bg: '<rect x="10" y="10" width="300" height="100" rx="10" fill="#16191c"/>',
+    from: '<circle cx="70" cy="52" r="13" fill="#f2c21b" stroke="#7a5d00" stroke-width="3"/><circle cx="70" cy="52" r="5" fill="#2b2b2b"/><text x="70" y="28" fill="#cfd5d8" font-size="13" text-anchor="middle" font-family="sans-serif">1</text>',
+    to: '<circle cx="240" cy="70" r="13" fill="#d9d9d9" stroke="#666" stroke-width="3"/><circle cx="240" cy="70" r="5" fill="#2b2b2b"/><text x="240" y="46" fill="#cfd5d8" font-size="13" text-anchor="middle" font-family="sans-serif">2</text>',
+    path: 'M70 52 C 110 120, 190 120, 240 70', end: [240, 70], color: '#d3261f', dark: '#7c120e', width: 6 }),
+  probe: dragArt({ bg: '<rect x="10" y="12" width="130" height="96" rx="10" fill="#e9e5dc" stroke="#9c978d" stroke-width="2"/><rect x="180" y="24" width="128" height="80" rx="8" fill="#16191c"/>',
+    from: '<circle cx="75" cy="64" r="22" fill="#cfcac1" stroke="#6b6b6b" stroke-width="3"/><circle cx="75" cy="64" r="13" fill="#3a3a3a" stroke="#f6e51d" stroke-width="3"/><circle cx="75" cy="64" r="3.5" fill="#d4b45a"/><text x="75" y="32" font-size="13" font-weight="700" text-anchor="middle" fill="#2a2a2a" font-family="sans-serif">CH1</text>',
+    to: '<circle cx="250" cy="64" r="12" fill="#f2c21b" stroke="#7a5d00" stroke-width="3"/><circle cx="250" cy="64" r="4.5" fill="#2b2b2b"/>',
+    path: 'M75 64 C 120 130, 200 130, 250 64', end: [250, 64], color: '#3d4248', dark: '#101214', width: 7 }),
   zoom: `<svg viewBox="0 0 320 130" class="tArt" aria-hidden="true">
     <g class="tKey"><rect x="18" y="44" width="92" height="60" rx="12" fill="#bfc4c7"/><rect x="18" y="38" width="92" height="58" rx="12" fill="#f4f4f1" stroke="#9aa3a7" stroke-width="2"/>
       <text x="64" y="75" font-size="22" font-weight="800" text-anchor="middle" fill="#1e2427" font-family="sans-serif">Ctrl</text></g>
@@ -49,10 +55,10 @@ const STEPS = [
   { art: 'welcome', title: A('Welcome to the Telecoms-Trainer 101 simulator', 'مرحباً بك في محاكي Telecoms-Trainer 101'),
     text: A('On the left is the Emona ETT-101 kit, on the right a UTD2102CEL-style oscilloscope. Wire the kit, turn the knobs and watch the signals, as in the lab. This short guide shows you around.',
       'على اليسار جهاز Emona ETT-101، وعلى اليمين راسم إشارة على نمط UTD2102CEL. صِل الأسلاك وأدِر المقابض وشاهد الإشارات كما في المعمل. هذا الدليل القصير يعرّفك بالبرنامج.') },
-  { target: '#board', art: 'drag', title: A('Wire the kit', 'توصيل الأسلاك'),
+  { target: '#board', view: 'kit', art: 'drag', title: A('Wire the kit', 'توصيل الأسلاك'),
     text: A('Drag from one socket to another to plug in a lead. Double-click a lead to remove it, right-click it to change its colour. Turn a knob by dragging around it or with the mouse wheel.',
       'اسحب من مقبس إلى مقبس آخر لتوصيل سلك. انقر على السلك مرتين لإزالته، وانقر بالزر الأيمن لتغيير لونه. أدِر المقبض بالسحب حوله أو بعجلة الفأرة.') },
-  { target: '#scope', art: 'probe', title: A('The oscilloscope', 'راسم الإشارة'),
+  { target: '#scope', view: 'scope', art: 'probe', title: A('The oscilloscope', 'راسم الإشارة'),
     text: A('Drag from the CH1 or CH2 socket to any socket on the kit to see that signal. The keys and knobs work like the real scope; AUTO sets everything up for you.',
       'اسحب من مقبس CH1 أو CH2 إلى أي مقبس على الجهاز لترى إشارته. الأزرار والمقابض تعمل مثل الجهاز الحقيقي، والزر AUTO يضبط كل شيء تلقائياً.') },
   { art: 'zoom', title: A('Zoom in and out', 'التكبير والتصغير'),
@@ -74,13 +80,14 @@ const STEPS = [
     text: A('Language, sound, saving and opening your wiring, help, and this guide if you want to see it again.', 'اللغة والصوت وحفظ التوصيلات وفتحها والمساعدة، وهذا الدليل إذا أردت أن تراه مرة أخرى.') },
 ];
 
-let root = null, i = 0, onEnd = null;
+let root = null, i = 0, onEnd = null, setView = null;
 const $ = s => document.querySelector(s);
 const reduce = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 export const tourOpen = () => !!root;
-export function startTour(done) {
-  endTour(false); onEnd = done; i = 0;
+export function tourReframe() { if (!root) return; if (setView) setView(STEPS[i].view || 'both'); place(); } // after a window resize or the start-up fit
+export function startTour(done, opts = {}) {
+  endTour(false); onEnd = done; i = 0; setView = opts.view || null;
   root = document.createElement('div'); root.id = 'tour'; root.setAttribute('role', 'dialog'); root.setAttribute('aria-modal', 'true'); root.setAttribute('aria-labelledby', 'tourTitle');
   root.innerHTML = `<svg class="tourDim" aria-hidden="true"><path class="tourHole" fill-rule="evenodd"/></svg><div class="tourRing"></div><svg class="tourArrow" aria-hidden="true"><defs><marker id="tourHead" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#f2c21b"/></marker></defs><path class="tourLine" fill="none" stroke="#f2c21b" stroke-width="3.5" stroke-linecap="round" marker-end="url(#tourHead)"/></svg><div class="tourCard sheet"></div>`;
   document.body.appendChild(root);
@@ -112,7 +119,13 @@ function show() {
   card.querySelector('.tourNext').onclick = () => go(1);
   const b = card.querySelector('.tourBack'); if (b) b.onclick = () => go(-1);
   root.classList.toggle('still', reduce());
-  place(); card.querySelector('.tourNext').focus({ preventScroll: true });
+  if (reduce()) { // no motion: show the finished drawing
+    card.querySelectorAll('animate, animateMotion').forEach(x => x.remove());
+    card.querySelectorAll('[data-final]').forEach(x => x.setAttribute('stroke-dashoffset', x.dataset.final));
+    card.querySelectorAll('[data-end]').forEach(x => x.setAttribute('transform', `translate(${x.dataset.end.replace(' ', ',')})`));
+  }
+  if (setView) setView(st.view || 'both'); // each step frames its part of the bench, whatever the zoom was
+  place(); requestAnimationFrame(place); card.querySelector('.tourNext').focus({ preventScroll: true });
 }
 function place() {
   if (!root) return;
@@ -130,11 +143,12 @@ function place() {
   let x, y;
   if (!tr) { x = (W - cw) / 2; y = (H - ch) / 2; }
   else {
-    const space = { below: H - tr.b, above: tr.y, right: W - tr.r, left: tr.x }, gap = 70;
-    if (space.below >= ch + gap) { y = tr.b + gap; x = (tr.x + tr.r) / 2 - cw / 2; }
-    else if (space.above >= ch + gap) { y = tr.y - gap - ch; x = (tr.x + tr.r) / 2 - cw / 2; }
-    else if (space.left >= cw + gap) { x = tr.x - gap - cw; y = (tr.y + tr.b) / 2 - ch / 2; }
-    else if (space.right >= cw + gap) { x = tr.r + gap; y = (tr.y + tr.b) / 2 - ch / 2; }
+    const space = { below: H - tr.b - 8, above: tr.y - 52, right: W - tr.r - 8, left: tr.x - 8 }, MIN = 22;
+    const gap = room => Math.min(70, room); // the arrow gets up to 70 px; less when space is tight
+    if (space.below >= ch + MIN) { y = tr.b + gap(space.below - ch); x = (tr.x + tr.r) / 2 - cw / 2; }
+    else if (space.above >= ch + MIN) { y = tr.y - gap(space.above - ch) - ch; x = (tr.x + tr.r) / 2 - cw / 2; }
+    else if (space.left >= cw + MIN) { x = tr.x - gap(space.left - cw) - cw; y = (tr.y + tr.b) / 2 - ch / 2; }
+    else if (space.right >= cw + MIN) { x = tr.r + gap(space.right - cw); y = (tr.y + tr.b) / 2 - ch / 2; }
     else { x = (W - cw) / 2; y = H - ch - 16; }
     x = Math.max(16, Math.min(W - cw - 16, x)); y = Math.max(56, Math.min(H - ch - 16, y));
   }

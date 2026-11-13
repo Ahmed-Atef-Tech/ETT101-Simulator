@@ -347,6 +347,11 @@ T('WS08', 'Workspace', 'Welcome guide: after the first-start notice, every step 
   await p.click('#btnSettings'); await p.click('#btnTour'); await p.waitForTimeout(200); ok(await app(p, () => __app.tour.open()), 'Settings shows it again');
   await p.keyboard.press('1'); eq(await app(p, () => __app.tour.open()), true, 'keys do not reach the app while the guide is open');
   await p.click('#tour .tourSkip'); ok(!(await app(p, () => __app.tour.open())), 'Skip closes it');
+  // zoomed far in before the guide: the scope step still shows the whole oscilloscope
+  await p.mouse.move(900, 500); for (let i = 0; i < 5; i++) { await p.keyboard.down('Control'); await p.mouse.wheel(0, -300); await p.keyboard.up('Control'); await p.waitForTimeout(40); }
+  await app(p, () => __app.tour.start()); await p.keyboard.press('ArrowRight'); await p.keyboard.press('ArrowRight'); await p.waitForTimeout(700); // card finishes sliding
+  const sr = await app(p, () => { const r = document.querySelector('#scope').getBoundingClientRect(), c = document.querySelector('#tour .tourCard').getBoundingClientRect(); return { inside: r.left >= 0 && r.top >= 40 && r.right <= innerWidth && r.bottom <= innerHeight, wide: r.width > innerWidth * 0.5, overlap: !(c.top >= r.bottom || c.bottom <= r.top || c.left >= r.right || c.right <= r.left) }; });
+  ok(sr.inside && sr.wide && !sr.overlap, 'scope step frames the whole scope, card beside it: ' + JSON.stringify(sr)); await p.keyboard.press('Escape');
   await app(p, () => __app.setLang('ar')); await p.click('#btnSettings'); await p.click('#btnTour'); await p.waitForTimeout(200);
   ok(/مرحباً/.test(await app(p, () => document.querySelector('#tourTitle').textContent)), 'Arabic'); await p.keyboard.press('ArrowLeft'); await p.waitForTimeout(100);
   ok(/توصيل/.test(await app(p, () => document.querySelector('#tourTitle').textContent)), 'ArrowLeft goes forward in Arabic');

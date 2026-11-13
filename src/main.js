@@ -9,7 +9,7 @@ import { Audio } from './ui/audio.js';
 import { SOCKET_NAME, SOCKET_POS, BLOCKS } from './ui/layout.js';
 import { MODULE_INFO, HELP_LINKS, HELP, NOTICE } from './ui/content.js';
 import { SHEETS, SECTIONS } from './ui/sheets.js';
-import { startTour, tourOpen, endTour } from './ui/tour.js';
+import { startTour, tourOpen, endTour, tourReframe } from './ui/tour.js';
 import { t, tr, trb, bidi, getLang, setLang } from './ui/i18n.js';
 import { initLibrary } from './ui/library.js';
 
@@ -105,7 +105,7 @@ function setView(m) {
   for (const [id, k] of [['vKit', 'kit'], ['vBoth', 'both'], ['vScope', 'scope']]) $('#' + id).classList.toggle('on', m === k);
   if (RECTS[m]) focusRect(...RECTS[m], m === 'both' ? 0 : 0.015);
 }
-window.addEventListener('resize', () => { if (RECTS[viewMode]) setView(viewMode); });
+window.addEventListener('resize', () => { if (tourOpen()) tourReframe(); else if (RECTS[viewMode]) setView(viewMode); });
 function toSvg(e) { const p = svg.createSVGPoint(); p.x = e.clientX; p.y = e.clientY; return p.matrixTransform(svg.getScreenCTM().inverse()); }
 function zoomAt(e, k) {
   const p = toSvg(e); const nw = Math.max(250, Math.min(VB.w * 2, view.w * k)), nh = nw * view.h / view.w;
@@ -451,11 +451,26 @@ document.addEventListener('pointerdown', () => audio.ensure(), { once: true });
 
 setLang(getLang()); applyTexts(); setTraining(training); wires.render();
 // first start: the beta notice, then the welcome guide (shown once; Settings shows it again)
-function runTour() { $('#settings').classList.remove('open'); closeMenus(); library.close(); if (RECTS[viewMode] && viewMode !== 'both') setView('both'); startTour(() => { try { localStorage.setItem('ett.tour', '1'); } catch (e) { } }); }
+// the guide frames each part itself (even if the bench was zoomed or moved), then puts the user's view back
+function tourView(name) {
+  const [x, y, w, h] = RECTS[name] || RECTS.both, r = svg.getBoundingClientRect();
+  if (name === 'scope') { // scope across the top, about 380 px free below it for the card
+    const free = Math.max(160, r.height - 380), rh = Math.max(h * 1.9, h * r.height / free), rw = Math.max(w, h * r.width / free);
+    focusRect(x + w / 2 - rw / 2, y, rw, rh, 0.03);
+  } else if (name === 'kit') { // kit on the left, about 450 px free on the right for the card
+    const free = Math.max(200, r.width - 450), rw = Math.max(w * 1.5, w * r.width / free), rh = Math.max(h, w * r.height / free);
+    focusRect(x, y + h / 2 - rh / 2, rw, rh, 0.03);
+  } else focusRect(x, y, w, h, 0);
+}
+function runTour() {
+  $('#settings').classList.remove('open'); closeMenus(); library.close();
+  const back = RECTS[viewMode] ? viewMode : lastFit;
+  startTour(() => { try { localStorage.setItem('ett.tour', '1'); } catch (e) { } setView(back); }, { view: tourView });
+}
 $('#btnTour').onclick = runTour;
 { let seen = false, toured = false; try { seen = localStorage.getItem('ett.notice') === '1'; toured = localStorage.getItem('ett.tour') === '1'; localStorage.setItem('ett.notice', '1'); } catch (e) { toured = true; }
   if (!seen) { showAbout(); if (!toured) afterModal = runTour; } else if (!toured) setTimeout(runTour, 500); }
-requestAnimationFrame(() => setView(viewMode));
+requestAnimationFrame(() => { if (tourOpen()) tourReframe(); else setView(viewMode); });
 
 // =============================================== main loop ===============================================
 let last = performance.now(), frame = 0, guideTick = 0, loadAvg = 0;
