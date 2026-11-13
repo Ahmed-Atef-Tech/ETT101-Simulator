@@ -258,10 +258,10 @@ html[lang="en"] [data-ar] { display: none !important; }
       <div class="more glass">
         <div class="row"><h3><span data-ar>ملفات التجارب</span><span data-en>Experiment files</span></h3>
           <p data-ar>الـ 68 تجربة من كتب الترم الأول والتاني، تفتحها من <span class="lat">OPEN SETUP</span>.</p><p data-en>All 68 experiments from the Term 1 and Term 2 books, for OPEN SETUP.</p>
-          <a class="act" id="lSetups" href="https://github.com/Ahmed-Atef-Tech/ETT101-Simulator/releases/latest"><span data-ar>تحميل الـ zip</span><span data-en>Download zip</span></a></div>
+          <a class="act" id="lSetups" href="https://github.com/Ahmed-Atef-Tech/ETT101-Simulator/releases/latest/download/ETT101-Experiments-Setups.zip"><span data-ar>تحميل الـ zip</span><span data-en>Download zip</span></a></div>
         <div class="row"><h3><span data-ar>مرجع الموديل</span><span data-en>Model reference</span></h3>
           <p data-ar>معادلة وأرقام كل بلوك، ومصدر كل رقم.</p><p data-en>Every module’s equation and values, and where each number comes from.</p>
-          <a class="act" id="lRef" href="https://github.com/Ahmed-Atef-Tech/ETT101-Simulator/releases/latest"><span data-ar>فتح المرجع</span><span data-en>Open reference</span></a></div>
+          <a class="act" id="lRef" href="https://github.com/Ahmed-Atef-Tech/ETT101-Simulator/releases/latest/download/ETT101-Model-Reference.md"><span data-ar>فتح المرجع</span><span data-en>Open reference</span></a></div>
         <div class="row"><h3><span data-ar>النسخ القديمة</span><span data-en>Earlier versions</span></h3>
           <p data-ar>كل النسخ اللي نزلت قبل كده، مع اللي اتغيّر في كل واحدة.</p><p data-en>Every earlier version, with what changed in each.</p>
           <a class="act" href="https://github.com/Ahmed-Atef-Tech/ETT101-Simulator/releases"><span data-ar>على GitHub</span><span data-en>On GitHub</span></a></div>
@@ -295,6 +295,10 @@ html[lang="en"] [data-ar] { display: none !important; }
 <script>
 (() => {
   const REPO = 'Ahmed-Atef-Tech/ETT101-Simulator';
+  // The buttons download this version straight away, even if the GitHub API is slow, blocked or
+  // rate-limited. The release workflow bumps it after every release; the API then swaps in anything newer.
+  const FALLBACK = '0.32.2';
+  const direct = (v, f) => `https://github.com/${REPO}/releases/download/v${v}/${f}`;
   const $ = id => document.getElementById(id);
   const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) { } } };
 
@@ -309,7 +313,7 @@ html[lang="en"] [data-ar] { display: none !important; }
   function paint() {
     const ar = lang === 'ar', st = $('status');
     st.classList.toggle('off', !rel);
-    if (failed) $('statusText').textContent = ar ? 'مش قادر أوصل لـ GitHub دلوقتي — الزراير هتفتح صفحة آخر نسخة' : 'Can’t reach GitHub right now — the buttons open the latest release page';
+    if (failed) $('statusText').textContent = ar ? `مش قادر أشيّك على GitHub دلوقتي، الزراير بتنزّل نسخة ${FALLBACK}` : `Couldn’t check GitHub just now; the buttons download version ${FALLBACK}`;
     else if (!rel) $('statusText').textContent = ar ? 'بجيب آخر نسخة…' : 'Checking the latest version…';
     else {
       const date = new Date(rel.published_at).toLocaleDateString(ar ? 'ar-EG' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -325,7 +329,11 @@ html[lang="en"] [data-ar] { display: none !important; }
   }
   document.querySelectorAll('[data-lang]').forEach(b => b.onclick = () => setLang(b.dataset.lang));
   setLang(lang);
-  fetch(`https://api.github.com/repos/${REPO}/releases/latest`, { headers: { Accept: 'application/vnd.github+json' } })
+  $('kWin').href = direct(FALLBACK, `ETT101-Simulator-Setup-${FALLBACK}.exe`);
+  $('kMac').href = direct(FALLBACK, `ETT101-Simulator-${FALLBACK}-mac.dmg`);
+  const ctl = 'AbortController' in window ? new AbortController() : null;
+  const giveUp = setTimeout(() => { if (ctl) ctl.abort(); if (!rel) { failed = true; paint(); } }, 6000);
+  const latest = fetch(`https://api.github.com/repos/${REPO}/releases/latest`, { headers: { Accept: 'application/vnd.github+json' }, signal: ctl ? ctl.signal : undefined })
     .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
     .then(j => {
       rel = j; const A = j.assets || [], find = re => A.find(a => re.test(a.name));
@@ -334,9 +342,15 @@ html[lang="en"] [data-ar] { display: none !important; }
       if (mac) { $('kMac').href = mac.browser_download_url; $('sMac').textContent = mb(mac.size); }
       if (setups) $('lSetups').href = setups.browser_download_url;
       if (ref) $('lRef').href = ref.browser_download_url;
-      $('scrVer').textContent = j.tag_name; paint();
+      $('scrVer').textContent = j.tag_name; clearTimeout(giveUp); paint();
     })
     .catch(() => { failed = true; paint(); });
+  // clicked while the check is still running: wait for it a moment, then download
+  ['kWin', 'kMac'].forEach(id => $(id).addEventListener('click', e => {
+    if (rel || failed) return;
+    e.preventDefault(); const go = () => { location.href = $(id).href; };
+    Promise.race([latest, new Promise(r => setTimeout(r, 2500))]).then(go, go);
+  }));
 
   // the scope trace: Exp 1 AM, m = 0.5 (message on CH1, AM signal on CH2)
   const cv = $('trace'), ctx = cv.getContext('2d'), still = matchMedia('(prefers-reduced-motion: reduce)');
