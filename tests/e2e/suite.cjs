@@ -25,7 +25,7 @@ async function open(opts = {}) {
   p.on('dialog', d => { p.dialogs.push(d.message()); (p.dialogAnswer === false ? d.dismiss() : d.accept()).catch(() => { }); });
   if (opts.init) await p.addInitScript(opts.init);
   await p.goto(URL); await p.waitForFunction(() => window.__app && window.__app.sim);
-  if (!opts.keep) { await p.evaluate(() => { localStorage.clear(); localStorage.setItem('ett.notice', '1'); }); await p.reload(); await p.waitForFunction(() => window.__app); }
+  if (!opts.keep) { await p.evaluate(() => { localStorage.clear(); localStorage.setItem('ett.notice', '1'); localStorage.setItem('ett.tour', '1'); }); await p.reload(); await p.waitForFunction(() => window.__app); }
   else await p.evaluate(() => document.getElementById('modal').classList.remove('open'));
   await p.waitForTimeout(250);
   return p;
@@ -330,6 +330,27 @@ T('SC09', 'Scope', 'Menus follow the UTD2102CEL manual: SET TO ZERO, Window spli
   await app(p, () => { const s = __app.scope; s.press('CURSOR'); s.press('F0'); s.press('F0'); s.press('F0'); s.press('F1'); }); await p.waitForTimeout(200);
   const c = await app(p, () => __app.scope.cursorVals()); ok(c && isFinite(c.VA) && isFinite(c.VB), 'tracking cursor reads the trace ' + JSON.stringify(c));
   eq(await finite(p), [], 'non-finite');
+});
+
+T('WS08', 'Workspace', 'Welcome guide: after the first-start notice, every step points at its part of the screen, Skip/Esc close it, Settings shows it again, Arabic', async p => {
+  await p.evaluate(() => { localStorage.removeItem('ett.notice'); localStorage.removeItem('ett.tour'); }); await p.reload(); await p.waitForFunction(() => window.__app); await p.waitForTimeout(300);
+  ok(!(await app(p, () => __app.tour.open())), 'guide waits for the notice'); await p.click('#modalClose'); await p.waitForTimeout(500);
+  ok(await app(p, () => __app.tour.open()), 'guide opens after the notice');
+  let n = 0, seen = [];
+  while (await app(p, () => __app.tour.open()) && n < 20) {
+    const st = await app(p, () => { const c = document.querySelector('#tour .tourCard').getBoundingClientRect(); return { title: document.querySelector('#tourTitle').textContent, hole: document.querySelector('#tour .tourHole').dataset.target === '1', card: c.left >= 0 && c.top >= 0 && c.right <= innerWidth && c.bottom <= innerHeight, arrow: document.querySelector('#tour .tourLine').getAttribute('d') || '' }; });
+    ok(st.card, `card on screen at step ${n + 1}`); if (st.hole) ok(st.arrow.startsWith('M'), `arrow drawn at step ${n + 1}`); seen.push(st.hole);
+    await p.keyboard.press('ArrowRight'); n++; await p.waitForTimeout(80);
+  }
+  eq(n, 11, 'steps'); ok(seen.filter(Boolean).length >= 8, 'steps with a target'); ok(await app(p, () => localStorage.getItem('ett.tour') === '1'), 'remembered');
+  await p.reload(); await p.waitForFunction(() => window.__app); await p.waitForTimeout(800); ok(!(await app(p, () => __app.tour.open())), 'not shown again');
+  await p.click('#btnSettings'); await p.click('#btnTour'); await p.waitForTimeout(200); ok(await app(p, () => __app.tour.open()), 'Settings shows it again');
+  await p.keyboard.press('1'); eq(await app(p, () => __app.tour.open()), true, 'keys do not reach the app while the guide is open');
+  await p.click('#tour .tourSkip'); ok(!(await app(p, () => __app.tour.open())), 'Skip closes it');
+  await app(p, () => __app.setLang('ar')); await p.click('#btnSettings'); await p.click('#btnTour'); await p.waitForTimeout(200);
+  ok(/مرحباً/.test(await app(p, () => document.querySelector('#tourTitle').textContent)), 'Arabic'); await p.keyboard.press('ArrowLeft'); await p.waitForTimeout(100);
+  ok(/توصيل/.test(await app(p, () => document.querySelector('#tourTitle').textContent)), 'ArrowLeft goes forward in Arabic');
+  await p.keyboard.press('Escape'); ok(!(await app(p, () => __app.tour.open())), 'Esc closes it'); await app(p, () => __app.setLang('en'));
 });
 
 // ================================================================== 5. rail panels

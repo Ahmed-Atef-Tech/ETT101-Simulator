@@ -247,6 +247,43 @@ html[lang="ar"] .rintro, html[lang="ar"] .lnote { line-height: 1.85; }
 .send svg { width: 17px; height: 17px; }
 @media (max-width: 760px) { .rbody { grid-template-columns: 1fr; } .rtoc { display: none; } .lrow { grid-template-columns: 1fr auto; } .lpart, .lgo { display: none; } }
 @media (max-width: 1150px) { .leads .lbl, .brand .sub { display: none; } }
+
+/* ---------- welcome guide ---------- */
+#tour { position: fixed; inset: 0; z-index: 60; }
+#tour .tourDim { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; }
+#tour .tourHole { fill: rgba(8, 12, 16, .66); transition: d .32s cubic-bezier(.2,.8,.2,1); }
+#tour .tourRing { position: fixed; border: 3px solid var(--probe); border-radius: 12px; pointer-events: none; transition: all .32s cubic-bezier(.2,.8,.2,1); animation: tourPulse 1.6s ease-in-out infinite; }
+@keyframes tourPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(242,194,27,.55); } 50% { box-shadow: 0 0 0 9px rgba(242,194,27,0); } }
+#tour .tourArrow { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; overflow: visible; }
+#tour .tourLine[d=""] { display: none; }
+#tour .tourLine { stroke-dasharray: 9 7; animation: tourDash 1s linear infinite; filter: drop-shadow(0 1px 1px rgba(0,0,0,.6)); }
+@keyframes tourDash { to { stroke-dashoffset: -16; } }
+#tour .tourCard { position: fixed; padding: 16px 20px 14px; transition: left .32s cubic-bezier(.2,.8,.2,1), top .32s cubic-bezier(.2,.8,.2,1); box-shadow: 0 18px 40px rgba(0,0,0,.45); }
+#tour .tourCard h2 { font-size: 18px; margin: 4px 0 6px; }
+#tour .tourCard p { font-size: 15px; line-height: 1.6; margin: 0 0 12px; }
+html[lang="ar"] #tour .tourCard p { line-height: 1.85; }
+#tour .tArt { display: block; width: 100%; height: auto; max-height: 130px; margin: 0 0 6px; }
+#tour .tourFoot { display: flex; align-items: center; gap: 10px; }
+#tour .tourDots { display: inline-flex; gap: 5px; margin-inline-end: auto; } #tour .tourDots i { width: 7px; height: 7px; border-radius: 50%; background: #c3c8ca; } #tour .tourDots i.on { background: var(--ink); width: 18px; border-radius: 4px; }
+#tour .tourSkip { background: none; border: 0; color: var(--ink-2); font-size: 14px; cursor: pointer; padding: 6px 4px; text-decoration: underline; text-underline-offset: 3px; }
+#tour .tourNav { display: inline-flex; gap: 8px; }
+#tour .tourNav button { min-width: 84px; padding: 7px 14px; font-size: 14.5px; border-radius: 4px; border: 1px solid #9aa3a7; background: #fff; cursor: pointer; }
+#tour .tourNav button.primary { background: var(--ink); color: #fff; border-color: var(--ink); }
+#tour button:focus-visible { outline: 2px solid var(--probe); outline-offset: 2px; }
+#tour .tDraw { stroke-dasharray: 100; animation: tDraw 2.4s ease-in-out infinite; }
+@keyframes tDraw { 0% { stroke-dashoffset: 100; } 55%, 100% { stroke-dashoffset: 0; } }
+#tour .tHand { animation: tHand 2.4s ease-in-out infinite; }
+@keyframes tHand { 0% { transform: translate(70px, 52px); } 55%, 100% { transform: translate(240px, 70px); } }
+#tour .tWheel { animation: tWheel .9s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes tWheel { 0%, 100% { transform: translateY(-3px); } 50% { transform: translateY(3px); } }
+#tour .tUp { animation: tBob 1.2s ease-in-out infinite; } #tour .tDown { animation: tBob 1.2s ease-in-out infinite reverse; }
+@keyframes tBob { 0%, 100% { opacity: .25; } 50% { opacity: 1; } }
+#tour .tKey { animation: tPress 1.2s ease-in-out infinite; }
+@keyframes tPress { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(4px); } }
+#tour .tWave { animation: tBob 2s ease-in-out infinite; }
+#tour.still *, #tour.still .tourCard { animation: none !important; transition: none !important; }
+#tour.still .tDraw { stroke-dashoffset: 0; } #tour.still .tHand { transform: translate(240px, 70px); }
+@media (prefers-reduced-motion: reduce) { #tour * { animation: none !important; transition: none !important; } }
 </style>
 </head>
 <body class="training">
@@ -283,6 +320,7 @@ html[lang="ar"] .rintro, html[lang="ar"] .lnote { line-height: 1.85; }
   <div class="sep"></div>
   <button class="mi" id="btnHelp" data-t="help"></button>
   <button class="mi" id="btnScopeHelp" data-t="scopeHelp"></button>
+  <button class="mi" id="btnTour" data-t="tourAgain"></button>
   <button class="mi" id="btnAbout" data-t="about"></button>
   <div class="small" data-t="zoomHint"></div>
 </div>
