@@ -1,6 +1,2 @@
-- The lab sheet always opens on the right side of the screen, in English and in Arabic.
-- The button next to the lead colours now centres the view: after zooming or dragging away, one click brings the kit and the scope back. Full screen is still on the F key (and F11 in the desktop app).
-- Black leads are now a dark graphite grey, so they stand out against the black kit panel.
-- تظهر ورقة التجربة دائماً على يمين الشاشة، بالعربية وبالإنجليزية.
-- أصبح الزر المجاور لألوان الأسلاك زرَّ توسيط للعرض: بعد التكبير أو السحب بعيداً، تعيد نقرة واحدة الجهاز وراسم الإشارة إلى مكانهما. ويبقى ملء الشاشة على المفتاح F (و F11 في تطبيق سطح المكتب).
-- أصبح لون السلك الأسود رمادياً داكناً ليظهر بوضوح فوق لوحة الجهاز السوداء.
+- The top toolbar keeps the same layout in Arabic and English: same order, from left to right, with only the labels translated.
+- يحافظ شريط الأدوات العلوي على الترتيب نفسه بالعربية والإنجليزية، من اليسار إلى اليمين، مع ترجمة النصوص فقط.
