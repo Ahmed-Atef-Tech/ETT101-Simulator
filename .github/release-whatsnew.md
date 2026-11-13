@@ -1,5 +1,4 @@
-- Lab sheets for every experiment: the 13 Term 2 experiments and the 4 extra ones now have step-by-step sheets with wiring checks, like Term 1.
-- The Lab sheets list is grouped by topic: Basics, Analog communication, and Digital communication (sampling and pulse modulation, digital modulation, noise and bandwidth). Each sheet shows which book and experiment it comes from.
-- Every group in Load experiment now has its step-by-step sheet button.
-- ورق التجارب بقى لكل التجارب: الـ 13 تجربة بتوع الترم التاني والـ 4 الإضافيين بقى ليهم ورقة خطوة بخطوة مع التشييك على التوصيل، زي الترم الأول.
-- قائمة ورق التجارب متقسمة حسب الموضوع: أساسيات، والاتصالات التناظرية، والاتصالات الرقمية (أخذ العينات وتضمين النبضات، والتضمين الرقمي، والوشوشة وعرض النطاق). وكل ورقة مكتوب عليها جاية من أنهي كتاب وأنهي تجربة.
+- Lab sheets are easier to read: each step is now a short numbered list of actions, and the numbers are the step numbers in the book, so you can follow the sheet next to the book. The connections to make are listed under the steps.
+- The Arabic interface is now in simple Modern Standard Arabic, and English names and values inside Arabic text (module names, units, settings) display in the right order.
+- أصبحت أوراق التجارب أسهل في القراءة: كل خطوة الآن قائمة مرقّمة من الإجراءات القصيرة، والأرقام هي أرقام الخطوات في الكتاب، لتتابع الورقة بجانب الكتاب. والتوصيلات المطلوبة مذكورة أسفل الخطوات.
+- أصبحت الواجهة العربية بلغة عربية فصحى بسيطة، وتظهر الأسماء والقيم الإنجليزية داخل النص العربي (أسماء الوحدات ووحدات القياس والإعدادات) بترتيبها الصحيح.

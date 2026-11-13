@@ -21,6 +21,7 @@ const STR = {
     confirmClear: 'Remove every lead and probe from the kit?', badFile: 'This file is not a saved setup.', savedImage: 'Scope picture saved', savedSetup: 'Setup saved',
     guideTitle: 'Lab sheet', chooseExp: 'Choose an experiment', back: 'All experiments', prev: 'Previous', next: 'Next', showWiring: 'Show the wiring', step: 'Step', of: 'of', watch: 'Watch the video',
     videoSoon: 'Video coming soon', close: 'Close', spec: 'Specifications', use: 'Use',
+    connections: 'Connections', bookSteps: 'The numbers are the step numbers in the book.',
     input: 'Input', output: 'Output', ground: 'Ground', analog: 'analog (round)', digital: 'digital (square)', notConnected: 'Nothing connected', shorted: 'Two outputs are connected together',
     leadTip: 'Drag to move it out of the way, click to highlight, double-click to remove, right-click for colour', removeLead: 'Remove lead',
     probeTip: 'Drag to move it out of the way, click to highlight, double-click to remove', removeProbe: 'Remove probe', resetShape: 'Reset shape',
@@ -29,31 +30,32 @@ const STR = {
     colors: { red: 'Red', black: 'Black', yellow: 'Yellow', blue: 'Blue', green: 'Green' },
   },
   ar: {
-    appName: 'Telecoms-Trainer 101', appSub: 'محاكي', beta: 'نسخة أولية', betaHint: 'نسخة أولية: ممكن متكونش مطابقة للكيت الحقيقي 100%. مجانية وللطلبة بس.', about: 'عن البرنامج',
-    guidance: 'الإرشادات', modeHint: 'الإرشادات بتظهر زرار i وأسماء المقابس وقراءتها اللحظية وقيم المقابض. اقفلها علشان تتدرب زي امتحان المعمل.',
-    library: 'تحميل تجربة', libHint: 'تجارب جاهزة من كتب المعمل، ومعاها رقم الصفحة. ضغطة واحدة بتوصّل الكيت وتظبط الأوسيلوسكوب.',
-    reference: 'المرجع', refHint: 'مرجع الموديل: معادلة وأرقام كل بلوك، ومصدر كل رقم.',
-    libTitle: 'تجارب جاهزة', libTab_t1: 'الترم الأول', libTab_t2: 'الترم التاني', libTab_x: 'إضافية', libSearch: 'بحث', libLoad: 'تحميل', libExp: 'تجربة', libPart: 'Part',
-    libSheet: 'ورقة التجربة خطوة بخطوة', libReplace: 'تحميل التجربة هيشيل التوصيلات والإعدادات اللي على الكيت دلوقتي. تكمّل؟',
-    libBookNote: 'رقم الصفحة هو الرقم المكتوب على الصفحة نفسها. في ملف الـ PDF الصفحة بتزيد 2 (عشان الغلاف والفهرس في الأول).',
-    libEmonaNote: 'تجارب من كتب Emona مش موجودة في كتب المادة. الصفحة هي المكتوبة على الصفحة (رقم التجربة-رقم الصفحة)، و“PDF” هي رقم الصفحة في ملف الـ PDF.',
-    libAdapted: 'معدّلة: كتاب الـ DATEx بيستخدم مولّد إشارات NI ELVIS، وهنا الـ VCO بيعمل الدور ده.', libNone: 'مفيش تجربة بالاسم ده.',
-    refTitle: 'مرجع الموديل', refIntro: 'الحاجات اللي المحاكي مبني عليها: معادلة وقيم كل بلوك، ومصدر كل رقم، والحاجات اللي لسه محتاجة تتقاس على الكيت الحقيقي، والاختبارات قصاد كتب المعمل. المرجع مكتوب بالإنجليزي عشان المصطلحات تفضل زي الكتب.',
-    bug: 'بلّغ عن مشكلة', bugHint: 'فيه حاجة مش مظبوطة؟ ابعتها للمطوّر على واتساب.', bugTitle: 'بلّغ عن مشكلة',
-    bugWhat: 'إيه اللي حصل؟', bugSteps: 'كنت بتعمل إيه قبلها؟ (اختياري)', bugAttach: 'ابعت معاها رقم النسخة ونوع الجهاز والتوصيلات الحالية (بتساعد نلاقي المشكلة)',
-    bugSend: 'ابعت على واتساب', bugNote: 'واتساب هيفتح والرسالة مكتوبة جاهزة، دوس إرسال هناك. وتقدر تبعت صورة للشاشة في واتساب.', bugEmpty: 'اكتب إيه اللي حصل الأول.', bugOpened: 'اتفتح واتساب ومعاه البلاغ', bugBlocked: 'واتساب ما اتفتحش هنا (الشاشة دي بتمنع فتح نوافذ جديدة). افتح الرابط، أو انسخ البلاغ وابعته على واتساب للرقم', bugOpenLink: 'افتح واتساب', bugCopy: 'انسخ البلاغ', bugCopied: 'اتنسخ البلاغ',
-    experiments: 'أوراق التجارب', viewKit: 'الكيت', viewBoth: 'الاتنين', viewScope: 'الأوسيلوسكوب', fullscreen: 'ملء الشاشة', exitFullscreen: 'خروج من ملء الشاشة',
+    appName: 'Telecoms-Trainer 101', appSub: 'محاكي', beta: 'نسخة أولية', betaHint: 'نسخة أولية: قد لا تطابق الجهاز الحقيقي بنسبة 100%. مجانية ومخصّصة للطلاب فقط.', about: 'عن البرنامج',
+    guidance: 'الإرشادات', modeHint: 'تُظهر الإرشادات أزرار المعلومات (i) وأسماء المقابس مع قراءاتها اللحظية وقيم المقابض. أوقفها لتتدرّب كما في امتحان المعمل.',
+    library: 'تحميل تجربة', libHint: 'تجارب جاهزة من كتب المعمل مع رقم صفحة كل تجربة. بنقرة واحدة تُوصَّل الأسلاك ويُضبط راسم الإشارة.',
+    reference: 'المرجع', refHint: 'مرجع النموذج: معادلة كل وحدة وقيمها، ومصدر كل رقم.',
+    libTitle: 'تجارب جاهزة', libTab_t1: 'الترم الأول', libTab_t2: 'الترم الثاني', libTab_x: 'إضافية', libSearch: 'بحث', libLoad: 'تحميل', libExp: 'التجربة', libPart: 'الجزء',
+    libSheet: 'ورقة التجربة خطوة بخطوة', libReplace: 'تحميل التجربة يزيل الأسلاك والإعدادات الموجودة الآن على الجهاز. هل تريد المتابعة؟',
+    libBookNote: 'رقم الصفحة هو الرقم المطبوع على الصفحة نفسها. في ملف PDF يزيد رقم الصفحة بمقدار 2 (لأن الغلاف والفهرس يأتيان أولاً).',
+    libEmonaNote: 'تجارب من كتب Emona غير موجودة في كتب المقرر. الصفحة هي المطبوعة على الصفحة (رقم التجربة-رقم الصفحة)، و“PDF” هو رقم الصفحة في ملف PDF.',
+    libAdapted: 'مُعدَّلة: يستخدم كتاب DATEx مولّد الدوال في NI ELVIS، وهنا يقوم VCO بهذا الدور.', libNone: 'لا توجد تجربة تطابق البحث.',
+    refTitle: 'مرجع النموذج', refIntro: 'ما بُني عليه المحاكي: معادلة كل وحدة وقيمها، ومصدر كل رقم، وما زال يحتاج إلى قياس على الجهاز الحقيقي، والاختبارات المقارنة بكتب المعمل. المرجع مكتوب بالإنجليزية لتبقى المصطلحات كما في الكتب.',
+    bug: 'الإبلاغ عن مشكلة', bugHint: 'هل هناك خطأ؟ أرسله إلى المطوّر عبر واتساب.', bugTitle: 'الإبلاغ عن مشكلة',
+    bugWhat: 'ما المشكلة؟', bugSteps: 'ماذا كنت تفعل قبل حدوثها؟ (اختياري)', bugAttach: 'أرفق رقم النسخة ونوع الجهاز والتوصيلات الحالية (يساعد ذلك في إيجاد المشكلة)',
+    bugSend: 'أرسل عبر واتساب', bugNote: 'سيفتح واتساب والرسالة مكتوبة، فاضغط إرسال هناك. ويمكنك إرفاق صورة للشاشة في واتساب.', bugEmpty: 'اكتب المشكلة أولاً.', bugOpened: 'فُتح واتساب ومعه البلاغ', bugBlocked: 'لم يُفتح واتساب هنا (هذه النافذة تمنع فتح نوافذ جديدة). افتح الرابط، أو انسخ البلاغ وأرسله عبر واتساب إلى الرقم', bugOpenLink: 'افتح واتساب', bugCopy: 'انسخ البلاغ', bugCopied: 'نُسخ البلاغ',
+    experiments: 'أوراق التجارب', viewKit: 'الجهاز', viewBoth: 'كلاهما', viewScope: 'راسم الإشارة', fullscreen: 'ملء الشاشة', exitFullscreen: 'الخروج من ملء الشاشة',
     leads: 'لون السلك', settings: 'الإعدادات',
-    language: 'اللغة', sound: 'صوت السماعة', on: 'شغال', off: 'مقفول',
-    saveSetup: 'حفظ التوصيلات…', openSetup: 'فتح توصيلات…', clearLeads: 'فك كل الأسلاك', help: 'طريقة الاستخدام', scopeHelp: 'مساعدة الأوسيلوسكوب', zoomHint: 'Ctrl مع عجلة الماوس للتكبير عند المؤشر. اسحب في المساحة الفاضية علشان تتحرك. المفاتيح 1 و 2 و 3 بتبدّل العرض.',
-    confirmClear: 'فك كل الأسلاك والـ probes من الكيت؟', badFile: 'الملف ده مش ملف توصيلات محفوظ.', savedImage: 'اتحفظت صورة الشاشة', savedSetup: 'اتحفظت التوصيلات',
-    guideTitle: 'ورقة التجربة', chooseExp: 'اختار تجربة', back: 'كل التجارب', prev: 'السابق', next: 'التالي', showWiring: 'إظهار التوصيلة', step: 'خطوة', of: 'من', watch: 'شاهد الفيديو',
+    language: 'اللغة', sound: 'صوت السماعة', on: 'تشغيل', off: 'إيقاف',
+    saveSetup: 'حفظ التوصيلات…', openSetup: 'فتح توصيلات…', clearLeads: 'إزالة كل الأسلاك', help: 'طريقة الاستخدام', scopeHelp: 'مساعدة راسم الإشارة', zoomHint: 'Ctrl مع عجلة الفأرة للتكبير عند المؤشر. اسحب في المساحة الفارغة للتحرّك. المفاتيح 1 و 2 و 3 تبدّل طريقة العرض.',
+    confirmClear: 'هل تريد إزالة كل الأسلاك والمجسّات (probes) من الجهاز؟', badFile: 'هذا الملف ليس ملف توصيلات محفوظاً.', savedImage: 'حُفظت صورة الشاشة', savedSetup: 'حُفظت التوصيلات',
+    guideTitle: 'ورقة التجربة', chooseExp: 'اختر تجربة', back: 'كل التجارب', prev: 'السابق', next: 'التالي', showWiring: 'إظهار التوصيل', step: 'الخطوة', of: 'من', watch: 'شاهد الفيديو',
     videoSoon: 'الفيديو قريباً', close: 'إغلاق', spec: 'المواصفات', use: 'الاستخدام',
-    input: 'مدخل', output: 'مخرج', ground: 'أرضي', analog: 'analog (دائري)', digital: 'digital (مربع)', notConnected: 'مش متوصل بحاجة', shorted: 'فيه مخرجين متوصلين ببعض',
-    leadTip: 'اسحبه عشان تبعده عن الكلام، كليك تنوّره، دبل كليك للفك، وكليك يمين للون', removeLead: 'فك السلك',
-    probeTip: 'اسحبه عشان تبعده عن الكلام، كليك تنوّره، دبل كليك للفك', removeProbe: 'فك الـ probe', resetShape: 'رجّع شكله الأصلي',
-    hpOff: 'السماعة مش متركبة. دوس على فتحة السماعة في BUFFER علشان تركّبها.', hpOn: 'السماعة متركبة، والصوت طالع من سماعات الجهاز.', hpMuted: 'السماعة متركبة، والصوت مقفول من الإعدادات.',
-    hpUnplug: 'دوس علشان تفك السماعة',
+    connections: 'التوصيلات', bookSteps: 'الأرقام هي أرقام الخطوات في الكتاب.',
+    input: 'مدخل', output: 'مخرج', ground: 'أرضي', analog: 'تماثلي (دائري)', digital: 'رقمي (مربع)', notConnected: 'غير موصول بشيء', shorted: 'يوجد مخرجان موصولان معاً',
+    leadTip: 'اسحبه لإبعاده عن الطريق، وانقر لتمييزه، وانقر مرتين لإزالته، وانقر بالزر الأيمن لتغيير لونه', removeLead: 'إزالة السلك',
+    probeTip: 'اسحبه لإبعاده عن الطريق، وانقر لتمييزه، وانقر مرتين لإزالته', removeProbe: 'إزالة المجسّ', resetShape: 'إعادة الشكل الأصلي',
+    hpOff: 'السماعة غير موصولة. انقر على مقبس السماعة في BUFFER لتوصيلها.', hpOn: 'السماعة موصولة، والصوت يخرج من سماعات الجهاز.', hpMuted: 'السماعة موصولة، والصوت مُوقَف من الإعدادات.',
+    hpUnplug: 'انقر لفصل السماعة',
     colors: { red: 'أحمر', black: 'أسود', yellow: 'أصفر', blue: 'أزرق', green: 'أخضر' },
   },
 };
@@ -63,3 +65,21 @@ export const getLang = () => lang;
 export function setLang(l) { lang = l; try { localStorage.setItem('ett.lang', l); } catch (e) { } document.documentElement.lang = l; document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr'; }
 export const t = k => STR[lang][k] ?? STR.en[k] ?? k;
 export const tr = o => (o && typeof o === 'object') ? (o[lang] ?? o.en) : o;
+
+// Arabic text with Latin words in it (module names, units, values): each Latin run goes in an LTR <bdi>, so it keeps its
+// own order and doesn't scramble the sentence around it. English is returned as it is.
+const RUN = /(?:[+±−-](?=\d))?[A-Za-z0-9µ](?:[A-Za-z0-9µ°±×%&+.\/:'=()\-–−]|\s(?=[A-Za-z0-9µ°±×%&+=()\/\-–−]))*/g;
+function balance(r) {
+  let s = r;
+  for (;;) {
+    const o = (s.match(/\(/g) || []).length, c = (s.match(/\)/g) || []).length;
+    if (/[\s.:]$/.test(s)) s = s.slice(0, -1);
+    else if ((c > o && s.endsWith(')')) || (o > c && s.endsWith('('))) s = s.slice(0, -1);
+    else return s;
+  }
+}
+export function bidi(text) {
+  if (lang !== 'ar' || typeof text !== 'string') return text;
+  return text.replace(RUN, r => { const k = balance(r); return `<bdi dir="ltr">${k}</bdi>${r.slice(k.length)}`; });
+}
+export const trb = o => bidi(tr(o));

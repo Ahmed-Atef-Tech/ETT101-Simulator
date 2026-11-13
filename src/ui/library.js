@@ -4,7 +4,7 @@ import SETUPS from 'virtual:setups';
 import specMd from '../../SPEC.md';
 import { marked } from 'marked';
 import { BOOKS, GROUPS } from './catalog.js';
-import { t, getLang } from './i18n.js';
+import { t, getLang, bidi } from './i18n.js';
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -32,7 +32,7 @@ export function initLibrary({ restore, toast, hasWork, openGuide, onLoaded }) {
     const where = m ? `${esc(ar ? WORDS[m[1]] || m[1] : m[1])} ${num(m[2])}` : '';
     return `<li><button class="lrow" data-f="${esc(it.f)}">
       <span class="lpart">${esc(part)}</span>
-      <span class="lname">${esc(ar ? it.ar : it.en)}${where ? `<span class="lwhere">${where}</span>` : ''}</span>
+      <span class="lname">${bidi(esc(ar ? it.ar : it.en))}${where ? `<span class="lwhere">${where}</span>` : ''}</span>
       <span class="lpage">${p.n ? `<b>${p.word} ${num(p.n)}</b>` : ''}<span>PDF ${num(p.pdf)}</span></span>
       <span class="lgo">${t('libLoad')}</span></button></li>`;
   }
@@ -42,7 +42,7 @@ export function initLibrary({ restore, toast, hasWork, openGuide, onLoaded }) {
     const range = g.pages ? `<span class="grange">${ar ? 'صفحات' : 'pp.'} ${num(g.pages)}</span>` : '';
     const sheet = g.guide ? `<button class="gsheet" data-g="${g.guide}">${t('libSheet')}</button>` : '';
     const emona = g.emona ? `<span class="gemona"><bdi>Emona ${esc(g.emona)}</bdi></span>` : '';
-    return `<section class="lgrp"><h3>${gn}<span class="gname">${esc(ar ? g.ar : g.en)}</span>${range}${sheet}</h3>
+    return `<section class="lgrp"><h3>${gn}<span class="gname">${bidi(esc(ar ? g.ar : g.en))}</span>${range}${sheet}</h3>
       ${emona || g.adapted ? `<div class="gmeta">${emona}${g.adapted ? `<span class="gadapt">${t('libAdapted')}</span>` : ''}</div>` : ''}
       <ul>${items.map(it => itemHtml(g, it)).join('')}</ul></section>`;
   }

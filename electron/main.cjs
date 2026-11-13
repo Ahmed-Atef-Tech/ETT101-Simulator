@@ -54,8 +54,8 @@ function setupUpdates() {
     told.add('a' + info.version);
     const r = await ask({
       title: 'تحديث جديد / Update available',
-      message: `فيه نسخة جديدة: ${info.version}\nA new version is available: ${info.version}`,
-      detail: `النسخة اللي عندك: ${app.getVersion()}\nدوس "تنزيل" وهتفتح صفحة التحميل. نزّل ملف الـ dmg واسحب البرنامج لـ Applications مكان القديم.`,
+      message: `توجد نسخة جديدة: ${info.version}\nA new version is available: ${info.version}`,
+      detail: `نسختك الحالية: ${app.getVersion()}\nاضغط "تنزيل" لفتح صفحة التحميل. نزّل ملف dmg واسحب البرنامج إلى Applications بدلاً من النسخة القديمة.`,
       buttons: ['تنزيل / Download', 'لاحقاً / Later'],
     });
     if (r.response === 0) shell.openExternal('https://ahmed-atef-tech.github.io/ETT101-Simulator/'); // the download page; it always links the latest release
@@ -66,8 +66,8 @@ function setupUpdates() {
     told.add('d' + info.version);
     const r = await ask({
       title: 'التحديث جاهز / Update ready',
-      message: `النسخة ${info.version} اتنزّلت وجاهزة.\nVersion ${info.version} has been downloaded.`,
-      detail: 'لو اخترت "لاحقاً"، هتتركب لوحدها أول ما تقفل البرنامج.\nIf you choose Later, it installs automatically when you close the app.',
+      message: `نُزّلت النسخة ${info.version} وهي جاهزة.\nVersion ${info.version} has been downloaded.`,
+      detail: 'إذا اخترت "لاحقاً"، فستُثبَّت تلقائياً عند إغلاق البرنامج.\nIf you choose Later, it installs automatically when you close the app.',
       buttons: ['إعادة التشغيل الآن / Restart now', 'لاحقاً / Later'],
     });
     if (r.response === 0) setImmediate(() => autoUpdater.quitAndInstall(true, true));
