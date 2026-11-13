@@ -1,1 +1,5 @@
-- Shorter preliminary-version notice in the app and on the download page: when the simulator and the real kit differ, the real kit is the reference.
+- Lab sheets for every experiment: the 13 Term 2 experiments and the 4 extra ones now have step-by-step sheets with wiring checks, like Term 1.
+- The Lab sheets list is grouped by topic: Basics, Analog communication, and Digital communication (sampling and pulse modulation, digital modulation, noise and bandwidth). Each sheet shows which book and experiment it comes from.
+- Every group in Load experiment now has its step-by-step sheet button.
+- ورق التجارب بقى لكل التجارب: الـ 13 تجربة بتوع الترم التاني والـ 4 الإضافيين بقى ليهم ورقة خطوة بخطوة مع التشييك على التوصيل، زي الترم الأول.
+- قائمة ورق التجارب متقسمة حسب الموضوع: أساسيات، والاتصالات التناظرية، والاتصالات الرقمية (أخذ العينات وتضمين النبضات، والتضمين الرقمي، والوشوشة وعرض النطاق). وكل ورقة مكتوب عليها جاية من أنهي كتاب وأنهي تجربة.

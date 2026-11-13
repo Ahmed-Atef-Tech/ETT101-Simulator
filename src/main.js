@@ -8,6 +8,7 @@ import { Wires, LEAD_COLORS } from './ui/wires.js';
 import { Audio } from './ui/audio.js';
 import { SOCKET_NAME, SOCKET_POS, BLOCKS } from './ui/layout.js';
 import { MODULE_INFO, HELP_LINKS, HELP, EXPERIMENTS, NOTICE } from './ui/content.js';
+import { SHEETS, SECTIONS, T1_SRC } from './ui/sheets.js';
 import { t, tr, getLang, setLang } from './ui/i18n.js';
 import { initLibrary } from './ui/library.js';
 
@@ -233,6 +234,9 @@ function flash([x1, y1, x2, y2]) { const r = el('rect', { x: x1 + 2, y: y1 + 2, 
 
 // =============================================== lab sheet (experiment guide) ===============================================
 let exp = null, stepI = 0, ghost = false;
+// every lab sheet: Term 1 (content.js) and Term 2 / extra (sheets.js), looked up by id
+const ALL_SHEETS = [...EXPERIMENTS.map((x, i) => ({ ...x, src: T1_SRC(i + 1) })), ...SHEETS];
+const SHEET_BY_ID = Object.fromEntries(ALL_SHEETS.map(x => [x.id, x]));
 const sameNet = (a, b) => sim.netOf(a) === sim.netOf(b);
 const probeOk = (ch, s) => sim.probes[ch] && sameNet(sim.probes[ch], s);
 const stepDone = st => (st.c || st.p) && (st.c || []).every(([a, b]) => sameNet(a, b)) && Object.entries(st.p || {}).every(([ch, s]) => probeOk(ch, s));
@@ -241,15 +245,24 @@ function renderGuide() {
   const g = $('#guide');
   const head = title => `<div class="sheetHead"><h2>${title}</h2><button class="x" id="gClose" aria-label="${t('close')}">${X_ICON}</button></div>`;
   if (!exp) {
-    g.innerHTML = head(t('guideTitle')) + `<ol class="explist">${EXPERIMENTS.map((x, i) => `<li><button data-e="${x.id}"><span class="n">${i + 1}</span><span>${tr(x.title)}</span></button></li>`).join('')}</ol>`;
-    g.querySelectorAll('[data-e]').forEach(b => b.onclick = () => { exp = EXPERIMENTS.find(x => x.id === b.dataset.e); stepI = 0; renderGuide(); });
+    let lastGroup = null;
+    const secs = SECTIONS.map(sec => {
+      const items = sec.ids.map(id => SHEET_BY_ID[id]).filter(Boolean)
+        .map(x => `<li><button data-e="${x.id}"><span>${tr(x.title)}</span><span class="src">${tr(x.src)}</span></button></li>`).join('');
+      const list = `<ol class="explist">${items}</ol>`;
+      if (!sec.group) { lastGroup = null; return `<h3>${tr(sec)}</h3>${list}`; }
+      const grp = sec.group.en !== lastGroup ? `<h3>${tr(sec.group)}</h3>` : ''; lastGroup = sec.group.en;
+      return `${grp}<h4>${tr(sec)}</h4>${list}`;
+    }).join('');
+    g.innerHTML = head(t('guideTitle')) + `<div class="sheetList">${secs}</div>`;
+    g.querySelectorAll('[data-e]').forEach(b => b.onclick = () => { exp = SHEET_BY_ID[b.dataset.e]; stepI = 0; renderGuide(); });
   } else {
-    const st = exp.steps[stepI], n = EXPERIMENTS.indexOf(exp) + 1;
+    const st = exp.steps[stepI];
     const checks = [...(st.c || []).map(([a, b]) => [sameNet(a, b), `<bdi>${SOCKET_NAME[a]}</bdi> → <bdi>${SOCKET_NAME[b]}</bdi>`]),
       ...Object.entries(st.p || {}).map(([ch, s]) => [probeOk(ch, s), `<bdi>${ch}</bdi> → <bdi>${SOCKET_NAME[s]}</bdi>`])];
     g.innerHTML = head(t('guideTitle')) + `
       <button class="crumb" id="gBack">${t('back')}</button>
-      <div class="expTitle">${n}. ${tr(exp.title)}</div>
+      <div class="expTitle">${tr(exp.title)}<span class="src">${tr(exp.src)}</span></div>
       <div class="stepbar">${exp.steps.map((s, i) => `<button data-i="${i}" class="${i === stepI ? 'cur' : ''} ${stepDone(s) ? 'done' : ''}" title="${t('step')} ${i + 1}">${i + 1}</button>`).join('')}</div>
       <p class="stepText">${tr(st)}</p>
       ${checks.length ? `<ul class="checks" dir="ltr">${checks.map(([ok, txt]) => `<li class="${ok ? 'ok' : ''}"><span class="box">${ok ? '✓' : ''}</span><span>${txt}</span></li>`).join('')}</ul>` : ''}
@@ -350,7 +363,7 @@ function restore(s) {
   }
   sim.headphones = !!s.headphones; sim.rebuild(); wires.render(); panel.refreshAll(); drawHeadphones();
 }
-function openGuideFor(id) { exp = EXPERIMENTS.find(x => x.id === id) || null; stepI = 0; if (!training) setTraining(true); $('#guide').classList.add('open'); renderGuide(); }
+function openGuideFor(id) { exp = SHEET_BY_ID[id] || null; stepI = 0; if (!training) setTraining(true); $('#guide').classList.add('open'); renderGuide(); }
 let lastLoaded = null; // the ready-made experiment on the kit, until the wiring changes
 const library = initLibrary({ restore, toast, hasWork: () => sim.leads.length > 0 || !!(sim.probes.CH1 || sim.probes.CH2), openGuide: openGuideFor, onLoaded: x => { lastLoaded = { ...x, leads: JSON.stringify(sim.leads.map(l => [l.a, l.b])) }; } });
 
@@ -440,4 +453,4 @@ function loop(now) {
 }
 requestAnimationFrame(loop);
 window.__sim = sim; window.__perf = () => loadAvg;
-window.__app = { sim, wires, scope, panel, restore, snapshot, setView, setLang: l => { setLang(l); applyTexts(); } };
+window.__app = { sim, wires, scope, panel, restore, snapshot, setView, sheets: ALL_SHEETS, sections: SECTIONS, setLang: l => { setLang(l); applyTexts(); } };

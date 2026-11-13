@@ -317,16 +317,44 @@ T('SC08', 'Scope', 'Scope help opens from the HELP key and from Settings', async
 
 // ================================================================== 5. rail panels
 T('RL01', 'Rail', 'Lab sheets: every experiment, every step, prev/next, step buttons, show wiring', async p => {
-  await p.click('#btnGuide'); const n = await app(p, () => document.querySelectorAll('.explist [data-e]').length); eq(n, 7, 'experiments in the lab sheet');
+  await p.click('#btnGuide'); const n = await app(p, () => document.querySelectorAll('.explist [data-e]').length); eq(n, 24, 'lab sheets in the list (7 Term 1 + 13 Term 2 + 4 extra)');
   for (let i = 0; i < n; i++) {
     await app(p, i => document.querySelectorAll('.explist [data-e]')[i].click(), i); await p.waitForTimeout(40);
-    const steps = await app(p, () => document.querySelectorAll('.stepbar button').length); ok(steps >= 3, 'steps ' + steps);
+    const steps = await app(p, () => document.querySelectorAll('.stepbar button').length); ok(steps >= 2, 'steps ' + steps);
     await p.check('#gGhost'); for (let s = 1; s < steps; s++) { await p.click('#gNext'); }
     ok(await app(p, () => document.querySelector('#gNext').disabled), 'next not disabled on the last step');
     await app(p, () => document.querySelector('.stepbar button').click()); ok(await app(p, () => document.querySelector('#gPrev').disabled), 'prev not disabled on step 1');
     await p.click('#gBack');
   }
   await p.click('#gClose'); ok(!(await app(p, () => document.querySelector('#guide').classList.contains('open'))), 'close');
+});
+T('RL11', 'Rail', 'Lab sheets: grouped by topic, every sheet listed once, every library group links to a sheet', async p => {
+  const r = await app(p, () => { const ids = __app.sections.flatMap(s => s.ids); return { ids, all: __app.sheets.map(x => x.id) }; });
+  eq(new Set(r.ids).size, r.ids.length, 'a sheet listed twice'); eq([...r.ids].sort().join(), [...r.all].sort().join(), 'sections and sheets differ');
+  await p.click('#btnGuide');
+  const heads = await app(p, () => [...document.querySelectorAll('.sheetList h3, .sheetList h4')].map(h => h.textContent));
+  ok(heads.includes('Analog communication') && heads.includes('Digital communication') && heads.includes('Digital modulation') && heads.filter(h => h === 'Digital communication').length === 1, 'section headings ' + heads.join(' | '));
+  ok(await app(p, () => /Term 2 · Exp 4/.test(document.querySelector('.explist [data-e="s15"]').textContent)), 'source tag');
+  await p.click('#gClose'); await p.click('#btnLib');
+  for (const tab of ['t1', 't2', 'x']) {
+    await p.click(`.ltab[data-tab="${tab}"]`);
+    const gs = await app(p, () => [...document.querySelectorAll('.gsheet')].map(b => b.dataset.g));
+    const groups = await app(p, () => document.querySelectorAll('.lgrp').length);
+    eq(gs.length, groups, 'groups without a sheet in tab ' + tab); for (const g of gs) ok(r.all.includes(g), 'unknown sheet ' + g);
+  }
+});
+T('RL12', 'Rail', 'Every lab-sheet step that builds a figure ticks when that figure\'s setup is loaded', async p => {
+  const steps = await app(p, () => __app.sheets.flatMap(x => x.steps.map((s, i) => ({ id: x.id, i, w: s.w, n: (s.c || []).length + Object.keys(s.p || {}).length })).filter(s => s.w)));
+  ok(steps.length >= 50, 'steps with a setup: ' + steps.length);
+  for (const s of steps) {
+    ok(s.n > 0, `${s.id} step ${s.i + 1} has no checks`);
+    await loadSetup(p, s.w);
+    const done = await app(p, s => { const app = __app; const ex = app.sheets.find(x => x.id === s.id), st = ex.steps[s.i];
+      const net = (a, b) => app.sim.netOf(a) === app.sim.netOf(b);
+      const bad = [...(st.c || []).filter(([a, b]) => !net(a, b)).map(x => x.join('>')), ...Object.entries(st.p || {}).filter(([ch, v]) => !(app.sim.probes[ch] && net(app.sim.probes[ch], v))).map(x => x.join('='))];
+      return bad; }, s);
+    eq(done.join(' '), '', `${s.id} step ${s.i + 1} (${s.w}) not ticked`);
+  }
 });
 T('RL02', 'Rail', 'Lab sheet ticks a step when its wiring is on the kit', async p => {
   await loadSetup(p, 'Term1/01-Exp1-AM-Modulation');
