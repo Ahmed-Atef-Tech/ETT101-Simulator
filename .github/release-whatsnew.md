@@ -1,8 +1,6 @@
-- **Web version for phones and computers:** open https://ahmed-atef-tech.github.io/ETT101-Simulator/app/ in Chrome or Safari, on Android, iPhone or any computer, with nothing to install. All the simulation runs on your own device. After the first visit it works offline, and *Add to Home screen* keeps it as an app.
-- **Touch controls:** pinch with two fingers to zoom and drag the bench to move; a finger only has to land near a socket; tap a lead twice to remove it; hold it for its menu. Knobs, scope keys and switches work by touch.
-- **Made for phone screens:** the toolbar folds up on small screens, panels fit short screens, a "turn your phone sideways" screen appears in portrait, and the tips, the welcome guide and the How to use page speak about touch on phones and tablets and about the mouse on computers.
-- **Slow devices:** the oscilloscope redraws less often when the device can't keep up, so wiring and knobs stay smooth.
-- **نسخة ويب للهاتف والكمبيوتر:** افتح https://ahmed-atef-tech.github.io/ETT101-Simulator/app/ في Chrome أو Safari على أندرويد أو آيفون أو أي كمبيوتر، من غير تثبيت. المحاكاة كلها تعمل على جهازك. وبعد أول فتحة تعمل من غير إنترنت، و«إضافة إلى الشاشة الرئيسية» تحفظها كتطبيق.
-- **التحكم باللمس:** كبّر بإصبعين واسحب للتحرك، ويكفي أن تضع إصبعك قرب المقبس، واضغط على السلك مرتين لإزالته، واضغط عليه مطوّلاً لقائمته. والمقابض وأزرار راسم الإشارة والمفاتيح تعمل باللمس.
-- **مناسبة لشاشة الهاتف:** يصغر شريط الأدوات على الشاشات الصغيرة، وتتسع القوائم للشاشات القصيرة، وتظهر رسالة «أدِر هاتفك بالعرض» عند الوضع الطولي. والتلميحات والدليل التعريفي وصفحة طريقة الاستخدام تتكلم عن اللمس على الهاتف والتابلت، وعن الفأرة على الكمبيوتر.
-- **الأجهزة البطيئة:** يُحدّث راسم الإشارة شاشته بمعدل أقل عندما لا يستطيع الجهاز المتابعة، فيبقى التوصيل وتدوير المقابض سلساً.
+- **Connect a socket to the scope without a long lead:** on a phone or tablet, hold your finger on any kit socket for a moment (a ring fills around it). A menu opens: *Connect to CH1*, *Connect to CH2* or *Connect to EXT TRIG*, and the channel turns on by itself. Hold it again to disconnect.
+- **Lead by two taps:** in the same menu, *Lead to another socket…* then tap the other socket. Handy when the two sockets are far apart on a small screen. *Cancel* stops it.
+- **On a computer:** right-click a socket for the same menu.
+- **توصيل مقبس براسم الإشارة بدون سحب سلك طويل:** على الهاتف أو التابلت اضغط بإصبعك على أي مقبس في الجهاز لحظة (تمتلئ حلقة حوله)، فتظهر قائمة: «توصيل بـ CH1» أو «توصيل بـ CH2» أو «توصيل بـ EXT TRIG»، وتعمل القناة تلقائياً. واضغط عليه مطوّلاً مرة أخرى للفصل.
+- **سلك بضغطتين:** من نفس القائمة اختر «سلك إلى مقبس آخر…» ثم اضغط على المقبس الآخر. مفيد عندما يكون المقبسان بعيدين على شاشة صغيرة. و«إلغاء» يوقفه.
+- **على الكمبيوتر:** انقر بالزر الأيمن على المقبس لنفس القائمة.

@@ -61,6 +61,8 @@ const hooks = {
   hoverTarget: () => { },
   hoverLead: (l, e) => { if (l && training) showTip(l.probe ? `<bdi>${l.probe}</bdi> ⟷ <bdi>${SOCKET_NAME[sim.probes[l.probe]] || ''}</bdi><br><span class="dim">${t('probeTip')}</span>` : `<bdi>${SOCKET_NAME[l.a]}</bdi> ⟷ <bdi>${SOCKET_NAME[l.b]}</bdi><br><span class="dim">${t('leadTip')}</span>`, e); else hideTip(); },
   leadMenu: (l, e) => leadMenu(l, e),
+  socketMenu: (hit, e) => socketMenu(hit, e),
+  pendingDone: ok => { $('#pendBar').hidden = true; if (ok) toast(t('connected')); },
 };
 const panel = new Panel(benchG, sim, hooks);
 const scope = new Scope(benchG, sim, hooks);
@@ -167,7 +169,12 @@ const touchEnd = e => {
 window.addEventListener('pointerup', touchEnd, { capture: true }); window.addEventListener('pointercancel', touchEnd, { capture: true });
 // the page itself never zooms on a phone (Safari ignores user-scalable)
 ['gesturestart', 'gesturechange'].forEach(t => document.addEventListener(t, e => e.preventDefault()));
-svg.addEventListener('contextmenu', e => { if (suppressCtx) { e.preventDefault(); suppressCtx = false; return; } if (!e.target.closest('.lead')) e.preventDefault(); });
+svg.addEventListener('contextmenu', e => {
+  if (suppressCtx) { e.preventDefault(); suppressCtx = false; return; }
+  if (e.target.closest('.lead')) return; e.preventDefault();
+  const sk = e.target.closest('[data-socket]'), bn = e.target.closest('[data-bnc]'); // right-click a socket: the same menu as holding it on a phone
+  if (sk && !e.target.closest('[data-lead-of]')) socketMenu({ sock: sk.getAttribute('data-socket') }, e); else if (bn) socketMenu({ bnc: bn.getAttribute('data-bnc') }, e);
+});
 // full screen
 // Centre button: after zooming or dragging away, bring back the last fitted view (Kit, Both or Scope)
 function toggleFull() { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen().catch(() => { }); }
@@ -232,8 +239,28 @@ function leadMenu(l, e) {
     if (ev.target.classList.contains('rm')) { if (l.probe) wires.setProbe(l.probe, null); else wires.removeLead(l.id); }
     closeMenus();
   });
-  document.body.appendChild(m);
+  document.body.appendChild(m); placeMenu(m);
 }
+// keep a pop-up menu fully on screen (phones)
+function placeMenu(m) { const r = m.getBoundingClientRect(); m.style.left = Math.max(6, Math.min(innerWidth - r.width - 6, r.left)) + 'px'; m.style.top = Math.max(52, Math.min(innerHeight - r.height - 6, r.top)) + 'px'; }
+// a socket's menu (hold it on a phone, right-click it with a mouse): send it to the scope, or tap the other end of a lead
+function socketMenu(hit, e) {
+  closeMenus(); const m = document.createElement('div'); m.className = 'ctx sockMenu'; m.style.left = e.clientX + 'px'; m.style.top = e.clientY + 'px';
+  const P = sim.probes;
+  if (hit.sock) {
+    const ch = c => P[c] === hit.sock ? `<button data-off="${c}">${t('probeOff').replace('{ch}', c === 'EXT' ? 'EXT TRIG' : c)}</button>` : `<button data-ch="${c}">${t('probeTo').replace('{ch}', c === 'EXT' ? 'EXT TRIG' : c)}</button>`;
+    m.innerHTML = `<div class="mh"><bdi>${SOCKET_NAME[hit.sock] || hit.sock}</bdi></div>${ch('CH1')}${ch('CH2')}${ch('EXT')}<button data-lead="1">${t('leadToOther')}</button>`;
+  } else m.innerHTML = `<div class="mh"><bdi>${hit.bnc === 'EXT' ? 'EXT TRIG' : hit.bnc}</bdi></div><button data-lead="1">${t('probeToSocket')}</button>` + (P[hit.bnc] ? `<button data-off="${hit.bnc}">${t('removeProbe')}</button>` : '');
+  m.addEventListener('click', ev => {
+    const b = ev.target.closest('button'); if (!b) return;
+    if (b.dataset.ch) { const c = b.dataset.ch; wires.connect({ bnc: c }, hit); if (c !== 'EXT') scope.st.ch[c].on = true; toast(`${c === 'EXT' ? 'EXT TRIG' : c} ⟷ ${SOCKET_NAME[hit.sock] || hit.sock}`); }
+    if (b.dataset.off) wires.setProbe(b.dataset.off, null);
+    if (b.dataset.lead) { wires.setPending(hit); $('#pendText').textContent = t(hit.sock ? 'tapOtherEnd' : 'tapSocketForProbe'); $('#pendBar').hidden = false; }
+    closeMenus();
+  });
+  document.body.appendChild(m); placeMenu(m);
+}
+$('#pendCancel').onclick = () => { wires.setPending(null); $('#pendBar').hidden = true; };
 function closeMenus() { document.querySelectorAll('.ctx').forEach(x => x.remove()); }
 window.addEventListener('pointerdown', e => {
   if (!e.target.closest('.ctx')) closeMenus();

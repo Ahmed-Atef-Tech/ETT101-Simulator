@@ -461,6 +461,34 @@ T('MB04', 'Phone', 'Touch controls: a knob turns by dragging around it, scope ke
   ok(await q.evaluate(() => __app.sim.leads.length > 0), 'experiment loaded'); await q.ctxDone();
 });
 
+T('MB05', 'Phone', 'Hold a socket: its menu connects it to CH1 / CH2 / EXT, or starts a lead finished by tapping the other socket; a mouse right-click gives the same menu', async p => {
+  const q = await phone(p, 'Pixel 7 landscape', 'ar'); await q.evaluate(() => __app.setView('both')); await q.waitForTimeout(300);
+  const s1 = await sockAtScreen(q, 'master.SINE2');
+  await q.tapAt(s1, 1000); await q.waitForTimeout(150);
+  const items = await q.evaluate(() => [...document.querySelectorAll('.sockMenu button')].map(b => b.textContent));
+  ok(items.length === 4 && /CH1/.test(items[0]) && /CH2/.test(items[1]), 'socket menu: ' + JSON.stringify(items));
+  ok(await q.evaluate(() => { const r = document.querySelector('.sockMenu').getBoundingClientRect(); return r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight; }), 'menu on screen');
+  eq(await q.evaluate(() => __app.sim.leads.length), 0, 'holding did not start a lead');
+  await q.tap('.sockMenu [data-ch="CH2"]'); await q.waitForTimeout(150);
+  eq(await q.evaluate(() => [__app.sim.probes.CH2, __app.scope.st.ch.CH2.on]), ['master.SINE2', true], 'Connect to CH2 (and CH2 on)');
+  await q.tapAt(s1, 1000); await q.waitForTimeout(150); ok(await q.evaluate(() => !!document.querySelector('.sockMenu [data-off="CH2"]')), 'menu offers Disconnect CH2'); await q.tap('.sockMenu [data-off="CH2"]');
+  eq(await q.evaluate(() => __app.sim.probes.CH2), null, 'Disconnect CH2');
+  // lead by two taps
+  await q.tapAt(s1, 1000); await q.waitForTimeout(150); await q.tap('.sockMenu [data-lead]'); await q.waitForTimeout(100);
+  ok(await q.evaluate(() => !document.getElementById('pendBar').hidden && !!document.querySelector('.pendingRing')), 'tap-the-other-end bar and ring');
+  const s2 = await sockAtScreen(q, 'mult1.YAC'); await q.tapAt(s2); await q.waitForTimeout(150);
+  eq(await q.evaluate(() => __app.sim.leads.map(l => [l.a, l.b].sort().join(' '))), ['master.SINE2 mult1.YAC'], 'lead made by two taps');
+  ok(await q.evaluate(() => document.getElementById('pendBar').hidden && !document.querySelector('.pendingRing')), 'bar gone');
+  // cancel
+  await q.tapAt(s2, 1000); await q.waitForTimeout(150); await q.tap('.sockMenu [data-lead]'); await q.tap('#pendCancel'); await q.tapAt(s1); await q.waitForTimeout(100);
+  eq(await q.evaluate(() => __app.sim.leads.length), 1, 'cancel: no second lead');
+  // a short tap or a drag still works as before (no menu)
+  await q.tapAt(s1, 200); ok(await q.evaluate(() => !document.querySelector('.sockMenu')), 'short tap: no menu'); await q.ctxDone();
+  // desktop: right-click a socket
+  const c = await sock(p, 'master.SINE100'); await p.mouse.click(c.x, c.y, { button: 'right' }); await p.waitForTimeout(100);
+  await p.click('.sockMenu [data-ch="CH1"]'); eq(await app(p, () => __app.sim.probes.CH1), 'master.SINE100', 'right-click a socket → Connect to CH1');
+});
+
 // ================================================================== 5. rail panels
 T('RL01', 'Rail', 'Lab sheets: every experiment, every step, prev/next, step buttons, show wiring', async p => {
   await p.click('#btnGuide'); const n = await app(p, () => document.querySelectorAll('.explist [data-e]').length); eq(n, 24, 'lab sheets in the list (7 Term 1 + 13 Term 2 + 4 extra)');

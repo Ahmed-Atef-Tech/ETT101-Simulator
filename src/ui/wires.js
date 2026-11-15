@@ -4,6 +4,7 @@ import { SOCKET_POS } from './layout.js';
 
 export const LEAD_COLORS = { red: '#d3261f', black: '#4a5057', yellow: '#f2c21b', blue: '#1f5fd1', green: '#1f9a45' };
 const DARK = { red: '#7c120e', black: '#16191c', yellow: '#94720a', blue: '#0e3274', green: '#0d5023' };
+const HOLD_MS = 800; // touch: hold a socket this long (a ring fills meanwhile) for its menu
 const PROBE_TAG = { CH1: '#f2d21b', CH2: '#35d0f0', EXT: '#c8c8c8' };
 
 export class Wires {
@@ -38,8 +39,10 @@ export class Wires {
     for (const ch of ['CH1', 'CH2', 'EXT']) test(this.scope.bncPos(ch), { bnc: ch });
     return best;
   }
+  endHold() { if (this.hold) { clearTimeout(this.hold.t); this.hold.ring.remove(); this.hold = null; } }
   // a second finger landed (pinch): drop whatever the first finger started
   cancel() {
+    this.endHold();
     if (this.tmp) { this.tmp.path.remove(); this.tmp = null; this.svg.classList.remove('dragging'); this.hooks.hoverTarget(null); }
     if (this.bendDrag) { const bd = this.bendDrag; clearTimeout(bd.press); this.bendDrag = null; this.svg.classList.remove('bending'); if (bd.moved) this.hooks.changed(); }
   }
@@ -48,9 +51,27 @@ export class Wires {
   pos(sock) { return SOCKET_POS[sock]; }
 
   // ---------- creating leads by dragging ----------
+  // after "lead to another socket" (or "probe to a socket") the next tap on a socket makes the connection
+  setPending(from) {
+    this.layer.querySelectorAll('.pendingRing').forEach(x => x.remove()); this.pending = from || null; if (!from) return;
+    const p = from.sock ? this.pos(from.sock) : this.scope.bncPos(from.bnc);
+    el('circle', { class: 'pendingRing', cx: p[0], cy: p[1], r: from.bnc ? 26 : 16, fill: 'none', 'pointer-events': 'none' }, this.dragG);
+  }
+  connect(a, b) { // a and b: { sock } or { bnc }; returns true when something was connected
+    if (a.sock && b.sock && a.sock !== b.sock) { this.addLead(a.sock, b.sock, this.color); this.hooks.plugged(); return true; }
+    const bnc = a.bnc || b.bnc, sock = a.sock || b.sock;
+    if (bnc && sock && !(a.bnc && b.bnc)) { this.probeColor[bnc] = this.color; this.setProbe(bnc, sock); this.hooks.plugged(); return true; }
+    return false;
+  }
   down(e) {
     if (e.button !== 0) return;
     const hit = this.sockAt(e);
+    if (this.pending && hit) { // the other end of a lead started from a menu
+      e.preventDefault(); const from = this.pending; this.setPending(null);
+      if (!(from.sock && from.sock === hit.sock) && !(from.bnc && from.bnc === hit.bnc)) this.hooks.pendingDone(this.connect(from, hit));
+      else this.hooks.pendingDone(false);
+      return;
+    }
     if (!hit) {
       const g = e.target.closest && e.target.closest('.lead');
       if (g) {
@@ -69,6 +90,11 @@ export class Wires {
     if (this.sel && !(pl && pl.getAttribute('data-lead-of') === this.sel)) { this.sel = null; this.layer.classList.remove('hasSel'); this.layer.querySelectorAll('.sel').forEach(x => x.classList.remove('sel')); }
     this.downAt = { x: e.clientX, y: e.clientY, lead: pl ? pl.getAttribute('data-lead-of') : null };
     const p0 = hit.sock ? this.pos(hit.sock) : this.scope.bncPos(hit.bnc);
+    // touch: holding a socket still for a moment opens its menu (connect to CH1 / CH2 / EXT, or tap the other end)
+    if (e.pointerType === 'touch') {
+      const ring = el('circle', { class: 'holdRing', cx: p0[0], cy: p0[1], r: hit.bnc ? 26 : 16, fill: 'none', 'pointer-events': 'none', pathLength: 100 }, this.dragG);
+      this.hold = { x: e.clientX, y: e.clientY, ring, t: setTimeout(() => { const h = this.hold; if (!h) return; this.hold = null; h.ring.remove(); if (this.tmp) { this.tmp.path.remove(); this.tmp = null; this.svg.classList.remove('dragging'); this.hooks.hoverTarget(null); } this.hooks.socketMenu(hit, { clientX: h.x, clientY: h.y }); }, HOLD_MS) };
+    }
     this.tmp = { from: hit, p0, path: el('path', { class: 'leadTmp', 'pointer-events': 'none', fill: 'none', stroke: LEAD_COLORS[this.color], 'stroke-width': hit.bnc ? 8 : 6.5, 'stroke-linecap': 'round', opacity: .85 }, this.dragG) };
     this.svg.classList.add('dragging');
   }
@@ -85,6 +111,7 @@ export class Wires {
       bd.g.querySelectorAll('path').forEach(el => el.setAttribute('d', d));
       return;
     }
+    if (this.hold && Math.hypot(e.clientX - this.hold.x, e.clientY - this.hold.y) > 10) this.endHold();
     if (!this.tmp) return; const p = this.toSvg(e); this.tmp.path.setAttribute('d', this.curve(this.tmp.p0, [p.x, p.y], !!this.tmp.from.bnc));
     const hit = this.sockAt(e); this.hooks.hoverTarget(hit && hit.sock);
   }
@@ -96,6 +123,7 @@ export class Wires {
       else if (bd.touch && !bd.menu && this.doubleTap(bd.ch ? 'probe:' + bd.ch : bd.lead.id)) { if (bd.ch) this.setProbe(bd.ch, null); else this.removeLead(bd.lead.id); }
       return;
     }
+    this.endHold();
     if (!this.tmp) return;
     const from = this.tmp.from, hit = this.sockAt(e);
     this.tmp.path.remove(); this.tmp = null; this.svg.classList.remove('dragging'); this.hooks.hoverTarget(null);
@@ -104,9 +132,7 @@ export class Wires {
       if (e.pointerType === 'touch' && this.doubleTap(d.lead)) { if (d.lead.startsWith('probe:')) this.setProbe(d.lead.slice(6), null); else this.removeLead(d.lead); return; } // two taps on a plug remove its lead
       this.select(this.sel === d.lead ? null : d.lead); return;
     }
-    if (from.sock && hit.sock && from.sock !== hit.sock) { this.addLead(from.sock, hit.sock, this.color); this.hooks.plugged(); }
-    else if (from.bnc && hit.sock) { this.probeColor[from.bnc] = this.color; this.setProbe(from.bnc, hit.sock); this.hooks.plugged(); }
-    else if (from.sock && hit.bnc) { this.probeColor[hit.bnc] = this.color; this.setProbe(hit.bnc, from.sock); this.hooks.plugged(); }
+    this.connect(from, hit);
   }
 
   select(id) {

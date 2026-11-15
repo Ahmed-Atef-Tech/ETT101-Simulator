@@ -96,7 +96,7 @@ export const HELP = {
   en: {
     app: `<h3>Using the simulator</h3><ul>
 <li><b>Patch a lead:</b> drag from one socket to another. Several leads can share a socket, just like the stackable leads.</li>
-<li><b>Remove a lead:</b> double-click it. Right-click a lead to change its colour.</li>
+<li><b>Remove a lead:</b> double-click it. Right-click a lead to change its colour. <b>Right-click a socket</b> to connect it to CH1, CH2 or EXT TRIG, or to start a lead and click the other socket.</li>
 <li><b>Knobs:</b> drag around the knob, sideways or up and down, or use the mouse wheel. Hold Shift for fine steps.</li>
 <li><b>View:</b> Kit, Both and Scope fit that part to the screen. Ctrl + wheel zooms at the cursor; drag the empty bench to move around. Keys 1, 2, 3 switch views.</li>
 <li><b>Headphones:</b> click the headphone socket on the BUFFER. Sound comes out of the computer speakers.</li>
@@ -104,7 +104,7 @@ export const HELP = {
     appTouch: `<h3>How to use it on a phone or tablet</h3><ul>
 <li><b>Zoom:</b> pinch with two fingers, right where you want to look. Drag an empty part of the bench with one finger to move around. The centre button brings everything back.</li>
 <li><b>Views:</b> Kit, Both and Scope fit that part to the screen. On a phone, Kit and Scope are the easiest.</li>
-<li><b>Connect a lead:</b> zoom in, then drag from one socket to another. Your finger only has to land near a socket.</li>
+<li><b>Connect a lead:</b> zoom in, then drag from one socket to another (your finger only has to land near a socket). Or <b>hold a socket</b> for a moment: its menu sends it to <b>CH1, CH2 or EXT TRIG</b> on the scope, or starts a lead that you finish by tapping the other socket.</li>
 <li><b>Remove a lead:</b> tap it twice. <b>Hold your finger on it</b> for its menu (colour, shape, remove).</li>
 <li><b>Knobs:</b> drag around the knob to turn it. Scope keys and switches: tap them.</li>
 <li><b>Headphones:</b> tap the headphone socket on the BUFFER; the sound comes out of the phone.</li>
@@ -125,7 +125,7 @@ export const HELP = {
   ar: {
     app: `<h3>طريقة الاستخدام</h3><ul>
 <li><b>توصيل سلك:</b> اسحب من مقبس إلى مقبس آخر. يمكن توصيل أكثر من سلك بالمقبس نفسه، كما في الأسلاك الحقيقية.</li>
-<li><b>إزالة سلك:</b> انقر عليه مرتين. وانقر بالزر الأيمن لتغيير لونه.</li>
+<li><b>إزالة سلك:</b> انقر عليه مرتين. وانقر بالزر الأيمن لتغيير لونه. و<b>انقر بالزر الأيمن على مقبس</b> لتوصيله بـ CH1 أو CH2 أو EXT TRIG، أو لبدء سلك ثم النقر على المقبس الآخر.</li>
 <li><b>المقابض:</b> أدِر حول المقبض، أو اسحب يميناً ويساراً أو لأعلى ولأسفل، أو استخدم عجلة الفأرة. اضغط Shift للحركة الدقيقة.</li>
 <li><b>العرض:</b> الأزرار Kit و Both و Scope تُكبّر الجزء المطلوب على الشاشة. Ctrl مع عجلة الفأرة للتكبير عند المؤشر، واسحب في المساحة الفارغة للتحرّك. المفاتيح 1 و 2 و 3 تبدّل طريقة العرض.</li>
 <li><b>السماعة:</b> انقر على مقبس السماعة في BUFFER، ويخرج الصوت من سماعات الحاسوب.</li>
@@ -133,7 +133,7 @@ export const HELP = {
     appTouch: `<h3>طريقة الاستخدام على الهاتف أو التابلت</h3><ul>
 <li><b>التكبير:</b> باعِد بين إصبعين أو قرّبهما عند المكان الذي تريد رؤيته. واسحب بإصبع واحدة في مكان فارغ لتتحرك في المساحة. وزر التوسيط يعيد كل شيء إلى مكانه.</li>
 <li><b>طرق العرض:</b> الجهاز وكلاهما وراسم الإشارة تجعل الجزء المطلوب يملأ الشاشة. وعلى الهاتف يكون عرض الجهاز وحده أو راسم الإشارة وحده الأسهل.</li>
-<li><b>توصيل سلك:</b> كبّر أولاً، ثم اسحب من مقبس إلى مقبس آخر. يكفي أن تضع إصبعك قرب المقبس.</li>
+<li><b>توصيل سلك:</b> كبّر أولاً، ثم اسحب من مقبس إلى مقبس آخر (يكفي أن تضع إصبعك قرب المقبس). أو <b>اضغط مطوّلاً على مقبس</b>: تظهر قائمة لتوصيله بـ <b>CH1 أو CH2 أو EXT TRIG</b> في راسم الإشارة، أو لبدء سلك تكمله بالضغط على المقبس الآخر.</li>
 <li><b>إزالة سلك:</b> اضغط عليه مرتين. و<b>اضغط عليه مطوّلاً</b> لتظهر قائمته (اللون والشكل والإزالة).</li>
 <li><b>المقابض:</b> اسحب حول المقبض لتديره. وأزرار راسم الإشارة والمفاتيح: اضغط عليها.</li>
 <li><b>السماعة:</b> اضغط على مقبس السماعة في BUFFER، ويخرج الصوت من الهاتف.</li>
