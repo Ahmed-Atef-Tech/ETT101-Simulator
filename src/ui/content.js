@@ -109,6 +109,7 @@ export const HELP = {
 <li><b>Knobs:</b> drag around the knob to turn it. Scope keys and switches: tap them.</li>
 <li><b>Headphones:</b> tap the headphone socket on the BUFFER; the sound comes out of the phone.</li>
 <li><b>Turn the phone sideways:</b> the kit and the scope need a wide screen.</li>
+<li><b>Full screen:</b> on Android the page fills the screen (no address bar) after your first tap; swipe from the edge and tap Back to leave it. Settings → Full screen turns it on or off. On iPhone, add it to the home screen and open it from there.</li>
 <li><b>Add it to your home screen</b> to open it like an app and use it without the internet: in Chrome, menu → Add to Home screen; on iPhone, Share → Add to Home Screen.</li></ul>`,
     scope: `<h3>The oscilloscope (UTD2102CEL style)</h3><ul>
 <li><b>Connect:</b> drag from a BNC socket (CH1, CH2, EXT TRIG) to any socket on the kit. Double-click the lead to remove it.</li>
@@ -138,6 +139,7 @@ export const HELP = {
 <li><b>المقابض:</b> اسحب حول المقبض لتديره. وأزرار راسم الإشارة والمفاتيح: اضغط عليها.</li>
 <li><b>السماعة:</b> اضغط على مقبس السماعة في BUFFER، ويخرج الصوت من الهاتف.</li>
 <li><b>أدِر الهاتف بالعرض:</b> يحتاج الجهاز وراسم الإشارة إلى شاشة عريضة.</li>
+<li><b>ملء الشاشة:</b> على أندرويد تملأ الصفحة الشاشة (بدون شريط العنوان) بعد أول ضغطة، وللخروج اسحب من حافة الشاشة واضغط رجوع. ومن الإعدادات ← ملء الشاشة تشغّله أو توقفه. وعلى آيفون أضِفه إلى الشاشة الرئيسية وافتحه من هناك.</li>
 <li><b>أضِفه إلى الشاشة الرئيسية</b> لتفتحه كتطبيق وتستخدمه من غير إنترنت: في Chrome من القائمة ثم «إضافة إلى الشاشة الرئيسية»، وفي آيفون من زر المشاركة ثم «إضافة إلى الشاشة الرئيسية».</li></ul>`,
     scope: `<h3>راسم الإشارة (على نمط UTD2102CEL)</h3><ul>
 <li><b>التوصيل:</b> اسحب من مقبس BNC (CH1 أو CH2 أو EXT TRIG) إلى أي مقبس على الجهاز. انقر على السلك مرتين لإزالته.</li>

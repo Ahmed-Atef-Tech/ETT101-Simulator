@@ -1,6 +1,4 @@
-- **Connect a socket to the scope without a long lead:** on a phone or tablet, hold your finger on any kit socket for a moment (a ring fills around it). A menu opens: *Connect to CH1*, *Connect to CH2* or *Connect to EXT TRIG*, and the channel turns on by itself. Hold it again to disconnect.
-- **Lead by two taps:** in the same menu, *Lead to another socket…* then tap the other socket. Handy when the two sockets are far apart on a small screen. *Cancel* stops it.
-- **On a computer:** right-click a socket for the same menu.
-- **توصيل مقبس براسم الإشارة بدون سحب سلك طويل:** على الهاتف أو التابلت اضغط بإصبعك على أي مقبس في الجهاز لحظة (تمتلئ حلقة حوله)، فتظهر قائمة: «توصيل بـ CH1» أو «توصيل بـ CH2» أو «توصيل بـ EXT TRIG»، وتعمل القناة تلقائياً. واضغط عليه مطوّلاً مرة أخرى للفصل.
-- **سلك بضغطتين:** من نفس القائمة اختر «سلك إلى مقبس آخر…» ثم اضغط على المقبس الآخر. مفيد عندما يكون المقبسان بعيدين على شاشة صغيرة. و«إلغاء» يوقفه.
-- **على الكمبيوتر:** انقر بالزر الأيمن على المقبس لنفس القائمة.
+- **Full screen on phones:** on Android, the web version now fills the whole screen without the browser's address bar after your first tap, and stays sideways. To leave, swipe from the edge and tap Back. *Settings → Full screen* turns it on or off. Installed from the home screen, it opens full screen too.
+- **iPhone:** Safari does not let websites go full screen, so the app tells you the way that works: Share → *Add to Home Screen*, then open it from there.
+- **ملء الشاشة على الهاتف:** على أندرويد تملأ نسخة الويب الشاشة كلها الآن بدون شريط العنوان بعد أول ضغطة، وتبقى بالعرض. وللخروج اسحب من حافة الشاشة واضغط رجوع. ومن «الإعدادات ← ملء الشاشة» تشغّلها أو توقفها. وعند فتحها من الشاشة الرئيسية تفتح بملء الشاشة أيضاً.
+- **آيفون:** متصفح Safari لا يسمح للمواقع بملء الشاشة، فيوضح البرنامج الطريقة التي تعمل: زر المشاركة ← «إضافة إلى الشاشة الرئيسية»، ثم افتحه من هناك.

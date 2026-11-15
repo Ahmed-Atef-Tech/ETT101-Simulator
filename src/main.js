@@ -361,12 +361,34 @@ if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitRail);
 const touchUI = window.matchMedia && matchMedia('(pointer: coarse)').matches; // phone or tablet
 if (touchUI) { $('#hint').dataset.t = 'zoomHintTouch'; setTimeout(() => $('#hint').classList.add('faded'), 12000); }
 $('#rotOK').onclick = () => document.documentElement.classList.add('rotateOK');
+// Full screen on phones and tablets (web version): the page fills the screen without the browser's address bar.
+// Browsers only allow it after a tap, so it starts on the first tap (once per visit; Settings turns it on or off).
+// Safari on iPhone does not allow it for web pages: there, opening from the home screen fills the screen instead.
+const FSC = (() => {
+  const de = document.documentElement, req = de.requestFullscreen || de.webkitRequestFullscreen;
+  const installed = navigator.standalone || matchMedia('(display-mode: standalone)').matches || (matchMedia('(display-mode: fullscreen)').matches && !document.fullscreenElement);
+  const on = () => !!(document.fullscreenElement || document.webkitFullscreenElement);
+  const api = { show: touchUI && !installed && !/Electron/.test(navigator.userAgent), can: !!req, on, auto: true, tried: false };
+  try { api.auto = localStorage.getItem('ett.fs') !== '0'; } catch (e) { }
+  api.enter = () => { if (!req || on()) return; try { const r = req.call(de, { navigationUI: 'hide' }); if (r && r.then) r.then(() => { try { screen.orientation.lock('landscape').catch(() => { }); } catch (e) { } }).catch(() => { }); } catch (e) { } };
+  api.exit = () => { if (!on()) return; try { (document.exitFullscreen || document.webkitExitFullscreen).call(document); } catch (e) { } };
+  return api;
+})();
+if (FSC.show) {
+  $('#fsRow').hidden = false;
+  if (!FSC.can) { $('#fsSeg').hidden = true; $('#fsNote').hidden = false;
+    try { if (!localStorage.getItem('ett.fsTip')) { localStorage.setItem('ett.fsTip', '1'); setTimeout(() => toast(t('fsIOS'), 8000), 13000); } } catch (e) { } }
+  else window.addEventListener('pointerup', e => { if (FSC.auto && !FSC.tried && e.isTrusted && e.pointerType !== 'mouse') { FSC.tried = true; FSC.enter(); } }, true);
+}
+document.querySelectorAll('[data-fs]').forEach(b => b.onclick = () => { FSC.auto = b.dataset.fs === '1'; FSC.tried = true; try { localStorage.setItem('ett.fs', FSC.auto ? '1' : '0'); } catch (e) { } if (FSC.auto) FSC.enter(); else FSC.exit(); applyTexts(); });
+['fullscreenchange', 'webkitfullscreenchange'].forEach(ev => document.addEventListener(ev, () => applyTexts()));
 function applyTexts() { if (typeof setBugKind === "function" && $("#bugTitle")) setBugKind(bugKind);
   document.querySelectorAll('[data-t]').forEach(n => { n.textContent = t(n.dataset.t); });
   document.querySelectorAll('[data-hint]').forEach(n => { n.title = t(n.dataset.hint); });
   $('#btnFull').title = t('recentre');
   document.querySelectorAll('[data-lang]').forEach(b => b.classList.toggle('on', b.dataset.lang === getLang()));
   document.querySelectorAll('[data-snd]').forEach(b => b.classList.toggle('on', (b.dataset.snd === '1') === !audio.muted));
+  if (typeof FSC !== 'undefined') document.querySelectorAll('[data-fs]').forEach(b => b.classList.toggle('on', (b.dataset.fs === '1') === (FSC.on() || (FSC.auto && !FSC.tried))));
   colorsEl.querySelectorAll('.plugsw').forEach(b => b.title = t('colors')[b.dataset.c]);
   $('#tGuide .state').textContent = training ? t('on') : t('off');
   drawHeadphones(); if ($('#guide').classList.contains('open')) renderGuide();
@@ -495,7 +517,7 @@ $('#fileIn').onchange = async e => { const f = e.target.files[0]; if (!f) return
 function stamp() { const d = new Date(), p = n => String(n).padStart(2, '0'); return `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`; }
 function download(blob, name) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); }
 function saveImage(cv) { cv.toBlob(b => download(b, `scope-${stamp()}.png`)); toast(t('savedImage')); }
-function toast(msg) { const d = $('#toast'); d.textContent = msg; d.classList.add('show'); clearTimeout(d._t); d._t = setTimeout(() => d.classList.remove('show'), 1800); }
+function toast(msg, ms = 1800) { const d = $('#toast'); d.textContent = msg; d.classList.add('show'); clearTimeout(d._t); d._t = setTimeout(() => d.classList.remove('show'), ms); }
 setInterval(() => { try { localStorage.setItem('ett.autosave', JSON.stringify(snapshot())); } catch (e) { } }, 3000);
 try { const a = localStorage.getItem('ett.autosave'); if (a) restore(JSON.parse(a)); } catch (e) { }
 

@@ -136,6 +136,7 @@ html[lang="ar"] .acts { line-height: 1.85; }
 #settings { position: fixed; top: 54px; right: 12px; width: 300px; z-index: 12; display: none; padding: 12px 14px; background: var(--paper); border: 1px solid #c9cdcf; border-radius: 6px; box-shadow: 0 14px 34px rgba(0,0,0,.4); }
 #settings.open { display: block; }
 .row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 0; font-size: 15px; }
+.fsNote { margin: 0 0 6px; font-size: 13px; line-height: 1.45; color: #4a5357; }
 .seg { display: inline-flex; border: 1px solid #9aa3a7; border-radius: 4px; overflow: hidden; }
 .seg button { border: 0; background: #fff; padding: 5px 11px; cursor: pointer; font-size: 14px; }
 .seg button + button { border-inline-start: 1px solid #9aa3a7; }
@@ -352,6 +353,8 @@ html[lang="ar"] #tour .tourCard p { line-height: 1.85; }
 <section id="refp" class="sheet panel" aria-modal="false"></section>
 <div id="settings">
   <div class="row"><span data-t="language"></span><span class="seg"><button data-lang="en" lang="en">English</button><button data-lang="ar" lang="ar">العربية</button></span></div>
+  <div class="row" id="fsRow" hidden><span data-t="fullScreen"></span><span class="seg" id="fsSeg"><button data-fs="1" data-t="on"></button><button data-fs="0" data-t="off"></button></span></div>
+  <p class="fsNote" id="fsNote" data-t="fsIOS" hidden></p>
   <div class="row"><span data-t="sound"></span><span class="seg"><button data-snd="1" data-t="on"></button><button data-snd="0" data-t="off"></button></span></div>
   <div class="sep"></div>
   <button class="mi" id="btnSave" data-t="saveSetup"></button>

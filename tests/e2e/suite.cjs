@@ -372,13 +372,13 @@ T('SC10', 'Scope', 'The scope screen stays sharp when the bench is zoomed in (dr
 
 // ------------------------------------------------------------------ phones (the web version, touch only)
 const WEB = 'file://' + path.resolve(__dirname, '../../dist/web/index.html');
-async function phone(p, name, lang = 'en') {
+async function phone(p, name, lang = 'en', fsAuto = false) { // fsAuto: let the first tap go full screen (off elsewhere, so the layout stays put)
   const dev = { ...devices[name] }; delete dev.defaultBrowserType;
   const ctx = await browser.newContext({ ...dev, locale: 'en-US' }), q = await ctx.newPage();
   q.on('pageerror', e => p.errs.push('phone pageerror: ' + e.message));
   q.on('console', m => { if (m.type() === 'error' && !/favicon|ERR_FILE_NOT_FOUND|net::|manifest/i.test(m.text())) p.errs.push('phone console: ' + m.text()); });
   await q.goto(WEB); await q.waitForFunction(() => window.__app);
-  await q.evaluate(l => { localStorage.clear(); localStorage.setItem('ett.notice', '1'); localStorage.setItem('ett.tour', '1'); localStorage.setItem('ett.lang', l); }, lang); await q.reload(); await q.waitForFunction(() => window.__app); await q.waitForTimeout(300);
+  await q.evaluate(l => { localStorage.clear(); localStorage.setItem('ett.notice', '1'); localStorage.setItem('ett.tour', '1'); localStorage.setItem('ett.lang', l[0]); if (!l[1]) localStorage.setItem('ett.fs', '0'); }, [lang, fsAuto]); await q.reload(); await q.waitForFunction(() => window.__app); await q.waitForTimeout(300);
   q.cdp = await ctx.newCDPSession(q);
   const T = (type, pts) => q.cdp.send('Input.dispatchTouchEvent', { type, touchPoints: pts.map((t, i) => ({ x: t.x, y: t.y, id: t.id ?? i + 1, radiusX: 4, radiusY: 4 })) });
   q.fingerDrag = async (a, b, steps = 8) => { await T('touchStart', [a]); for (let k = 1; k <= steps; k++) await T('touchMove', [{ x: a.x + (b.x - a.x) * k / steps, y: a.y + (b.y - a.y) * k / steps }]); await T('touchEnd', []); await q.waitForTimeout(80); };
@@ -405,7 +405,7 @@ T('MB01', 'Phone', 'Web version on phones: toolbar fits from iPhone SE to Pixel 
   eq(await q.evaluate(() => getComputedStyle(document.getElementById('rotate')).display), 'flex', 'portrait: turn-the-phone screen');
   await q.tap('#rotOK'); eq(await q.evaluate(() => getComputedStyle(document.getElementById('rotate')).display), 'none', 'Continue anyway'); await q.ctxDone();
   const man = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../dist/web/manifest.webmanifest'), 'utf8'));
-  ok(man.icons.every(i => fs.existsSync(path.resolve(__dirname, '../../dist/web', i.src))) && man.display === 'standalone', 'manifest icons exist');
+  ok(man.icons.every(i => fs.existsSync(path.resolve(__dirname, '../../dist/web', i.src))) && man.display === 'fullscreen', 'manifest icons exist (installed app opens full screen)');
   const sw = fs.readFileSync(path.resolve(__dirname, '../../dist/web/sw.js'), 'utf8'), ver = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../package.json'))).version;
   ok(sw.includes(`ett101-${ver}`) && /index\.html/.test(sw), 'service worker caches this version');
 });
@@ -487,6 +487,31 @@ T('MB05', 'Phone', 'Hold a socket: its menu connects it to CH1 / CH2 / EXT, or s
   // desktop: right-click a socket
   const c = await sock(p, 'master.SINE100'); await p.mouse.click(c.x, c.y, { button: 'right' }); await p.waitForTimeout(100);
   await p.click('.sockMenu [data-ch="CH1"]'); eq(await app(p, () => __app.sim.probes.CH1), 'master.SINE100', 'right-click a socket → Connect to CH1');
+});
+
+T('MB06', 'Phone', 'Full screen: on a phone the first tap fills the screen (no address bar); Settings turns it off and it stays off; iPhone gets the home-screen note instead; never on a computer', async p => {
+  eq(await app(p, () => document.getElementById('fsRow').hidden), true, 'computer: no full-screen setting');
+  let q = await phone(p, 'Pixel 7 landscape', 'en', true);
+  eq(await q.evaluate(() => [!document.getElementById('fsRow').hidden, document.getElementById('fsNote').hidden, !!document.fullscreenElement]), [true, true, false], 'phone: setting shown, not yet full screen');
+  await q.tapAt({ x: 700, y: 330 }); await q.waitForTimeout(400);
+  eq(await q.evaluate(() => !!document.fullscreenElement), true, 'first tap → full screen');
+  await q.tap('#btnSettings'); await q.waitForTimeout(150);
+  ok(await q.evaluate(() => document.querySelector('[data-fs="1"]').classList.contains('on')), 'Settings shows On');
+  await q.tap('[data-fs="0"]'); await q.waitForTimeout(400);
+  eq(await q.evaluate(() => [!!document.fullscreenElement, localStorage.getItem('ett.fs'), document.querySelector('[data-fs="0"]').classList.contains('on')]), [false, '0', true], 'Off leaves full screen and is saved');
+  await q.reload(); await q.waitForFunction(() => window.__app); await q.waitForTimeout(300);
+  await q.tapAt({ x: 700, y: 330 }); await q.waitForTimeout(400);
+  eq(await q.evaluate(() => !!document.fullscreenElement), false, 'stays off after reload');
+  await q.tap('#btnSettings'); await q.waitForTimeout(150); await q.tap('[data-fs="1"]'); await q.waitForTimeout(400);
+  eq(await q.evaluate(() => !!document.fullscreenElement), true, 'On from Settings enters full screen');
+  await q.ctxDone();
+  // iPhone Safari: no full-screen API for pages
+  const dev = { ...devices['iPhone 14 landscape'] }; delete dev.defaultBrowserType;
+  const ctx = await browser.newContext(dev); q = await ctx.newPage();
+  await q.addInitScript(() => { delete Element.prototype.requestFullscreen; delete Element.prototype.webkitRequestFullscreen; });
+  await q.goto(WEB); await q.waitForFunction(() => window.__app);
+  eq(await q.evaluate(() => [!document.getElementById('fsRow').hidden, document.getElementById('fsSeg').hidden, !document.getElementById('fsNote').hidden]), [true, true, true], 'iPhone: home-screen note instead of the switch');
+  await ctx.close();
 });
 
 // ================================================================== 5. rail panels
