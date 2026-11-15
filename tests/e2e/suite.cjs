@@ -490,11 +490,15 @@ T('MB05', 'Phone', 'Hold a socket: its menu connects it to CH1 / CH2 / EXT, or s
 });
 
 T('MB06', 'Phone', 'Full screen: on a phone the first tap fills the screen (no address bar); Settings turns it off and it stays off; iPhone gets the home-screen note instead; never on a computer', async p => {
-  eq(await app(p, () => document.getElementById('fsRow').hidden), true, 'computer: no full-screen setting');
+  eq(await app(p, () => [document.getElementById('fsRow').hidden, document.getElementById('btnFS').hidden]), [true, true], 'computer: no full-screen setting or button');
   let q = await phone(p, 'Pixel 7 landscape', 'en', true);
   eq(await q.evaluate(() => [!document.getElementById('fsRow').hidden, document.getElementById('fsNote').hidden, !!document.fullscreenElement]), [true, true, false], 'phone: setting shown, not yet full screen');
   await q.tapAt({ x: 700, y: 330 }); await q.waitForTimeout(400);
   eq(await q.evaluate(() => !!document.fullscreenElement), true, 'first tap → full screen');
+  eq(await q.evaluate(() => document.getElementById('btnFS').hidden), true, 'full-screen button hidden while full screen');
+  await q.evaluate(() => document.exitFullscreen()); await q.waitForTimeout(400);
+  eq(await q.evaluate(() => getComputedStyle(document.getElementById('btnFS')).display !== 'none' && !document.getElementById('btnFS').hidden), true, 'after leaving: full-screen button in the toolbar');
+  await q.tap('#btnFS'); await q.waitForTimeout(400); eq(await q.evaluate(() => !!document.fullscreenElement), true, 'the button goes back to full screen');
   await q.tap('#btnSettings'); await q.waitForTimeout(150);
   ok(await q.evaluate(() => document.querySelector('[data-fs="1"]').classList.contains('on')), 'Settings shows On');
   await q.tap('[data-fs="0"]'); await q.waitForTimeout(400);
@@ -508,9 +512,11 @@ T('MB06', 'Phone', 'Full screen: on a phone the first tap fills the screen (no a
   // iPhone Safari: no full-screen API for pages
   const dev = { ...devices['iPhone 14 landscape'] }; delete dev.defaultBrowserType;
   const ctx = await browser.newContext(dev); q = await ctx.newPage();
-  await q.addInitScript(() => { delete Element.prototype.requestFullscreen; delete Element.prototype.webkitRequestFullscreen; });
+  await q.addInitScript(() => { delete Element.prototype.requestFullscreen; delete Element.prototype.webkitRequestFullscreen; localStorage.setItem('ett.notice', '1'); localStorage.setItem('ett.tour', '1'); });
   await q.goto(WEB); await q.waitForFunction(() => window.__app);
   eq(await q.evaluate(() => [!document.getElementById('fsRow').hidden, document.getElementById('fsSeg').hidden, !document.getElementById('fsNote').hidden]), [true, true, true], 'iPhone: home-screen note instead of the switch');
+  ok(await q.evaluate(() => !document.getElementById('btnFS').hidden), 'iPhone: button shown'); await q.tap('#btnFS'); await q.waitForTimeout(200);
+  ok(await q.evaluate(() => document.getElementById('toast').classList.contains('show') && /Home Screen/.test(document.getElementById('toast').textContent)), 'iPhone: button explains Add to Home Screen');
   await ctx.close();
 });
 

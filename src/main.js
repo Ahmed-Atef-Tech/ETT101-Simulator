@@ -380,6 +380,7 @@ if (FSC.show) {
     try { if (!localStorage.getItem('ett.fsTip')) { localStorage.setItem('ett.fsTip', '1'); setTimeout(() => toast(t('fsIOS'), 8000), 13000); } } catch (e) { } }
   else window.addEventListener('pointerup', e => { if (FSC.auto && !FSC.tried && e.isTrusted && e.pointerType !== 'mouse') { FSC.tried = true; FSC.enter(); } }, true);
 }
+$('#btnFS').onclick = () => { if (!FSC.can) { toast(t('fsIOS'), 8000); return; } FSC.auto = true; FSC.tried = true; try { localStorage.setItem('ett.fs', '1'); } catch (e) { } FSC.enter(); };
 document.querySelectorAll('[data-fs]').forEach(b => b.onclick = () => { FSC.auto = b.dataset.fs === '1'; FSC.tried = true; try { localStorage.setItem('ett.fs', FSC.auto ? '1' : '0'); } catch (e) { } if (FSC.auto) FSC.enter(); else FSC.exit(); applyTexts(); });
 ['fullscreenchange', 'webkitfullscreenchange'].forEach(ev => document.addEventListener(ev, () => applyTexts()));
 function applyTexts() { if (typeof setBugKind === "function" && $("#bugTitle")) setBugKind(bugKind);
@@ -388,6 +389,7 @@ function applyTexts() { if (typeof setBugKind === "function" && $("#bugTitle")) 
   $('#btnFull').title = t('recentre');
   document.querySelectorAll('[data-lang]').forEach(b => b.classList.toggle('on', b.dataset.lang === getLang()));
   document.querySelectorAll('[data-snd]').forEach(b => b.classList.toggle('on', (b.dataset.snd === '1') === !audio.muted));
+  if (typeof FSC !== 'undefined') $('#btnFS').hidden = !FSC.show || FSC.on();
   if (typeof FSC !== 'undefined') document.querySelectorAll('[data-fs]').forEach(b => b.classList.toggle('on', (b.dataset.fs === '1') === (FSC.on() || (FSC.auto && !FSC.tried))));
   colorsEl.querySelectorAll('.plugsw').forEach(b => b.title = t('colors')[b.dataset.c]);
   $('#tGuide .state').textContent = training ? t('on') : t('off');
