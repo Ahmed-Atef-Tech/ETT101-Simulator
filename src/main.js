@@ -139,6 +139,34 @@ window.addEventListener('pointermove', e => {
 });
 window.addEventListener('pointerup', () => { if (pan && pan.moved) suppressCtx = true; if (pan && pan.mat && !pan.moved && wires.sel) wires.select(null); pan = null; svg.classList.remove('panning'); });
 svg.addEventListener('dblclick', e => { if (e.target.classList.contains('mat')) setView('both'); });
+// ---------- touch: two fingers pinch to zoom and move the bench; one finger keeps wiring, turning and panning ----------
+const touches = new Map(); let pinch = null;
+const mid = () => { const [a, b] = [...touches.values()]; return { d: Math.hypot(a.x - b.x, a.y - b.y) || 1, x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }; };
+window.addEventListener('pointerdown', e => {
+  if (e.pointerType !== 'touch' || !e.isTrusted || !(e.target.closest && e.target.closest('#bench'))) return;
+  touches.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  if (touches.size === 2) {
+    e.stopPropagation(); e.preventDefault(); wires.cancel(); pan = null; hideTip();
+    const [first] = touches.keys(), p0 = touches.get(first); // end whatever the first finger was doing (knob turn, pan) without side effects
+    window.dispatchEvent(new PointerEvent('pointerup', { pointerId: first, pointerType: 'touch', clientX: p0.x, clientY: p0.y, bubbles: true }));
+    pinch = mid();
+  } else if (touches.size > 2 || pinch) e.stopPropagation();
+}, { capture: true });
+window.addEventListener('pointermove', e => {
+  if (!e.isTrusted || !touches.has(e.pointerId)) return;
+  touches.set(e.pointerId, { x: e.clientX, y: e.clientY }); if (!pinch) return;
+  e.stopPropagation(); if (pinch.lock || touches.size < 2) return;
+  const m = mid(), r = svg.getBoundingClientRect(), k = view.w / r.width;
+  view.x -= (m.x - pinch.x) * k; view.y -= (m.y - pinch.y) * k; applyView();
+  zoomAt({ clientX: m.x, clientY: m.y }, pinch.d / m.d); pinch = m;
+}, { capture: true });
+const touchEnd = e => {
+  if (!e.isTrusted || !touches.has(e.pointerId)) return; touches.delete(e.pointerId);
+  if (pinch) { e.stopPropagation(); pinch = touches.size ? { lock: true } : null; } // the finger left behind does nothing until all are up
+};
+window.addEventListener('pointerup', touchEnd, { capture: true }); window.addEventListener('pointercancel', touchEnd, { capture: true });
+// the page itself never zooms on a phone (Safari ignores user-scalable)
+['gesturestart', 'gesturechange'].forEach(t => document.addEventListener(t, e => e.preventDefault()));
 svg.addEventListener('contextmenu', e => { if (suppressCtx) { e.preventDefault(); suppressCtx = false; return; } if (!e.target.closest('.lead')) e.preventDefault(); });
 // full screen
 // Centre button: after zooming or dragging away, bring back the last fitted view (Kit, Both or Scope)
@@ -297,12 +325,15 @@ function drawGhost() {
 
 // =============================================== rail & settings ===============================================
 function fitRail() {
-  const r = $('#rail'); r.classList.remove('c1', 'c2', 'c3');
+  const r = $('#rail'); r.classList.remove('c1', 'c2', 'c3', 'c4', 'c5', 'c6'); $('#colors').classList.remove('open');
   const fits = () => { const box = r.getBoundingClientRect(), pad = 6; return r.scrollWidth <= r.clientWidth && [...r.children].every(el => { if (el.hidden || el.type === 'file') return true; const b = el.getBoundingClientRect(); return !b.width || (b.left >= box.left + pad - 1 && b.right <= box.right - pad + 1); }); };
-  for (const c of ['c1', 'c2', 'c3']) { if (fits()) break; r.classList.add(c); }
+  for (const c of ['c1', 'c2', 'c3', 'c4', 'c5', 'c6']) { if (fits()) break; r.classList.add(c); }
 }
 window.addEventListener('resize', fitRail);
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitRail);
+const touchUI = window.matchMedia && matchMedia('(pointer: coarse)').matches; // phone or tablet
+if (touchUI) { $('#hint').dataset.t = 'zoomHintTouch'; setTimeout(() => $('#hint').classList.add('faded'), 12000); }
+$('#rotOK').onclick = () => document.documentElement.classList.add('rotateOK');
 function applyTexts() { if (typeof setBugKind === "function" && $("#bugTitle")) setBugKind(bugKind);
   document.querySelectorAll('[data-t]').forEach(n => { n.textContent = t(n.dataset.t); });
   document.querySelectorAll('[data-hint]').forEach(n => { n.title = t(n.dataset.hint); });
@@ -329,7 +360,7 @@ $('#btnSettings').onclick = () => $('#settings').classList.toggle('open');
 document.querySelectorAll('[data-lang]').forEach(b => b.onclick = () => { setLang(b.dataset.lang); applyTexts(); });
 document.querySelectorAll('[data-snd]').forEach(b => b.onclick = () => { audio.ensure(); audio.muted = b.dataset.snd !== '1'; applyTexts(); });
 $('#btnClear').onclick = () => { $('#settings').classList.remove('open'); if (confirm(t('confirmClear'))) wires.clearAll(); };
-$('#btnHelp').onclick = () => { $('#settings').classList.remove('open'); showModal(t('help'), HELP[getLang()].app, links._channel); };
+$('#btnHelp').onclick = () => { $('#settings').classList.remove('open'); showModal(t('help'), HELP[getLang()][touchUI ? 'appTouch' : 'app'], links._channel); }; // phones and tablets get the touch version
 $('#btnScopeHelp').onclick = () => { $('#settings').classList.remove('open'); hooks.scopeHelp(); };
 // preliminary-version notice: shown once on first start, and any time from the Beta tag or Settings
 function showAbout() { showModal(t('about'), NOTICE[getLang()] + `<p class="small">v${APP_VERSION}</p>`, false); }
@@ -337,7 +368,7 @@ $('#btnBeta').onclick = showAbout;
 $('#btnAbout').onclick = () => { $('#settings').classList.remove('open'); showAbout(); };
 const colorsEl = $('#colors');
 colorsEl.innerHTML = Object.keys(LEAD_COLORS).map(c => `<button class="plugsw ${c === wires.color ? 'sel' : ''}" data-c="${c}" style="background:${LEAD_COLORS[c]}"></button>`).join('');
-colorsEl.onclick = e => { const c = e.target.dataset.c; if (!c) return; wires.color = c; if (wires.sel) wires.select(null); colorsEl.querySelectorAll('.plugsw').forEach(s => s.classList.toggle('sel', s.dataset.c === c)); };
+colorsEl.onclick = e => { const c = e.target.dataset.c; if (!c) return; if ($('#rail').classList.contains('c5') && !colorsEl.classList.contains('open')) { colorsEl.classList.add('open'); return; } colorsEl.classList.remove('open'); wires.color = c; if (wires.sel) wires.select(null); colorsEl.querySelectorAll('.plugsw').forEach(s => s.classList.toggle('sel', s.dataset.c === c)); };
 
 // save / open setups
 function snapshot() {
@@ -455,14 +486,14 @@ setLang(getLang()); applyTexts(); setTraining(training); wires.render();
 // first start: the beta notice, then the welcome guide (shown once; Settings shows it again)
 // the guide frames each part itself (even if the bench was zoomed or moved), then puts the user's view back
 function tourView(name) {
-  const [x, y, w, h] = RECTS[name] || RECTS.both, r = svg.getBoundingClientRect();
-  if (name === 'scope') { // scope across the top, about 380 px free below it for the card
-    const free = Math.max(160, r.height - 380), rh = Math.max(h * 1.9, h * r.height / free), rw = Math.max(w, h * r.width / free);
+  const [x, y, w, h] = RECTS[name] || RECTS.both, r = svg.getBoundingClientRect(), card = document.querySelector('#tour .tourCard');
+  const needR = (card ? card.offsetWidth : 400) + 50, needB = (card ? card.offsetHeight : 330) + 50; // room the card needs beside or below
+  const right = () => { const free = Math.max(160, r.width - needR), rw = Math.max(w * 1.2, w * r.width / free), rh = Math.max(h, w * r.height / free); focusRect(x, y + h / 2 - rh / 2, rw, rh, 0.03); };
+  if (name === 'scope' && r.height - needB >= 180) { // scope across the top, the card below it
+    const free = r.height - needB, rh = Math.max(h * 1.4, h * r.height / free), rw = Math.max(w, h * r.width / free);
     focusRect(x + w / 2 - rw / 2, y, rw, rh, 0.03);
-  } else if (name === 'kit') { // kit on the left, about 450 px free on the right for the card
-    const free = Math.max(200, r.width - 450), rw = Math.max(w * 1.5, w * r.width / free), rh = Math.max(h, w * r.height / free);
-    focusRect(x, y + h / 2 - rh / 2, rw, rh, 0.03);
-  } else focusRect(x, y, w, h, 0);
+  } else if (name === 'scope' || name === 'kit') right(); // short screens and the kit: the part on the left, the card on the right
+  else focusRect(x, y, w, h, 0);
 }
 function runTour() {
   $('#settings').classList.remove('open'); closeMenus(); library.close();
@@ -476,14 +507,18 @@ requestAnimationFrame(() => { if (tourOpen()) tourReframe(); else setView(viewMo
 
 // =============================================== main loop ===============================================
 let last = performance.now(), frame = 0, guideTick = 0, loadAvg = 0;
+// a slow phone redraws the scope less often (every 2nd frame normally, up to every 8th) so wiring and knobs stay smooth
+let scopeEvery = 2, msAvg = 16;
 function loop(now) {
+  msAvg = msAvg * 0.92 + Math.min(500, now - last) * 0.08; // average frame time
+  if (frame % 15 === 14) { if (msAvg > 42 && scopeEvery < 8) scopeEvery++; else if (msAvg < 22 && scopeEvery > 2) scopeEvery--; }
   let dt = Math.min(0.05, (now - last) / 1000); last = now;
   if (sim.headphones && audio.ctx && audio.ctx.state === 'running') { const q = sim.audioQueued(); dt *= q < 3000 ? 1.15 : q > 9000 ? 0.85 : 1; }
   const t0 = performance.now();
   sim.run(Math.round(dt * FS));
   loadAvg = loadAvg * 0.95 + (performance.now() - t0) * 0.05;
   if (sim.order.includes(sim.mods.speech) && !audio.micOn && !audio.micErr) audio.startMic();
-  if (frame++ % 2 === 0) scope.update();
+  if (frame++ % scopeEvery === 0) scope.update();
   panel.updateLeds();
   if (++guideTick % 20 === 0 && exp && $('#guide').classList.contains('open') && document.activeElement?.id !== 'gGhost') {
     const h = JSON.stringify([sim.version, sim.probes]); if (h !== renderGuide._h) { renderGuide._h = h; renderGuide(); }
@@ -491,5 +526,5 @@ function loop(now) {
   requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
-window.__sim = sim; window.__perf = () => loadAvg;
+window.__sim = sim; window.__perf = () => loadAvg; window.__fps = () => ({ fps: 1000 / msAvg, scopeEvery });
 window.__app = { sim, wires, scope, panel, restore, snapshot, setView, tour: { start: runTour, open: tourOpen, end: endTour }, sheets: ALL_SHEETS, sections: SECTIONS, setLang: l => { setLang(l); applyTexts(); } };

@@ -198,7 +198,11 @@ html[lang="en"] [data-ar] { display: none !important; }
         <a class="btn btn-glass" id="kMac" href="https://github.com/Ahmed-Atef-Tech/ETT101-Simulator/releases/latest">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.4 12.8c0-2.4 2-3.6 2.1-3.7-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9-.8 0-1.9-.8-3.1-.8-1.6 0-3.1 1-3.9 2.4-1.7 2.9-.4 7.3 1.2 9.6.8 1.2 1.8 2.4 3 2.4 1.2-.1 1.7-.8 3.1-.8 1.5 0 1.9.8 3.1.8 1.3 0 2.1-1.2 2.9-2.3.9-1.3 1.3-2.6 1.3-2.7-.1 0-2.5-1-2.5-3.9zM14 5.7c.7-.8 1.1-1.9 1-3-1 0-2.1.7-2.8 1.5-.6.7-1.2 1.8-1 2.9 1.1.1 2.1-.6 2.8-1.4z"/></svg>
           <span><span data-ar>تحميل لـ Mac</span><span data-en>Download for Mac</span></span><small id="sMac"></small></a>
+        <a class="btn btn-glass" id="kWeb" href="app/">
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="6.5" y="2.5" width="11" height="19" rx="2.2"/><path d="M10.5 18.5h3"/></svg>
+          <span><span data-ar>افتح أونلاين (هاتف أو كمبيوتر)</span><span data-en>Open online (phone or computer)</span></span></a>
       </div>
+      <p class="note" id="webNote" hidden><span data-ar>نسخة الويب تعمل في المتصفح على أندرويد وآيفون وأي كمبيوتر، والحسابات كلها على جهازك. أدِر الهاتف بالعرض، ولإضافتها إلى الشاشة الرئيسية: في Chrome من القائمة ثم «إضافة إلى الشاشة الرئيسية»، وفي آيفون من زر المشاركة ثم «إضافة إلى الشاشة الرئيسية».</span><span data-en>The web version runs in the browser on Android, iPhone and any computer; all the work happens on your device. Turn the phone sideways. To add it to your home screen: in Chrome, menu → Add to Home screen; on iPhone, Share → Add to Home Screen.</span></p>
       <p class="mine" id="mine"></p>
       <p class="note beta-note" data-ar><b>نسخة أولية (تجريبية):</b> قد لا تطابق الجهاز الحقيقي بنسبة 100%، والجهاز الحقيقي هو المرجع. البرنامج مجاني وغير ربحي، صُمّم لمساعدة الطلاب فقط، ولا يجوز بيعه أو التربح منه بأي شكل من الأشكال.</p>
       <p class="note beta-note" data-en><b>Preliminary (beta) version:</b> it may not match the real kit 100%; the real kit is the reference. Free and non-commercial, made only to help students; it must not be sold or used to make money in any way.</p>
@@ -305,7 +309,9 @@ html[lang="en"] [data-ar] { display: none !important; }
   // which computer is this
   const ua = navigator.userAgent, plat = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '';
   const os = (/Win/i.test(plat) || /Windows/i.test(ua)) ? 'win' : ((/Mac/i.test(plat) || /Mac OS X/i.test(ua)) && !/iPhone|iPad/i.test(ua)) ? 'mac' : null;
-  if (os) { const k = $(os === 'win' ? 'kWin' : 'kMac'); k.classList.replace('btn-glass', 'btn-light'); k.parentNode.prepend(k); }
+  const mobile = /Android|iPhone|iPad|iPod/i.test(ua) || (/Mac/i.test(plat) && navigator.maxTouchPoints > 1); // iPadOS reports a Mac
+  if (mobile) { const k = $('kWeb'); k.classList.replace('btn-glass', 'btn-light'); k.parentNode.prepend(k); $('webNote').hidden = false; }
+  else if (os) { const k = $(os === 'win' ? 'kWin' : 'kMac'); k.classList.replace('btn-glass', 'btn-light'); k.parentNode.prepend(k); }
 
   // latest release
   let rel = null, failed = false, lang = store.get('ett.dl.lang') || 'ar';

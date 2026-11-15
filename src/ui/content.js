@@ -101,6 +101,15 @@ export const HELP = {
 <li><b>View:</b> Kit, Both and Scope fit that part to the screen. Ctrl + wheel zooms at the cursor; drag the empty bench to move around. Keys 1, 2, 3 switch views.</li>
 <li><b>Headphones:</b> click the headphone socket on the BUFFER. Sound comes out of the computer speakers.</li>
 <li><b>Guidance</b> (switch at the top) shows the <b>i</b> button on every module, socket names with a live reading, and knob values. Turn it off to practise like the real exam.</li></ul>`,
+    appTouch: `<h3>How to use it on a phone or tablet</h3><ul>
+<li><b>Zoom:</b> pinch with two fingers, right where you want to look. Drag an empty part of the bench with one finger to move around. The centre button brings everything back.</li>
+<li><b>Views:</b> Kit, Both and Scope fit that part to the screen. On a phone, Kit and Scope are the easiest.</li>
+<li><b>Connect a lead:</b> zoom in, then drag from one socket to another. Your finger only has to land near a socket.</li>
+<li><b>Remove a lead:</b> tap it twice. <b>Hold your finger on it</b> for its menu (colour, shape, remove).</li>
+<li><b>Knobs:</b> drag around the knob to turn it. Scope keys and switches: tap them.</li>
+<li><b>Headphones:</b> tap the headphone socket on the BUFFER; the sound comes out of the phone.</li>
+<li><b>Turn the phone sideways:</b> the kit and the scope need a wide screen.</li>
+<li><b>Add it to your home screen</b> to open it like an app and use it without the internet: in Chrome, menu → Add to Home screen; on iPhone, Share → Add to Home Screen.</li></ul>`,
     scope: `<h3>The oscilloscope (UTD2102CEL style)</h3><ul>
 <li><b>Connect:</b> drag from a BNC socket (CH1, CH2, EXT TRIG) to any socket on the kit. Double-click the lead to remove it.</li>
 <li><b>CH1 / CH2:</b> the first press selects the channel and opens its menu; the shared VERTICAL knobs then control it. Press again while its menu is open to turn the channel off.</li>
@@ -121,6 +130,15 @@ export const HELP = {
 <li><b>العرض:</b> الأزرار Kit و Both و Scope تُكبّر الجزء المطلوب على الشاشة. Ctrl مع عجلة الفأرة للتكبير عند المؤشر، واسحب في المساحة الفارغة للتحرّك. المفاتيح 1 و 2 و 3 تبدّل طريقة العرض.</li>
 <li><b>السماعة:</b> انقر على مقبس السماعة في BUFFER، ويخرج الصوت من سماعات الحاسوب.</li>
 <li><b>الإرشادات</b> (المفتاح في الأعلى) تُظهر زر <b>i</b> على كل وحدة، وأسماء المقابس مع قراءاتها اللحظية، وقيم المقابض. أوقفها لتتدرّب كما في الامتحان.</li></ul>`,
+    appTouch: `<h3>طريقة الاستخدام على الهاتف أو التابلت</h3><ul>
+<li><b>التكبير:</b> باعِد بين إصبعين أو قرّبهما عند المكان الذي تريد رؤيته. واسحب بإصبع واحدة في مكان فارغ لتتحرك في المساحة. وزر التوسيط يعيد كل شيء إلى مكانه.</li>
+<li><b>طرق العرض:</b> الجهاز وكلاهما وراسم الإشارة تجعل الجزء المطلوب يملأ الشاشة. وعلى الهاتف يكون عرض الجهاز وحده أو راسم الإشارة وحده الأسهل.</li>
+<li><b>توصيل سلك:</b> كبّر أولاً، ثم اسحب من مقبس إلى مقبس آخر. يكفي أن تضع إصبعك قرب المقبس.</li>
+<li><b>إزالة سلك:</b> اضغط عليه مرتين. و<b>اضغط عليه مطوّلاً</b> لتظهر قائمته (اللون والشكل والإزالة).</li>
+<li><b>المقابض:</b> اسحب حول المقبض لتديره. وأزرار راسم الإشارة والمفاتيح: اضغط عليها.</li>
+<li><b>السماعة:</b> اضغط على مقبس السماعة في BUFFER، ويخرج الصوت من الهاتف.</li>
+<li><b>أدِر الهاتف بالعرض:</b> يحتاج الجهاز وراسم الإشارة إلى شاشة عريضة.</li>
+<li><b>أضِفه إلى الشاشة الرئيسية</b> لتفتحه كتطبيق وتستخدمه من غير إنترنت: في Chrome من القائمة ثم «إضافة إلى الشاشة الرئيسية»، وفي آيفون من زر المشاركة ثم «إضافة إلى الشاشة الرئيسية».</li></ul>`,
     scope: `<h3>راسم الإشارة (على نمط UTD2102CEL)</h3><ul>
 <li><b>التوصيل:</b> اسحب من مقبس BNC (CH1 أو CH2 أو EXT TRIG) إلى أي مقبس على الجهاز. انقر على السلك مرتين لإزالته.</li>
 <li><b>CH1 / CH2:</b> الضغطة الأولى تختار القناة وتفتح قائمتها، ثم تتحكم فيها مقابض VERTICAL المشتركة. وإذا كانت قائمتها مفتوحة، فالضغطة توقف القناة.</li>

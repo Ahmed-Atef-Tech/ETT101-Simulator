@@ -6,6 +6,7 @@
 #      A release starts automatically when that version has not been released yet.
 #   2) Actions tab -> "Release" -> "Run workflow" -> type the new version.
 #   3) Push a tag:  git tag v0.27.0 && git push origin v0.27.0
+# The publish job also builds the web version into docs/app (GitHub Pages): https://<owner>.github.io/<repo>/app/
 # Release page text: .github/release-notice.md (the beta / non-commercial notice, on every release)
 # followed by .github/release-whatsnew.md (update it with each new version).
 # Downloads of build tools come from GitHub Releases; if GitHub is having an outage, re-run later.
@@ -140,15 +141,26 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh release edit "${{ needs.prepare.outputs.tag }}" --repo "${{ github.repository }}" --draft=false --latest
-      - name: Point the download page's direct links at this version
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - name: Build the web version (docs/app on GitHub Pages; it runs in the browser, phones included)
+        env:
+          ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
+        run: |
+          for i in 1 2 3; do npm ci --ignore-scripts && break; echo "::warning::npm ci attempt $i failed; retrying in 30 s"; sleep 30; done
+          node build.mjs
+      - name: Point the download page at this version and publish the web version
         # docs/index.html downloads FALLBACK straight away, without waiting for the GitHub API.
-        # A push made with GITHUB_TOKEN does not start another workflow run.
+        # A push made with GITHUB_TOKEN does not start another workflow run (GitHub Pages still redeploys).
         run: |
           V="${{ needs.prepare.outputs.version }}"
           git fetch -q origin main && git checkout -q -B main origin/main
           sed -i -E "s/(const FALLBACK = ')[0-9]+\.[0-9]+\.[0-9]+(')/\1$V\2/" docs/index.html
-          if git diff --quiet; then echo "Download page already points at $V"; exit 0; fi
+          rm -rf docs/app && cp -r dist/web docs/app && git add -A docs
+          if git diff --cached --quiet; then echo "Download page and web version already at $V"; exit 0; fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -qam "Download page: direct links point to v$V"
+          git commit -qm "Web version and download page: v$V"
           git push -q origin main

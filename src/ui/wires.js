@@ -21,11 +21,30 @@ export class Wires {
   }
   toSvg(e) { const p = this.svg.createSVGPoint(); p.x = e.clientX; p.y = e.clientY; return p.matrixTransform(this.svg.getScreenCTM().inverse()); }
   sockAt(e) {
+    if (e.pointerType === 'touch') { // a finger: a lead's cable under it wins, otherwise the socket whose centre is nearest
+      const u = document.elementFromPoint(e.clientX, e.clientY); if (u && u.closest('.lead') && !u.closest('[data-socket]')) return null;
+      return this.nearSocket(e);
+    }
     const t = document.elementFromPoint(e.clientX, e.clientY); if (!t) return null;
     const s = t.closest('[data-socket]'); if (s) return { sock: s.getAttribute('data-socket') };
     const b = t.closest('[data-bnc]'); if (b) return { bnc: b.getAttribute('data-bnc') };
     return null;
   }
+  // a fingertip is wider than a socket: take the nearest socket or BNC within about 22 screen pixels
+  nearSocket(e) {
+    const m = this.svg.getScreenCTM(); if (!m) return null; const R2 = 22 * 22; let best = null, bd = R2;
+    const test = (p, hit) => { const x = m.a * p[0] + m.c * p[1] + m.e, y = m.b * p[0] + m.d * p[1] + m.f, d = (x - e.clientX) ** 2 + (y - e.clientY) ** 2; if (d < bd) { bd = d; best = hit; } };
+    for (const k in SOCKET_POS) test(SOCKET_POS[k], { sock: k });
+    for (const ch of ['CH1', 'CH2', 'EXT']) test(this.scope.bncPos(ch), { bnc: ch });
+    return best;
+  }
+  // a second finger landed (pinch): drop whatever the first finger started
+  cancel() {
+    if (this.tmp) { this.tmp.path.remove(); this.tmp = null; this.svg.classList.remove('dragging'); this.hooks.hoverTarget(null); }
+    if (this.bendDrag) { const bd = this.bendDrag; clearTimeout(bd.press); this.bendDrag = null; this.svg.classList.remove('bending'); if (bd.moved) this.hooks.changed(); }
+  }
+  // touch: two taps on the same lead within 350 ms remove it (the mouse uses a double-click)
+  doubleTap(id) { const now = performance.now(), hit = this.lastTap && this.lastTap.id === id && now - this.lastTap.t < 350; this.lastTap = hit ? null : { id, t: now }; return hit; }
   pos(sock) { return SOCKET_POS[sock]; }
 
   // ---------- creating leads by dragging ----------
@@ -36,7 +55,11 @@ export class Wires {
       const g = e.target.closest && e.target.closest('.lead');
       if (g) {
         const ch = g.getAttribute('data-probe'), lead = ch ? null : this.sim.leads.find(l => l.id === g.getAttribute('data-lead'));
-        if (ch || lead) { e.preventDefault(); this.bendDrag = { g, ch, lead, x: e.clientX, y: e.clientY, moved: false }; }
+        if (ch || lead) {
+          e.preventDefault(); const bd = this.bendDrag = { g, ch, lead, x: e.clientX, y: e.clientY, moved: false, touch: e.pointerType === 'touch' };
+          // touch: hold still for half a second = the right-click menu (colour, reset shape, remove)
+          if (bd.touch) bd.press = setTimeout(() => { if (this.bendDrag === bd && !bd.moved) { bd.menu = true; this.longPressT = performance.now(); this.hooks.leadMenu(ch ? { probe: ch } : lead, { clientX: bd.x, clientY: bd.y }); } }, 550);
+        }
       }
       return;
     }
@@ -52,8 +75,8 @@ export class Wires {
   move(e) {
     const bd = this.bendDrag;
     if (bd) {
-      if (!bd.moved && Math.hypot(e.clientX - bd.x, e.clientY - bd.y) < 4) return;
-      if (!bd.moved) { bd.moved = true; this.svg.classList.add('bending'); this.hooks.hoverLead(null); }
+      if (bd.menu || (!bd.moved && Math.hypot(e.clientX - bd.x, e.clientY - bd.y) < (bd.touch ? 10 : 4))) return;
+      if (!bd.moved) { bd.moved = true; clearTimeout(bd.press); this.svg.classList.add('bending'); this.hooks.hoverLead(null); }
       const p = this.toSvg(e), pt = [Math.max(-300, Math.min(2700, p.x)), Math.max(-300, Math.min(1400, p.y))];
       if (bd.ch) this.probeBend[bd.ch] = pt; else bd.lead.bend = pt;
       // reshape in place (no redraw) so the drag stays smooth and the click that follows can be told apart
@@ -67,12 +90,20 @@ export class Wires {
   }
   up(e) {
     const bd = this.bendDrag;
-    if (bd) { this.bendDrag = null; this.svg.classList.remove('bending'); if (bd.moved) { this.justBent = true; setTimeout(() => { this.justBent = false; }, 0); this.hooks.changed(); } return; }
+    if (bd) {
+      clearTimeout(bd.press); this.bendDrag = null; this.svg.classList.remove('bending');
+      if (bd.moved) { this.justBent = true; setTimeout(() => { this.justBent = false; }, 0); this.hooks.changed(); }
+      else if (bd.touch && !bd.menu && this.doubleTap(bd.ch ? 'probe:' + bd.ch : bd.lead.id)) { if (bd.ch) this.setProbe(bd.ch, null); else this.removeLead(bd.lead.id); }
+      return;
+    }
     if (!this.tmp) return;
     const from = this.tmp.from, hit = this.sockAt(e);
     this.tmp.path.remove(); this.tmp = null; this.svg.classList.remove('dragging'); this.hooks.hoverTarget(null);
     if (!hit) return;
-    const d = this.downAt; if (d && d.lead && from.sock && hit.sock === from.sock && Math.hypot(e.clientX - d.x, e.clientY - d.y) < 4) { this.select(this.sel === d.lead ? null : d.lead); return; }
+    const d = this.downAt; if (d && d.lead && from.sock && hit.sock === from.sock && Math.hypot(e.clientX - d.x, e.clientY - d.y) < (e.pointerType === 'touch' ? 10 : 4)) {
+      if (e.pointerType === 'touch' && this.doubleTap(d.lead)) { if (d.lead.startsWith('probe:')) this.setProbe(d.lead.slice(6), null); else this.removeLead(d.lead); return; } // two taps on a plug remove its lead
+      this.select(this.sel === d.lead ? null : d.lead); return;
+    }
     if (from.sock && hit.sock && from.sock !== hit.sock) { this.addLead(from.sock, hit.sock, this.color); this.hooks.plugged(); }
     else if (from.bnc && hit.sock) { this.probeColor[from.bnc] = this.color; this.setProbe(from.bnc, hit.sock); this.hooks.plugged(); }
     else if (from.sock && hit.bnc) { this.probeColor[hit.bnc] = this.color; this.setProbe(hit.bnc, from.sock); this.hooks.plugged(); }
@@ -125,7 +156,7 @@ export class Wires {
       el('path', { d, fill: 'none', stroke: 'transparent', 'stroke-width': 16, class: 'leadHit' }, g);
       g.addEventListener('click', e => { if (e.detail > 1 || this.justBent) return; e.stopPropagation(); this.select(this.sel === l.id ? null : l.id); });
       g.addEventListener('dblclick', e => { e.stopPropagation(); this.removeLead(l.id); });
-      g.addEventListener('contextmenu', e => { e.preventDefault(); this.hooks.leadMenu(l, e); });
+      g.addEventListener('contextmenu', e => { e.preventDefault(); if (performance.now() - (this.longPressT || -1e9) < 1500) return; this.hooks.leadMenu(l, e); });
       g.addEventListener('pointerenter', e => this.hooks.hoverLead(l, e)); g.addEventListener('pointerleave', () => this.hooks.hoverLead(null));
       for (const s of [l.a, l.b]) { const p = plug(s, c, dk, null, l.id); p.addEventListener('dblclick', e => { e.stopPropagation(); this.removeLead(l.id); }); }
     }
@@ -141,7 +172,7 @@ export class Wires {
       el('path', { d, fill: 'none', stroke: 'rgba(255,255,255,.18)', 'stroke-width': 2, transform: 'translate(-1,-2)' }, g);
       el('path', { d, fill: 'none', stroke: 'transparent', 'stroke-width': 16, class: 'leadHit' }, g);
       g.addEventListener('click', e => { if (e.detail > 1 || this.justBent) return; e.stopPropagation(); this.select(this.sel === pid ? null : pid); });
-      g.addEventListener('contextmenu', e => { e.preventDefault(); this.hooks.leadMenu({ probe: ch }, e); });
+      g.addEventListener('contextmenu', e => { e.preventDefault(); if (performance.now() - (this.longPressT || -1e9) < 1500) return; this.hooks.leadMenu({ probe: ch }, e); });
       g.addEventListener('pointerenter', e => this.hooks.hoverLead({ probe: ch }, e)); g.addEventListener('pointerleave', () => this.hooks.hoverLead(null));
       g.addEventListener('dblclick', e => { e.stopPropagation(); this.setProbe(ch, null); });
       const p = plug(s, pc === 'black' ? '#3d4248' : c, dk, PROBE_TAG[ch], pid); p.addEventListener('dblclick', e => { e.stopPropagation(); this.setProbe(ch, null); });

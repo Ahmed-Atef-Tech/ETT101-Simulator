@@ -88,7 +88,7 @@ export class Scope {
     el('rect', { x: 88, y: 78, width: 736, height: 432, rx: 4, fill: '#111', stroke: '#2a6fd0', 'stroke-width': 3 }, g);
     const fo = el('foreignObject', { x: 92, y: 82, width: 728, height: 424 }, g);
     const cv = document.createElement('canvas'); cv.width = 800; cv.height = 480; cv.style.width = '728px'; cv.style.height = '424px'; cv.style.display = 'block';
-    fo.appendChild(cv); this.cv = cv; this.cx = cv.getContext('2d');
+    fo.appendChild(cv); this.cv = cv; this.cx = cv.getContext('2d', { alpha: false }); // the screen is always fully painted: an opaque canvas is cheaper to show
     this.pcv = document.createElement('canvas'); this.pcv.width = GW; this.pcv.height = GH; this.pcx = this.pcv.getContext('2d');
     this.k = 1; this.W = 800; this.H = 480; // the screen is drawn in 800 x 480 units (the real LCD) at k device pixels per unit
     // PrtSc + F keys
@@ -175,7 +175,7 @@ export class Scope {
       }
       last = { x: e.clientX, y: e.clientY, a: Math.atan2(dy, dx), d };
     };
-    const up = () => { window.removeEventListener('pointermove', mv); window.removeEventListener('pointerup', up); if (!moved) { this.push(id); this.hooks.click(); } };
+    const up = e => { window.removeEventListener('pointermove', mv); window.removeEventListener('pointerup', up); if (!moved && e.isTrusted) { this.push(id); this.hooks.click(); } }; // a pinch ends the turn without a push
     g.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); const b = g.getBoundingClientRect(); cx = b.x + b.width / 2; cy = b.y + b.height / 2; last = null; mv(e); acc = 0; moved = false; window.addEventListener('pointermove', mv); window.addEventListener('pointerup', up); });
     g.addEventListener('wheel', e => { e.preventDefault(); e.stopPropagation(); turn(e.deltaY < 0 ? 1 : -1); }, { passive: false });
   }
@@ -537,7 +537,13 @@ export class Scope {
     if (this.levelShow && performance.now() - this.levelShow < 1500) this.drawLevelLine(g);
     this.pane = FULL;
   }
+  // the grid is drawn once per size and reused: thousands of dots per frame are slow on phones
   drawGrid(g, P = FULL) {
+    const key = `${this.st.disp.grid}|${P.y}|${P.h}|${this.k}`, c = this.gridCache || (this.gridCache = {});
+    if (!c[key]) { const cv = document.createElement('canvas'); cv.width = Math.ceil((GW + 4) * this.k); cv.height = Math.ceil((P.h + 4) * this.k); const x = cv.getContext('2d'); x.setTransform(this.k, 0, 0, this.k, (2 - GX) * this.k, (2 - P.y) * this.k); this.drawGridNow(x, P); c[key] = cv; }
+    g.drawImage(c[key], GX - 2, P.y - 2, GW + 4, P.h + 4);
+  }
+  drawGridNow(g, P) {
     const s = this.st; if (s.disp.grid === 'Off') { g.strokeStyle = '#9a9a9a'; g.lineWidth = 1; g.strokeRect(GX - .5, P.y - .5, GW + 1, P.h + 1); return; }
     const py = P.h / VDIVS;
     g.fillStyle = '#6b6b6b'; g.strokeStyle = '#555';

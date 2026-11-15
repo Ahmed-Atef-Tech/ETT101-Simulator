@@ -23,3 +23,18 @@ fs.mkdirSync('dist', { recursive: true });
 fs.writeFileSync('dist/index.html', html);
 fs.writeFileSync('electron/index.html', html); // the desktop app loads this copy
 console.log('dist/index.html', (html.length / 1024).toFixed(0), 'KB');
+// the web version (GitHub Pages, phones): same page plus what makes it installable and work offline
+const web = html.replace('<head>', () => `<head>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#2a3b40">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ETT-101">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">`).replace('</body>', () => `<script>if ('serviceWorker' in navigator && location.protocol === 'https:') addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));</script>\n</body>`);
+fs.rmSync('dist/web', { recursive: true, force: true }); fs.mkdirSync('dist/web', { recursive: true });
+fs.writeFileSync('dist/web/index.html', web);
+for (const f of fs.readdirSync('web')) if (f !== 'sw.js') fs.copyFileSync(`web/${f}`, `dist/web/${f}`);
+fs.writeFileSync('dist/web/sw.js', fs.readFileSync('web/sw.js', 'utf8').replace('__VERSION__', pkg.version));
+console.log('dist/web/ (web version)', fs.readdirSync('dist/web').length, 'files');

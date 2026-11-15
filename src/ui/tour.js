@@ -34,6 +34,13 @@ const ART = {
     from: '<circle cx="75" cy="64" r="22" fill="#cfcac1" stroke="#6b6b6b" stroke-width="3"/><circle cx="75" cy="64" r="13" fill="#3a3a3a" stroke="#f6e51d" stroke-width="3"/><circle cx="75" cy="64" r="3.5" fill="#d4b45a"/><text x="75" y="32" font-size="13" font-weight="700" text-anchor="middle" fill="#2a2a2a" font-family="sans-serif">CH1</text>',
     to: '<circle cx="250" cy="64" r="12" fill="#f2c21b" stroke="#7a5d00" stroke-width="3"/><circle cx="250" cy="64" r="4.5" fill="#2b2b2b"/>',
     path: 'M75 64 C 120 130, 200 130, 250 64', end: [250, 64], color: '#3d4248', dark: '#101214', width: 7 }),
+  pinch: `<svg viewBox="0 0 320 130" class="tArt" aria-hidden="true">
+    <rect x="70" y="8" width="180" height="114" rx="16" fill="#16191c" stroke="#3a4046" stroke-width="3"/><rect x="82" y="20" width="156" height="90" rx="4" fill="#2a3b40"/>
+    <g fill="#f2c21b" opacity=".9"><rect x="110" y="44" width="40" height="30" rx="3"/><rect x="160" y="52" width="48" height="34" rx="3" fill="#e9e5dc"/></g>
+    <g><circle r="15" fill="#fbd7b5" stroke="#1e2427" stroke-width="2.5"/><animateTransform attributeName="transform" type="translate" values="150 66;118 40;118 40;150 66" keyTimes="0;0.45;0.75;1" dur="2.4s" repeatCount="indefinite"/></g>
+    <g><circle r="15" fill="#fbd7b5" stroke="#1e2427" stroke-width="2.5"/><animateTransform attributeName="transform" type="translate" values="172 72;206 98;206 98;172 72" keyTimes="0;0.45;0.75;1" dur="2.4s" repeatCount="indefinite"/></g>
+    <path d="M128 34 l-12 -10 M128 34 l0 -9 M128 34 l-9 0" stroke="#1f9a45" stroke-width="3" stroke-linecap="round" fill="none"/><path d="M196 106 l12 10 M196 106 l0 9 M196 106 l9 0" stroke="#1f9a45" stroke-width="3" stroke-linecap="round" fill="none" transform="translate(4 -4)"/>
+  </svg>`,
   zoom: `<svg viewBox="0 0 320 130" class="tArt" aria-hidden="true">
     <g class="tKey"><rect x="18" y="44" width="92" height="60" rx="12" fill="#bfc4c7"/><rect x="18" y="38" width="92" height="58" rx="12" fill="#f4f4f1" stroke="#9aa3a7" stroke-width="2"/>
       <text x="64" y="75" font-size="22" font-weight="800" text-anchor="middle" fill="#1e2427" font-family="sans-serif">Ctrl</text></g>
@@ -56,18 +63,23 @@ const STEPS = [
     text: A('On the left is the Emona ETT-101 kit, on the right a UTD2102CEL-style oscilloscope. Wire the kit, turn the knobs and watch the signals, as in the lab. This short guide shows you around.',
       'على اليسار جهاز Emona ETT-101، وعلى اليمين راسم إشارة على نمط UTD2102CEL. صِل الأسلاك وأدِر المقابض وشاهد الإشارات كما في المعمل. هذا الدليل القصير يعرّفك بالبرنامج.') },
   { target: '#board', view: 'kit', art: 'drag', title: A('Wire the kit', 'توصيل الأسلاك'),
+    touch: { text: A('Drag from one socket to another to plug in a lead. Tap a lead twice to remove it, hold your finger on it for its menu (colour, shape). Turn a knob by dragging around it.',
+      'اسحب من مقبس إلى مقبس آخر لتوصيل سلك. اضغط على السلك مرتين لإزالته، واضغط عليه مطوّلاً لقائمته (اللون والشكل). أدِر المقبض بالسحب حوله.') },
     text: A('Drag from one socket to another to plug in a lead. Double-click a lead to remove it, right-click it to change its colour. Turn a knob by dragging around it or with the mouse wheel.',
       'اسحب من مقبس إلى مقبس آخر لتوصيل سلك. انقر على السلك مرتين لإزالته، وانقر بالزر الأيمن لتغيير لونه. أدِر المقبض بالسحب حوله أو بعجلة الفأرة.') },
   { target: '#scope', view: 'scope', art: 'probe', title: A('The oscilloscope', 'راسم الإشارة'),
     text: A('Drag from the CH1 or CH2 socket to any socket on the kit to see that signal. The keys and knobs work like the real scope; AUTO sets everything up for you.',
       'اسحب من مقبس CH1 أو CH2 إلى أي مقبس على الجهاز لترى إشارته. الأزرار والمقابض تعمل مثل الجهاز الحقيقي، والزر AUTO يضبط كل شيء تلقائياً.') },
   { art: 'zoom', title: A('Zoom in and out', 'التكبير والتصغير'),
+    touch: { art: 'pinch', text: A('Pinch with two fingers to zoom in or out, right where your fingers are. Drag an empty part of the bench with one finger to move around.',
+      'باعِد بين إصبعين أو قرّبهما للتكبير والتصغير عند مكان أصابعك تماماً. واسحب بإصبع واحدة في مكان فارغ لتتحرك في المساحة.') },
     text: A('Hold Ctrl and turn the mouse wheel: up zooms in, down zooms out, right where the pointer is. Drag an empty part of the bench to move around.',
       'اضغط Ctrl مع تدوير عجلة الفأرة: للأعلى للتكبير، وللأسفل للتصغير، عند مكان المؤشر تماماً. واسحب في مكان فارغ لتتحرك في المساحة.') },
   { target: '#btnFull', title: A('Back to the middle', 'العودة إلى المنتصف'),
     text: A('Lost after zooming? This button brings the kit and the scope back to the middle of the screen.', 'هل ابتعدت بعد التكبير؟ هذا الزر يعيد الجهاز وراسم الإشارة إلى منتصف الشاشة.') },
   { target: '.tray', title: A('Kit, Both or Scope', 'الجهاز أو كلاهما أو راسم الإشارة'),
-    text: A('Show the kit, both, or only the scope. The keys 1, 2 and 3 do the same.', 'اعرض الجهاز أو كليهما أو راسم الإشارة فقط. والمفاتيح 1 و 2 و 3 تفعل الشيء نفسه.') },
+    text: A('Show the kit, both, or only the scope. The keys 1, 2 and 3 do the same.', 'اعرض الجهاز أو كليهما أو راسم الإشارة فقط. والمفاتيح 1 و 2 و 3 تفعل الشيء نفسه.'),
+    touch: { text: A('Show the kit, both, or only the scope: on a phone the Kit and Scope views are the easiest to use.', 'اعرض الجهاز أو كليهما أو راسم الإشارة فقط. على الهاتف يكون عرض الجهاز وحده أو راسم الإشارة وحده الأسهل في الاستخدام.') } },
   { target: '#btnLib', title: A('Ready-made experiments', 'تجارب جاهزة'),
     text: A('Every experiment of the lab books, with its page number. One click wires the kit and sets the scope.', 'كل تجارب كتب المعمل مع رقم الصفحة. بنقرة واحدة تُوصَّل الأسلاك ويُضبط راسم الإشارة.') },
   { target: '#btnGuide', title: A('Lab sheets', 'أوراق التجارب'),
@@ -82,8 +94,11 @@ const STEPS = [
 
 let root = null, i = 0, onEnd = null, setView = null;
 const $ = s => document.querySelector(s);
+const touchUI = window.matchMedia && matchMedia('(pointer: coarse)').matches; // phones and tablets get touch wording
 const reduce = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+// short phone screens: a narrow card beside the part it points at, a wide one when it points at nothing
+const cardW = st => innerHeight < 500 ? (st.target ? Math.min(340, Math.round(innerWidth * 0.46)) : Math.min(540, innerWidth - 24)) : Math.min(400, innerWidth - 32);
 export const tourOpen = () => !!root;
 export function tourReframe() { if (!root) return; if (setView) setView(STEPS[i].view || 'both'); place(); } // after a window resize or the start-up fit
 export function startTour(done, opts = {}) {
@@ -110,7 +125,7 @@ function onKey(e) {
 }
 function go(d) { const n = i + d; if (n < 0) return; if (n >= STEPS.length) { endTour(true); return; } i = n; show(); }
 function show() {
-  const st = STEPS[i], last = i === STEPS.length - 1, card = root.querySelector('.tourCard');
+  const base = STEPS[i], st = touchUI && base.touch ? { ...base, ...base.touch } : base, last = i === STEPS.length - 1, card = root.querySelector('.tourCard');
   card.innerHTML = `${st.art ? ART[st.art] : ''}
     <h2 id="tourTitle">${trb(st.title)}</h2><p>${trb(st.text)}</p>
     <div class="tourFoot"><button type="button" class="tourSkip">${t('tourSkip')}</button><span class="tourDots" aria-label="${i + 1} / ${STEPS.length}">${STEPS.map((_, k) => `<i class="${k === i ? 'on' : ''}"></i>`).join('')}</span>
@@ -124,6 +139,7 @@ function show() {
     card.querySelectorAll('[data-final]').forEach(x => x.setAttribute('stroke-dashoffset', x.dataset.final));
     card.querySelectorAll('[data-end]').forEach(x => x.setAttribute('transform', `translate(${x.dataset.end.replace(' ', ',')})`));
   }
+  card.style.width = cardW(st) + 'px';
   if (setView) setView(st.view || 'both'); // each step frames its part of the bench, whatever the zoom was
   place(); requestAnimationFrame(place); card.querySelector('.tourNext').focus({ preventScroll: true });
 }
@@ -139,7 +155,7 @@ function place() {
   hole.dataset.target = tr ? '1' : '';
   ring.style.display = tr ? '' : 'none'; if (tr) Object.assign(ring.style, { left: tr.x + 'px', top: tr.y + 'px', width: tr.r - tr.x + 'px', height: tr.b - tr.y + 'px' });
   // card: centred when there is no target; otherwise in the largest free space beside the target
-  const cw = Math.min(400, W - 32); card.style.width = cw + 'px'; const ch = card.offsetHeight;
+  const cw = cardW(st); card.style.width = cw + 'px'; const ch = card.offsetHeight;
   let x, y;
   if (!tr) { x = (W - cw) / 2; y = (H - ch) / 2; }
   else {

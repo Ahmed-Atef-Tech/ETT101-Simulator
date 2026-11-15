@@ -10,6 +10,8 @@ An interactive simulator of the **Emona ETT-101 (Telecoms-Trainer 101)** kit and
 
 **[Download page](https://ahmed-atef-tech.github.io/ETT101-Simulator/)** · [GitHub release](https://github.com/Ahmed-Atef-Tech/ETT101-Simulator/releases/latest)
 
+**[Open the web version](https://ahmed-atef-tech.github.io/ETT101-Simulator/app/)**: runs in the browser on Android, iPhone and any computer, with nothing to install. All the simulation runs on your own device, and after the first visit it also works offline. On a phone, turn it sideways; to keep it as an app, use *Add to Home screen* (Chrome menu, or Share on iPhone). Pinch with two fingers to zoom, tap a lead twice to remove it, hold it for its menu.
+
 | Device | File |
 |---|---|
 | Windows 10 / 11 | `ETT101-Simulator-Setup-x.y.z.exe` |
@@ -64,6 +66,11 @@ npm test             # setup and book checks (the simulation against the lab boo
 npm run test:e2e     # interface tests in Chromium (needs Playwright)
 npm run test:monkey  # 3000 random actions looking for errors
 npm run test:scope   # oscilloscope checks against the UTD2102CEL manual (writes docs/scope-check.md)
+```
+
+`node build.mjs` also writes the web version to `dist/web/` (page, manifest, icons, offline service worker); the Release workflow copies it to `docs/app/`, which GitHub Pages serves.
+
+```bash
 ```
 
 ## Repository layout

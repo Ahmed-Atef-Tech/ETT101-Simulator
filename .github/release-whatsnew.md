@@ -1,4 +1,8 @@
-- The oscilloscope screen stays sharp when you zoom in: it is now redrawn at the size it is shown on your screen (up to 3× the real 800 × 480), instead of stretching a small picture.
-- Waveforms are drawn as one smooth shape, so the trace has no steps or gaps between columns when zoomed in.
-- أصبحت شاشة راسم الإشارة واضحة عند التكبير: تُرسم الآن بالحجم الذي تظهر به على شاشتك (حتى 3 أضعاف دقة 800 × 480 الحقيقية) بدلاً من تكبير صورة صغيرة.
-- تُرسم الإشارات الآن كشكل واحد ناعم، فلا تظهر درجات أو فراغات في الخط عند التكبير.
+- **Web version for phones and computers:** open https://ahmed-atef-tech.github.io/ETT101-Simulator/app/ in Chrome or Safari, on Android, iPhone or any computer, with nothing to install. All the simulation runs on your own device. After the first visit it works offline, and *Add to Home screen* keeps it as an app.
+- **Touch controls:** pinch with two fingers to zoom and drag the bench to move; a finger only has to land near a socket; tap a lead twice to remove it; hold it for its menu. Knobs, scope keys and switches work by touch.
+- **Made for phone screens:** the toolbar folds up on small screens, panels fit short screens, a "turn your phone sideways" screen appears in portrait, and the tips, the welcome guide and the How to use page speak about touch on phones and tablets and about the mouse on computers.
+- **Slow devices:** the oscilloscope redraws less often when the device can't keep up, so wiring and knobs stay smooth.
+- **نسخة ويب للهاتف والكمبيوتر:** افتح https://ahmed-atef-tech.github.io/ETT101-Simulator/app/ في Chrome أو Safari على أندرويد أو آيفون أو أي كمبيوتر، من غير تثبيت. المحاكاة كلها تعمل على جهازك. وبعد أول فتحة تعمل من غير إنترنت، و«إضافة إلى الشاشة الرئيسية» تحفظها كتطبيق.
+- **التحكم باللمس:** كبّر بإصبعين واسحب للتحرك، ويكفي أن تضع إصبعك قرب المقبس، واضغط على السلك مرتين لإزالته، واضغط عليه مطوّلاً لقائمته. والمقابض وأزرار راسم الإشارة والمفاتيح تعمل باللمس.
+- **مناسبة لشاشة الهاتف:** يصغر شريط الأدوات على الشاشات الصغيرة، وتتسع القوائم للشاشات القصيرة، وتظهر رسالة «أدِر هاتفك بالعرض» عند الوضع الطولي. والتلميحات والدليل التعريفي وصفحة طريقة الاستخدام تتكلم عن اللمس على الهاتف والتابلت، وعن الفأرة على الكمبيوتر.
+- **الأجهزة البطيئة:** يُحدّث راسم الإشارة شاشته بمعدل أقل عندما لا يستطيع الجهاز المتابعة، فيبقى التوصيل وتدوير المقابض سلساً.

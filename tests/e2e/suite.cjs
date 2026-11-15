@@ -1,7 +1,7 @@
 // End-to-end test suite for the simulator page (dist/index.html), driven through Chromium with Playwright.
 // Run:  node build.mjs && node tests/e2e/suite.cjs [--only=LD] [--monkey=3000] [--json=out.json]
 // Every test also fails if the page throws or logs an error while it runs.
-const { chromium } = require('playwright');
+const { chromium, devices } = require('playwright');
 const path = require('path'), fs = require('fs');
 
 const URL = 'file://' + path.resolve(__dirname, '../../dist/index.html');
@@ -368,6 +368,97 @@ T('SC10', 'Scope', 'The scope screen stays sharp when the bench is zoomed in (dr
   ok(z.k > k0 && z.w === 800 * z.k && (z.w >= Math.min(2400, z.shown * 0.98)), 'canvas follows the zoom: ' + JSON.stringify({ k0, ...z }));
   await p.keyboard.press('3'); await p.waitForTimeout(500); ok(await app(p, () => __app.scope.k) <= Math.max(k0, 1.5), 'back to normal resolution');
   eq(await finite(p), [], 'non-finite');
+});
+
+// ------------------------------------------------------------------ phones (the web version, touch only)
+const WEB = 'file://' + path.resolve(__dirname, '../../dist/web/index.html');
+async function phone(p, name, lang = 'en') {
+  const dev = { ...devices[name] }; delete dev.defaultBrowserType;
+  const ctx = await browser.newContext({ ...dev, locale: 'en-US' }), q = await ctx.newPage();
+  q.on('pageerror', e => p.errs.push('phone pageerror: ' + e.message));
+  q.on('console', m => { if (m.type() === 'error' && !/favicon|ERR_FILE_NOT_FOUND|net::|manifest/i.test(m.text())) p.errs.push('phone console: ' + m.text()); });
+  await q.goto(WEB); await q.waitForFunction(() => window.__app);
+  await q.evaluate(l => { localStorage.clear(); localStorage.setItem('ett.notice', '1'); localStorage.setItem('ett.tour', '1'); localStorage.setItem('ett.lang', l); }, lang); await q.reload(); await q.waitForFunction(() => window.__app); await q.waitForTimeout(300);
+  q.cdp = await ctx.newCDPSession(q);
+  const T = (type, pts) => q.cdp.send('Input.dispatchTouchEvent', { type, touchPoints: pts.map((t, i) => ({ x: t.x, y: t.y, id: t.id ?? i + 1, radiusX: 4, radiusY: 4 })) });
+  q.fingerDrag = async (a, b, steps = 8) => { await T('touchStart', [a]); for (let k = 1; k <= steps; k++) await T('touchMove', [{ x: a.x + (b.x - a.x) * k / steps, y: a.y + (b.y - a.y) * k / steps }]); await T('touchEnd', []); await q.waitForTimeout(80); };
+  q.tapAt = async (a, hold = 0) => { await T('touchStart', [a]); if (hold) await q.waitForTimeout(hold); await T('touchEnd', []); await q.waitForTimeout(40); };
+  q.pinch = async (c, d0, d1, steps = 10, first = null) => { // two fingers centred on c, from d0 apart to d1 apart (first finger may land elsewhere first)
+    const f1 = first || { x: c.x - d0 / 2, y: c.y }; await T('touchStart', [f1]); await q.waitForTimeout(30);
+    await T('touchStart', [{ ...f1, id: 1 }, { x: c.x + d0 / 2, y: c.y, id: 2 }]);
+    for (let k = 1; k <= steps; k++) { const d = d0 + (d1 - d0) * k / steps; await T('touchMove', [{ x: c.x - d / 2, y: c.y, id: 1 }, { x: c.x + d / 2, y: c.y, id: 2 }]); }
+    await T('touchEnd', []); await q.waitForTimeout(80);
+  };
+  q.ctxDone = () => ctx.close();
+  return q;
+}
+const sockAtScreen = (q, s) => q.evaluate(s => { const p = window.__app.wires.pos(s), m = document.querySelector('#bench').getScreenCTM(); return { x: m.a * p[0] + m.c * p[1] + m.e, y: m.b * p[0] + m.d * p[1] + m.f }; }, s);
+
+T('MB01', 'Phone', 'Web version on phones: toolbar fits from iPhone SE to Pixel 7 in landscape, touch hint, portrait asks to turn the phone, installable files', async p => {
+  for (const name of ['iPhone SE landscape', 'iPhone 14 landscape', 'Pixel 7 landscape']) {
+    const q = await phone(p, name, name.startsWith('iPhone SE') ? 'ar' : 'en');
+    const r = await q.evaluate(() => { const rail = document.getElementById('rail'), b = rail.getBoundingClientRect(); return { fits: rail.scrollWidth <= innerWidth + 1 && [...rail.children].every(e => { const r = e.getBoundingClientRect(); return !r.width || (r.left >= 0 && r.right <= innerWidth + 1); }), hint: document.getElementById('hint').dataset.t, rotate: getComputedStyle(document.getElementById('rotate')).display, manifest: !!document.querySelector('link[rel=manifest]'), apple: !!document.querySelector('link[rel=apple-touch-icon]') }; });
+    ok(r.fits, `${name}: toolbar fits`); eq(r.hint, 'zoomHintTouch', `${name}: touch hint`); eq(r.rotate, 'none', `${name}: no rotate screen in landscape`); ok(r.manifest && r.apple, `${name}: install links`);
+    await q.ctxDone();
+  }
+  const q = await phone(p, 'iPhone 14');
+  eq(await q.evaluate(() => getComputedStyle(document.getElementById('rotate')).display), 'flex', 'portrait: turn-the-phone screen');
+  await q.tap('#rotOK'); eq(await q.evaluate(() => getComputedStyle(document.getElementById('rotate')).display), 'none', 'Continue anyway'); await q.ctxDone();
+  const man = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../dist/web/manifest.webmanifest'), 'utf8'));
+  ok(man.icons.every(i => fs.existsSync(path.resolve(__dirname, '../../dist/web', i.src))) && man.display === 'standalone', 'manifest icons exist');
+  const sw = fs.readFileSync(path.resolve(__dirname, '../../dist/web/sw.js'), 'utf8'), ver = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../package.json'))).version;
+  ok(sw.includes(`ett101-${ver}`) && /index\.html/.test(sw), 'service worker caches this version');
+});
+
+T('MB02', 'Phone', 'Touch wiring: a finger near a socket grabs it, a lead is made; tap twice removes it; holding opens its menu', async p => {
+  const q = await phone(p, 'Pixel 7 landscape'); await q.evaluate(() => __app.setView('kit')); await q.waitForTimeout(300);
+  // zoom in on the two sockets as a student would (a 2-finger pinch is tested in MB03): frame them with some room
+  await q.evaluate(() => { const w = __app.wires, a = w.pos('master.SINE2'), b = w.pos('mult1.YAC'), r = document.querySelector('#bench').getBoundingClientRect(); const W = Math.max(Math.abs(a[0] - b[0]), Math.abs(a[1] - b[1]) * r.width / r.height) + 160, H = W * r.height / r.width; document.querySelector('#bench').setAttribute('viewBox', `${(a[0] + b[0]) / 2 - W / 2} ${(a[1] + b[1]) / 2 - H / 2} ${W} ${H}`); });
+  let a = await sockAtScreen(q, 'master.SINE2'); const b = await sockAtScreen(q, 'mult1.YAC');
+
+  await q.fingerDrag({ x: a.x + 9, y: a.y - 7 }, { x: b.x - 8, y: b.y + 9 }); // both ends a fingertip away from the socket centre
+  eq(await q.evaluate(() => __app.sim.leads.map(l => [l.a, l.b].sort().join(' '))), ['master.SINE2 mult1.YAC'], 'lead made by touch');
+  const mid = await q.evaluate(() => { const g = document.querySelector('.lead[data-lead]'), path = g.querySelector('path'), L = path.getTotalLength(), pt = path.getPointAtLength(L / 2), m = path.getScreenCTM(); return { x: m.a * pt.x + m.c * pt.y + m.e, y: m.b * pt.x + m.d * pt.y + m.f }; });
+  await q.tapAt(mid, 700); await q.waitForTimeout(100);
+  ok(await q.evaluate(() => !!document.querySelector('.ctx')), 'holding the lead opens its menu'); await q.evaluate(() => document.querySelectorAll('.ctx').forEach(m => m.remove()));
+  eq(await q.evaluate(() => __app.sim.leads.length), 1, 'menu did not remove it');
+  await q.tapAt(mid); await q.waitForTimeout(120); await q.tapAt(mid); await q.waitForTimeout(150);
+  eq(await q.evaluate(() => __app.sim.leads.length), 0, 'two taps remove the lead');
+  // probe by touch: CH1 BNC to a socket in Both view
+  await q.evaluate(() => __app.setView('both')); await q.waitForTimeout(300);
+  const bnc = await q.evaluate(() => { const p = __app.scope.bncPos('CH1'), m = document.querySelector('#bench').getScreenCTM(); return { x: m.a * p[0] + m.c * p[1] + m.e, y: m.b * p[0] + m.d * p[1] + m.f }; });
+  const s2 = await sockAtScreen(q, 'master.SINE100'); await q.fingerDrag(bnc, { x: s2.x + 5, y: s2.y + 5 });
+  eq(await q.evaluate(() => __app.sim.probes.CH1), 'master.SINE100', 'probe by touch'); await q.ctxDone();
+});
+
+T('MB03', 'Phone', 'Pinch: two fingers zoom and move the bench; the first finger on a knob or socket does not turn it or start a lead', async p => {
+  const q = await phone(p, 'iPhone 14 landscape'); await q.evaluate(() => __app.setView('both')); await q.waitForTimeout(300);
+  const w0 = await q.evaluate(() => +document.querySelector('#bench').getAttribute('viewBox').split(' ')[2]);
+  await q.pinch({ x: 380, y: 200 }, 80, 260); const w1 = await q.evaluate(() => +document.querySelector('#bench').getAttribute('viewBox').split(' ')[2]);
+  ok(w1 < w0 * 0.55, `pinch out zooms in: ${w0} → ${w1}`);
+  await q.pinch({ x: 380, y: 200 }, 260, 90); const w2 = await q.evaluate(() => +document.querySelector('#bench').getAttribute('viewBox').split(' ')[2]);
+  ok(w2 > w1 * 1.8, `pinch in zooms out: ${w1} → ${w2}`);
+  await q.evaluate(() => __app.setView('kit')); await q.waitForTimeout(300);
+  const knob = await q.evaluate(() => { const r = document.querySelector('.knob[data-mod="vco"][data-p="FREQ"]').getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; });
+  const f0 = await q.evaluate(() => __app.sim.mods.vco.p.FREQ);
+  await q.pinch({ x: knob.x + 60, y: knob.y }, 100, 200, 10, knob);
+  eq(await q.evaluate(() => __app.sim.mods.vco.p.FREQ), f0, 'knob under the first finger unchanged');
+  const sk = await sockAtScreen(q, 'master.SINE2'); await q.pinch({ x: sk.x + 50, y: sk.y }, 80, 160, 10, sk);
+  eq(await q.evaluate(() => __app.sim.leads.length), 0, 'no lead from the first finger'); ok(await q.evaluate(() => !__app.wires.tmp), 'no lead left half-drawn');
+  await q.ctxDone();
+});
+
+T('MB04', 'Phone', 'Touch controls: a knob turns by dragging around it, scope keys and soft keys work by tap, experiments load by tap', async p => {
+  const q = await phone(p, 'Pixel 7 landscape'); await q.evaluate(() => __app.setView('kit')); await q.waitForTimeout(300);
+  const k = await q.evaluate(() => { const r = document.querySelector('.knob[data-mod="vco"][data-p="FREQ"]').getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2, r: r.width / 2 }; });
+  const f0 = await q.evaluate(() => __app.sim.mods.vco.p.FREQ);
+  await q.fingerDrag({ x: k.x - k.r * 0.9, y: k.y + k.r * 0.6 }, { x: k.x + k.r * 0.9, y: k.y - k.r * 0.9 }, 12);
+  ok(await q.evaluate(f0 => Math.abs(__app.sim.mods.vco.p.FREQ - f0) > 0.02, f0), 'knob turned by finger');
+  await q.tap('#vScope'); await q.waitForTimeout(300);
+  const key = label => q.evaluate(label => { const g = [...document.querySelectorAll('#scope .sbtn')].find(b => b.textContent.replace(/\s+/g, ' ').trim() === label); if (!g) return null; const r = g.getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; }, label);
+  const m = await key('MEASURE'); ok(m, 'MEASURE key found'); await q.tapAt(m); eq(await q.evaluate(() => __app.scope.st.menu), 'MEASURE', 'scope key by tap');
+  await q.tap('#btnLib'); await q.waitForTimeout(200); await q.evaluate(() => document.querySelector('#lib .lrow').click()); await q.waitForTimeout(400);
+  ok(await q.evaluate(() => __app.sim.leads.length > 0), 'experiment loaded'); await q.ctxDone();
 });
 
 // ================================================================== 5. rail panels
