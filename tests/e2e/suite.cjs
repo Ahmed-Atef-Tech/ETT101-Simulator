@@ -522,7 +522,7 @@ T('MB06', 'Phone', 'Full screen: on a phone the first tap fills the screen (no a
 
 // ================================================================== 5. rail panels
 T('RL01', 'Rail', 'Lab sheets: every experiment, every step, prev/next, step buttons, show wiring', async p => {
-  await p.click('#btnGuide'); const n = await app(p, () => document.querySelectorAll('.explist [data-e]').length); eq(n, 24, 'lab sheets in the list (7 Term 1 + 13 Term 2 + 4 extra)');
+  await p.click('#btnGuide'); const n = await app(p, () => document.querySelectorAll('.explist [data-e]').length); eq(n, 21, 'lab sheets in the list (7 Term 1 + 13 Term 2 + 1 extra; the DATEx extras have wiring only)');
   for (let i = 0; i < n; i++) {
     await app(p, i => document.querySelectorAll('.explist [data-e]')[i].click(), i); await p.waitForTimeout(40);
     const steps = await app(p, () => document.querySelectorAll('.stepbar button').length); ok(steps >= 2, 'steps ' + steps);
@@ -545,12 +545,13 @@ T('RL11', 'Rail', 'Lab sheets: grouped by topic, every sheet listed once, every 
     await p.click(`.ltab[data-tab="${tab}"]`);
     const gs = await app(p, () => [...document.querySelectorAll('.gsheet')].map(b => b.dataset.g));
     const groups = await app(p, () => document.querySelectorAll('.lgrp').length);
-    eq(gs.length, groups, 'groups without a sheet in tab ' + tab); for (const g of gs) ok(r.all.includes(g), 'unknown sheet ' + g);
+    // the three DATEx extras (tab x) have ready-made wiring but no written lab sheet
+    eq(gs.length, groups - (tab === 'x' ? 3 : 0), 'groups without a sheet in tab ' + tab); for (const g of gs) ok(r.all.includes(g), 'unknown sheet ' + g);
   }
 });
 T('RL12', 'Rail', 'Every lab-sheet step that builds a figure ticks when that figure\'s setup is loaded', async p => {
   const steps = await app(p, () => __app.sheets.flatMap(x => x.steps.map((s, i) => ({ id: x.id, i, w: s.w, n: (s.c || []).length + Object.keys(s.p || {}).length })).filter(s => s.w)));
-  ok(steps.length >= 50, 'steps with a setup: ' + steps.length);
+  ok(steps.length >= 44, 'steps with a setup: ' + steps.length);
   for (const s of steps) {
     ok(s.n > 0, `${s.id} step ${s.i + 1} has no checks`);
     await loadSetup(p, s.w);
