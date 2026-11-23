@@ -83,12 +83,14 @@ export const NOTICE = {
 <li><b>Not an exact copy of the kit.</b> The simulator models the Emona ETT-101 and the oscilloscope from their published specifications and the lab books. Readings may not match the real kit 100%. When they differ, the real kit is the reference.</li>
 <li><b>For students, free and non-commercial.</b> It was made to help students practise and prepare for the communications labs. It must not be sold, rented, put behind a paywall, bundled with paid courses or used to make money in any way.</li>
 <li><b>Not affiliated with Emona Instruments or UNI-T.</b> Kit and instrument names are used only to say what is being simulated.</li>
-<li>Found something that does not match the kit? Use <b>Report a bug</b> so it can be fixed.</li></ul>`,
+<li>Found something that does not match the kit? Use <b>Report a bug</b> so it can be fixed.</li></ul>
+<p class="fineprint">Fonts: Barlow Semi Condensed (© The Barlow Project Authors) and IBM Plex Sans Arabic (© IBM Corp.), SIL Open Font License 1.1.</p>`,
   ar: `<p class="lead"><b>هذه نسخة أولية (تجريبية)</b> وما زالت قيد الاختبار.</p><ul>
 <li><b>ليست نسخة مطابقة تماماً للجهاز.</b> البرنامج محاكاة لجهاز Emona ETT-101 ولراسم الإشارة، مبنية على المواصفات المنشورة وكتب المعمل، لذلك قد لا تطابق القراءات الجهاز الحقيقي بنسبة 100%. وعند وجود اختلاف، يكون الجهاز الحقيقي هو المرجع.</li>
 <li><b>للطلاب، مجاني وغير ربحي.</b> صُمّم البرنامج لمساعدة الطلاب على التدرّب والاستعداد لمعمل الاتصالات. ولا يجوز بيعه أو تأجيره أو وضعه ضمن دورة مدفوعة أو التربح منه بأي شكل من الأشكال.</li>
 <li><b>غير تابع لشركة Emona Instruments أو UNI-T.</b> تُستخدم أسماء الجهاز والأدوات فقط لتوضيح ما يحاكيه البرنامج.</li>
-<li>إذا وجدت شيئاً لا يطابق الجهاز، استخدم زر <b>الإبلاغ عن مشكلة</b> ليتم إصلاحه.</li></ul>`,
+<li>إذا وجدت شيئاً لا يطابق الجهاز، استخدم زر <b>الإبلاغ عن مشكلة</b> ليتم إصلاحه.</li></ul>
+<p class="fineprint" dir="ltr">Fonts: Barlow Semi Condensed (© The Barlow Project Authors) and IBM Plex Sans Arabic (© IBM Corp.), SIL Open Font License 1.1.</p>`,
 };
 
 // ------------------------------------------------------------------ help pages

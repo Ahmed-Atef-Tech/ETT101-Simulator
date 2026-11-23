@@ -310,7 +310,7 @@ const T2 = 'Term2';
 }
 
 
-// ----- Adapted from the Emona DATEx Lab Manual Vol.1 (same author, same modules). The DATEx uses the NI ELVIS function
+// ----- Wiring for experiments in the Emona DATEx Lab Manual Vol.1 (same modules), set up on this kit. The DATEx uses the NI ELVIS function
 // generator, DMM and signal analyser; here the VCO, the scope's own readings and the scope FFT take their place. -----
 { const X = 'Extra';
   const FFT2 = { math: { on: true, kind: 'FFT', op: '+', fftSrc: 'CH2', win: 'Hanning', dbdiv: 20, fpos: 0, unit: 'dBVrms', vrd: 7 } };

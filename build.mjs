@@ -17,6 +17,10 @@ const font = (fam, file, w) => `@font-face{font-family:'${fam}';font-style:norma
 const B = 'node_modules/@fontsource/barlow-semi-condensed/files/barlow-semi-condensed-latin-', A = 'node_modules/@fontsource/ibm-plex-sans-arabic/files/ibm-plex-sans-arabic-arabic-';
 const fonts = [400, 500, 600, 700].map(w => font('Barlow SC', `${B}${w}-normal.woff2`, w)).join('') + [400, 600].map(w => font('Plex Arabic', `${A}${w}-normal.woff2`, w)).join('');
 let html = fs.readFileSync('src/index.html', 'utf8');
+// the fonts' licence (SIL OFL 1.1) must travel with every copy: it goes in the page itself, so the desktop app,
+// the web version and any saved copy all carry it
+const ofl = fs.readFileSync('LICENSES/fonts-OFL.txt', 'utf8').replace(/-{2,}/g, m => '='.repeat(m.length));
+html = html.replace('<head>', () => `<head>\n<!--\n${ofl}\n-->`);
 html = html.replace('/*FONTS*/', () => fonts);
 html = html.replace('<script type="module" src="./main.js"></script>', () => `<script>${js.replace(/<\/script/g, '<\\/script')}</script>`);
 fs.mkdirSync('dist', { recursive: true });
@@ -36,5 +40,6 @@ const web = html.replace('<head>', () => `<head>
 fs.rmSync('dist/web', { recursive: true, force: true }); fs.mkdirSync('dist/web', { recursive: true });
 fs.writeFileSync('dist/web/index.html', web);
 for (const f of fs.readdirSync('web')) if (f !== 'sw.js') fs.copyFileSync(`web/${f}`, `dist/web/${f}`);
+fs.copyFileSync('LICENSES/fonts-OFL.txt', 'dist/web/fonts-OFL.txt');
 fs.writeFileSync('dist/web/sw.js', fs.readFileSync('web/sw.js', 'utf8').replace('__VERSION__', pkg.version));
 console.log('dist/web/ (web version)', fs.readdirSync('dist/web').length, 'files');

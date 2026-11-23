@@ -15,7 +15,7 @@ The course lab books are adapted from the Emona lab manual written for this kit:
 
 - **Term 1:** Electrical Testing (6) lab manual, ELC414. Its Exp 1–7 (AM, DSBSC, AM demodulation, DSBSC demodulation, SSB, FM, FM demodulation) come from Emona Volume 1 Exp 4–10. Also included: Exp 7 Part C (inside the zero-crossing detector).
 - **Term 2:** Electrical Testing (7) lab manual, ELC424. Its 13 experiments come from Emona Volume 1 Exp 11, 12, 13, 15, 16, 17, 18 and 19 (sampling, PCM encoding and decoding, ASK, FSK, BPSK, QPSK, DSSS) and Volume 2 Exp 6, 8, 9, 16 and 17 (PWM, PLL carrier acquisition, signal-to-noise ratio, delta and delta-sigma).
-- **Extra:** Emona Volume 1 Exp 3 from the Emona 101 Trainer SAMPLE Lab Manual, and Volume 1 Exp 14, Volume 1 Exp 20 and Volume 2 Exp 18 adapted from the Emona DATEx Lab Manual, Vol. 1 (with the VCO in place of the NI ELVIS function generator).
+- **Extra:** Emona Volume 1 Exp 3 from the Emona 101 Trainer SAMPLE Lab Manual, and Volume 1 Exp 14, Volume 1 Exp 20 and Volume 2 Exp 18: wiring for the experiments of the same names in the Emona DATEx Lab Manual, Vol. 1, set up on this kit (the VCO does the job of the NI ELVIS function generator; the simulator has no lab sheet for these three).
 
 Under each experiment, the page and figure numbers are those printed in the course book, followed by the matching Emona experiment. The books themselves are not included in this repository.
 

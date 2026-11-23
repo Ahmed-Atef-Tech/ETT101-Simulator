@@ -1,7 +1,7 @@
 // UI strings. English is the default; Arabic switches the whole interface to right-to-left.
 const STR = {
   en: {
-    appName: 'Telecoms-Trainer 101', appSub: 'simulator', beta: 'Beta', betaHint: 'Preliminary version: may not match the real kit 100%. Free, for students only.', about: 'About this simulator',
+    appName: 'Telecoms-Trainer 101', appSub: 'unofficial simulator', beta: 'Beta', betaHint: 'Preliminary version: may not match the real kit 100%. Free, for students only.', about: 'About this simulator',
     guidance: 'Guidance', modeHint: 'Guidance shows the info buttons, socket names with live readings, and knob values. Turn it off to practise like the real lab exam.',
     library: 'Load experiment', libHint: 'Ready-made experiments from the lab books, with the page of each one. One click wires the kit and sets the scope.',
     reference: 'Reference', refHint: 'The model reference: every module’s equation and numbers, and where each number comes from.',
@@ -9,7 +9,7 @@ const STR = {
     libSheet: 'Step-by-step sheet', libReplace: 'Loading an experiment replaces the leads and settings on the kit now. Continue?',
     libBookNote: 'Page numbers are the numbers printed on the page. In the PDF file the page is 2 higher (cover and contents come first).',
     libEmonaNote: 'Experiments from the Emona manuals that are not in the course books. The page is the one printed on the page (experiment-page); “PDF” is the page in the PDF file.',
-    libAdapted: 'Adapted: the DATEx uses the NI ELVIS function generator; here the VCO takes its place.', libNone: 'No experiment matches your search.',
+    libAdapted: 'Note: the DATEx book uses the NI ELVIS function generator; in this setup the VCO does that job.', libNone: 'No experiment matches your search.',
     refTitle: 'Model reference', refIntro: 'What the simulator is built on: each module’s equation and values, where every number comes from, what still needs measuring on the real kit, and the checks against the lab books.',
     bug: 'Report or suggest', bugHint: 'Report a problem or suggest a new feature: it goes to the developer on WhatsApp.', bugTitle: 'Report a bug', ideaTitle: 'Suggest a feature', bugKindBug: 'Problem', bugKindIdea: 'Suggestion',
     ideaWhat: 'What would you like added or improved?', ideaWhy: 'How would it help you? (optional)', ideaEmpty: 'Write your suggestion first.', ideaOpened: 'WhatsApp opened with your suggestion',
@@ -37,7 +37,7 @@ const STR = {
     colors: { red: 'Red', black: 'Black', yellow: 'Yellow', blue: 'Blue', green: 'Green' },
   },
   ar: {
-    appName: 'Telecoms-Trainer 101', appSub: 'محاكي', beta: 'نسخة أولية', betaHint: 'نسخة أولية: قد لا تطابق الجهاز الحقيقي بنسبة 100%. مجانية ومخصّصة للطلاب فقط.', about: 'عن البرنامج',
+    appName: 'Telecoms-Trainer 101', appSub: 'محاكي غير رسمي', beta: 'نسخة أولية', betaHint: 'نسخة أولية: قد لا تطابق الجهاز الحقيقي بنسبة 100%. مجانية ومخصّصة للطلاب فقط.', about: 'عن البرنامج',
     guidance: 'الإرشادات', modeHint: 'تُظهر الإرشادات أزرار المعلومات (i) وأسماء المقابس مع قراءاتها اللحظية وقيم المقابض. أوقفها لتتدرّب كما في امتحان المعمل.',
     library: 'تحميل تجربة', libHint: 'تجارب جاهزة من كتب المعمل مع رقم صفحة كل تجربة. بنقرة واحدة تُوصَّل الأسلاك ويُضبط راسم الإشارة.',
     reference: 'المرجع', refHint: 'مرجع النموذج: معادلة كل وحدة وقيمها، ومصدر كل رقم.',
@@ -45,7 +45,7 @@ const STR = {
     libSheet: 'ورقة التجربة خطوة بخطوة', libReplace: 'تحميل التجربة يزيل الأسلاك والإعدادات الموجودة الآن على الجهاز. هل تريد المتابعة؟',
     libBookNote: 'رقم الصفحة هو الرقم المطبوع على الصفحة نفسها. في ملف PDF يزيد رقم الصفحة بمقدار 2 (لأن الغلاف والفهرس يأتيان أولاً).',
     libEmonaNote: 'تجارب من كتب Emona غير موجودة في كتب المقرر. الصفحة هي المطبوعة على الصفحة (رقم التجربة-رقم الصفحة)، و“PDF” هو رقم الصفحة في ملف PDF.',
-    libAdapted: 'مُعدَّلة: يستخدم كتاب DATEx مولّد الدوال في NI ELVIS، وهنا يقوم VCO بهذا الدور.', libNone: 'لا توجد تجربة تطابق البحث.',
+    libAdapted: 'ملاحظة: يستخدم كتاب DATEx مولّد الدوال في NI ELVIS، وفي هذا الإعداد يقوم VCO بهذا الدور.', libNone: 'لا توجد تجربة تطابق البحث.',
     refTitle: 'مرجع النموذج', refIntro: 'ما بُني عليه المحاكي: معادلة كل وحدة وقيمها، ومصدر كل رقم، وما زال يحتاج إلى قياس على الجهاز الحقيقي، والاختبارات المقارنة بكتب المعمل. المرجع مكتوب بالإنجليزية لتبقى المصطلحات كما في الكتب.',
     bug: 'مشكلة أو اقتراح', bugHint: 'أبلِغ عن مشكلة أو اقترح ميزة جديدة: تصل الرسالة إلى المطوّر عبر واتساب.', bugTitle: 'الإبلاغ عن مشكلة', ideaTitle: 'اقتراح ميزة', bugKindBug: 'مشكلة', bugKindIdea: 'اقتراح',
     ideaWhat: 'ما الذي تريد إضافته أو تحسينه؟', ideaWhy: 'كيف سيساعدك ذلك؟ (اختياري)', ideaEmpty: 'اكتب اقتراحك أولاً.', ideaOpened: 'فُتح واتساب ومعه اقتراحك',

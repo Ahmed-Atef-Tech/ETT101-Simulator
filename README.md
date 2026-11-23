@@ -45,6 +45,12 @@ Reference: the course lab books Electrical Testing (6), ELC414 (Term 1) and Elec
 
 ---
 
+## Licences and credits
+
+- **Not affiliated** with Emona Instruments or UNI-T. The product names are used only to say what is simulated; no logos, manual text or book figures are included. The lab sheets give the step and figure numbers of the course books in our own words, so they can be read next to the book.
+- **Fonts:** Barlow Semi Condensed (Copyright 2017 The Barlow Project Authors) and IBM Plex Sans Arabic (Copyright 2019 IBM Corp.), both under the SIL Open Font License 1.1. The licence travels with the app and is in [LICENSES/fonts-OFL.txt](LICENSES/fonts-OFL.txt).
+- **Desktop app:** built with Electron (MIT licence); its own and Chromium's licence files are installed with the app.
+
 ## For maintainers: releasing an update
 
 1. Make the change, and write what changed in `.github/release-whatsnew.md`.

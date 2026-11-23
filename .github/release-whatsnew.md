@@ -1,2 +1,8 @@
-- **Full-screen button:** on phones and tablets, a full-screen button appears in the toolbar whenever the page is not full screen (for example after you swipe out of it). Tap it to fill the screen again; it hides while you are in full screen. On iPhone it shows how to get full screen: Share → *Add to Home Screen*.
-- **زر ملء الشاشة:** على الهاتف والتابلت يظهر زر ملء الشاشة في شريط الأدوات كلما خرجت الصفحة من ملء الشاشة (مثلاً بعد السحب من الحافة). اضغط عليه لتعود إلى ملء الشاشة، ويختفي وأنت في ملء الشاشة. وعلى آيفون يوضح طريقة ملء الشاشة: زر المشاركة ← «إضافة إلى الشاشة الرئيسية».
+- **Lab-sheet questions reworded:** the questions in the lab sheets now use the simulator's own wording; they ask the same things as before.
+- **Extra DATEx experiments:** their ready-made wiring stays in *Load experiment*; they no longer have a written lab sheet.
+- **Unofficial and not affiliated:** the title now says *unofficial simulator*, and the download page says clearly that the simulator is not affiliated with Emona Instruments or UNI-T.
+- **Font licences:** the licence of the two fonts the app uses (SIL Open Font License) now comes with the app and the web version, and *About* credits them.
+- **أسئلة أوراق التجارب بصياغة جديدة:** أصبحت الأسئلة بصياغة البرنامج نفسه، وتسأل عن نفس الأشياء كما كانت.
+- **تجارب DATEx الإضافية:** بقيت توصيلاتها الجاهزة في «تحميل تجربة»، ولم تعد لها ورقة تجربة مكتوبة.
+- **غير رسمي وغير تابع:** أصبح العنوان «محاكي غير رسمي»، وتوضح صفحة التحميل أن البرنامج غير تابع لشركة Emona Instruments أو UNI-T.
+- **تراخيص الخطوط:** أصبح ترخيص الخطين المستخدمين في البرنامج (SIL Open Font License) مرفقاً بالبرنامج ونسخة الويب، ويذكرهما قسم «حول البرنامج».

@@ -100,15 +100,15 @@ export const GROUPS = [
   { tab: 'x', book: 'smp', emona: 'Vol.1 Exp 3', guide: 'x3', en: 'Using the trainer to model equations', ar: 'نمذجة المعادلات باستخدام الجهاز', items: [
     E('Extra/Vol1-Exp3-A-Adder-Model', 'A', 'Fig. 2', { label: '3-4', pdf: 16 }, 'The ADDER models y = −(x + x)', 'ADDER يمثّل y = −(x + x)'),
     E('Extra/Vol1-Exp3-B-Phase-Cancellation', 'B', 'Fig. 4', { label: '3-8', pdf: 20 }, 'Cancelling a signal with its 180° copy', 'إلغاء إشارة بنسخة مزاحة 180°')] },
-  { tab: 'x', book: 'dx', emona: 'Vol.2 Exp 18 · DATEx Exp 7', guide: 'x18', adapted: true, en: 'AM and DSBSC in the frequency domain', ar: 'AM و DSBSC في المجال الترددي', items: [
+  { tab: 'x', book: 'dx', emona: 'Vol.2 Exp 18 · DATEx Exp 7', adapted: true, en: 'AM and DSBSC in the frequency domain', ar: 'AM و DSBSC في المجال الترددي', items: [
     E('Extra/Vol2-Exp18-A-AM-Spectrum', 'A–C', '', { label: '7-5', pdf: 127 }, 'AM spectrum on the FFT', 'طيف AM باستخدام FFT'),
     E('Extra/Vol2-Exp18-D-DSBSC-Spectrum', 'D–E', 'Fig. 7', { label: '7-16', pdf: 138 }, 'DSBSC spectrum on the FFT', 'طيف DSBSC باستخدام FFT')] },
-  { tab: 'x', book: 'dx', emona: 'Vol.1 Exp 14 · DATEx Exp 16', guide: 'x14', adapted: true, en: 'Bandwidth limiting and restoring digital signals', ar: 'تحديد عرض النطاق واسترجاع الإشارات الرقمية', items: [
+  { tab: 'x', book: 'dx', emona: 'Vol.1 Exp 14 · DATEx Exp 16', adapted: true, en: 'Bandwidth limiting and restoring digital signals', ar: 'تحديد عرض النطاق واسترجاع الإشارات الرقمية', items: [
     E('Extra/Vol1-Exp14-A-PCM-Through-Narrow-Channel', 'A', '', { label: '16-4', pdf: 288 }, 'PCM through a narrow channel', 'PCM عبر قناة ضيقة'),
     E('Extra/Vol1-Exp14-B-Bandwidth-Limited-Data', 'B', 'Fig. 7', { label: '16-10', pdf: 294 }, 'Band-limited digital data', 'بيانات رقمية محدودة النطاق'),
     E('Extra/Vol1-Exp14-B-Higher-Bit-Rate', 'B', 'Steps 41–46', { label: '16-12', pdf: 296 }, 'A higher bit rate through the same channel', 'معدل بيانات أعلى في القناة نفسها'),
     E('Extra/Vol1-Exp14-C-Restoring-Data', 'C', '', { label: '16-14', pdf: 298 }, 'Restoring the data with a comparator', 'استرجاع البيانات بالمقارن (comparator)')] },
-  { tab: 'x', book: 'dx', emona: 'Vol.1 Exp 20 · DATEx Exp 22', guide: 'x20', adapted: true, en: 'Undersampling in software defined radio', ar: 'أخذ العينات بمعدل منخفض (undersampling) في SDR', items: [
+  { tab: 'x', book: 'dx', emona: 'Vol.1 Exp 20 · DATEx Exp 22', adapted: true, en: 'Undersampling in software defined radio', ar: 'أخذ العينات بمعدل منخفض (undersampling) في SDR', items: [
     E('Extra/Vol1-Exp20-B-Undersampling', 'B', '', { pdf: 397 }, 'Down-conversion by undersampling', 'خفض التردد بأخذ العينات بمعدل منخفض'),
     E('Extra/Vol1-Exp20-C-Unsynchronised-Clock', 'C', 'Fig. 6', { pdf: 402 }, 'An unsynchronised sample clock', 'ساعة غير متزامنة')] },
 ];
