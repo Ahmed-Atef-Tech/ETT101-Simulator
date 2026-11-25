@@ -137,6 +137,24 @@ html[lang="ar"] .acts { line-height: 1.85; }
 #settings.open { display: block; }
 .row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 0; font-size: 15px; }
 .fsNote { margin: 0 0 6px; font-size: 13px; line-height: 1.45; color: #4a5357; }
+[hidden] { display: none !important; } /* a class that sets display must never show a hidden element */
+.checkBtn { margin: 10px 0 0; width: 100%; min-height: 40px; border: 1px solid #c9b25a; background: #fff8dc; color: #5b4a07; border-radius: 6px; font: inherit; font-weight: 600; cursor: pointer; }
+.checkBtn:hover { background: #fff1b8; } .checkBtn:focus-visible, .link:focus-visible { outline: 2px solid #2f62bd; outline-offset: 2px; }
+.wcheck { margin: 10px 0 0; padding: 10px 12px; border: 1px solid #e3a6a1; background: #fff4f3; border-radius: 6px; font-size: 14px; }
+.wcheck.good { border-color: #9ccf9c; background: #f1faf1; }
+.wcHead { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.wcheck ul { margin: 8px 0 0; padding: 0; list-style: none; } .wcheck li { padding: 4px 0 4px 22px; position: relative; line-height: 1.4; }
+[dir="rtl"] .wcheck li { padding: 4px 22px 4px 0; }
+.wcheck li::before { position: absolute; inset-inline-start: 0; top: 4px; font-weight: 700; }
+.wcheck li.miss::before { content: '○'; color: #b08900; } .wcheck li.wrong::before, .wcheck li.extra::before { content: '✕'; color: #c62828; } .wcheck li.short::before { content: '⚠'; color: #c62828; }
+.wcheck .small { margin: 8px 0 0; color: #6b7478; font-size: 12.5px; }
+.link { background: none; border: 0; padding: 4px 2px; color: #2f62bd; text-decoration: underline; font: inherit; cursor: pointer; }
+.badLead { animation: badPulse 1s ease-in-out infinite alternate; pointer-events: none; } @keyframes badPulse { from { opacity: .25; } to { opacity: .7; } }
+@media (prefers-reduced-motion: reduce) { .badLead { animation: none; } }
+#tip .sig, .sockMenu .sig { margin: 4px 0 2px; font-weight: 400; } #tip .sig b { color: #ffd84d; } .sockMenu .sig { font-size: 13px; } .sockMenu .sig b { color: #2f62bd; }
+.linkForm { display: grid; gap: 8px; margin-top: 8px; } .linkForm input { font: inherit; padding: 9px 10px; border: 1px solid #b8bec2; border-radius: 6px; min-height: 40px; }
+.linkForm button { justify-self: start; min-height: 40px; padding: 0 16px; }
+#rail .key[disabled] { opacity: .4; cursor: default; }
 .fineprint { margin: 10px 0 0; font-size: 12px; color: #6b7478; }
 .seg { display: inline-flex; border: 1px solid #9aa3a7; border-radius: 4px; overflow: hidden; }
 .seg button { border: 0; background: #fff; padding: 5px 11px; cursor: pointer; font-size: 14px; }
@@ -245,7 +263,10 @@ html[lang="ar"] .rintro, html[lang="ar"] .lnote { line-height: 1.85; }
 #rail.c5 #colors { position: relative; } #rail.c5 #colors .plugsw:not(.sel) { display: none; }
 #rail.c5 #colors.open { position: absolute; top: 44px; z-index: 30; padding: 8px; gap: 10px; background: var(--rail-hi); border: 1px solid var(--rail-edge); border-radius: 6px; box-shadow: 0 8px 20px rgba(0,0,0,.35); }
 #rail.c5 #colors.open .plugsw { display: block; width: 30px; height: 30px; }
-#rail.c6 #btnRef { display: none; } #rail.c6 .tray .key { padding: 0 5px; font-size: 12.5px; } #rail.c6 .tray .lamp { display: none; }
+#rail.c6 #btnUndo, #rail.c6 #btnRedo, #rail.c6 #btnFull, #rail.c6 #btnFS { padding: 0 6px; } #rail.c6 { gap: 4px; }
+#rail.c7 #btnRedo { display: none; } /* the smallest phones keep Undo and lose Redo before anything else */
+#rail.c8 #btnBug { display: none; } #bugMi { display: none; } #rail.c8 ~ #settings #bugMi { display: block; } /* then Report a bug moves into Settings */
+#rail.c9 #btnRef { display: none; } #rail.c9 .tray .key { padding: 0 5px; font-size: 12.5px; } #rail.c9 .tray .lamp { display: none; }
 /* short screens (phones in landscape): panels use the height under the toolbar and scroll inside */
 @media (max-height: 500px) {
   #hint { font-size: 11px; bottom: 6px; max-width: 70vw; transition: opacity 1s; } #hint.faded { opacity: 0; }
@@ -338,6 +359,8 @@ html[lang="ar"] #tour .tourCard p { line-height: 1.85; }
     <button class="key" id="vBoth"><span class="lamp"></span><span data-t="viewBoth"></span></button>
     <button class="key" id="vScope"><span class="lamp"></span><span data-t="viewScope"></span></button>
   </div>
+  <button class="key" id="btnUndo" data-hint="undoHint" disabled><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 3.5 2.5 6.5l3 3"/><path d="M2.5 6.5h7a4 4 0 0 1 0 8H7"/></svg></button>
+  <button class="key" id="btnRedo" data-hint="redoHint" disabled><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m10.5 3.5 3 3-3 3"/><path d="M13.5 6.5h-7a4 4 0 0 0 0 8H9"/></svg></button>
   <button class="key" id="btnFull" title=""><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4"/><circle cx="8" cy="8" r="1.6" fill="currentColor" stroke="none"/></svg></button>
   <button class="key" id="btnFS" hidden data-hint="fullScreen"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 6V2h4M2 2l4 4M10 2h4v4M14 2l-4 4M14 10v4h-4M14 14l-4-4M6 14H2v-4M2 14l4-4"/></svg></button>
   <div class="leads"><span class="lbl" data-t="leads"></span><span id="colors" class="leads"></span></div>
@@ -361,8 +384,11 @@ html[lang="ar"] #tour .tourCard p { line-height: 1.85; }
   <div class="sep"></div>
   <button class="mi" id="btnSave" data-t="saveSetup"></button>
   <button class="mi" id="btnLoad" data-t="openSetup"></button>
+  <button class="mi" id="btnShare" data-t="shareSetup"></button>
+  <button class="mi" id="btnOpenLink" data-t="openLink"></button>
   <button class="mi danger" id="btnClear" data-t="clearLeads"></button>
   <div class="sep"></div>
+  <button class="mi" id="bugMi" data-t="bug"></button>
   <button class="mi" id="btnHelp" data-t="help"></button>
   <button class="mi" id="btnScopeHelp" data-t="scopeHelp"></button>
   <button class="mi" id="btnTour" data-t="tourAgain"></button>

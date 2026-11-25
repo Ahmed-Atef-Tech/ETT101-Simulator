@@ -289,7 +289,7 @@ T('SC05', 'Scope', 'AUTO works with no signal, with a DC level, and on every rea
   const files = await app(p, () => [...document.querySelectorAll('.lrow')].length); // panel not open yet: count below
   await p.click('#btnLib'); const all = [];
   for (const t of ['t1', 't2', 'x']) { await p.click(`.ltab[data-tab="${t}"]`); all.push(...await app(p, () => [...document.querySelectorAll('.lrow')].map(r => r.dataset.f))); }
-  await p.click('#libX'); eq(all.length, 68, 'setups listed');
+  await p.click('#libX'); eq(all.length, 69, 'setups listed');
   for (const f of all) { await loadSetup(p, f); await p.waitForTimeout(40); await app(p, () => __app.scope.press('auto')); await p.waitForTimeout(40); }
   eq(await finite(p), [], 'non-finite after AUTO');
 });
@@ -490,7 +490,7 @@ T('MB05', 'Phone', 'Hold a socket: its menu connects it to CH1 / CH2 / EXT, or s
 });
 
 T('MB06', 'Phone', 'Full screen: on a phone the first tap fills the screen (no address bar); Settings turns it off and it stays off; iPhone gets the home-screen note instead; never on a computer', async p => {
-  eq(await app(p, () => [document.getElementById('fsRow').hidden, document.getElementById('btnFS').hidden]), [true, true], 'computer: no full-screen setting or button');
+  eq(await app(p, () => ['fsRow', 'btnFS', 'fsNote'].map(id => getComputedStyle(document.getElementById(id)).display)), ['none', 'none', 'none'], 'computer: no full-screen setting or button on screen');
   let q = await phone(p, 'Pixel 7 landscape', 'en', true);
   eq(await q.evaluate(() => [!document.getElementById('fsRow').hidden, document.getElementById('fsNote').hidden, !!document.fullscreenElement]), [true, true, false], 'phone: setting shown, not yet full screen');
   await q.tapAt({ x: 700, y: 330 }); await q.waitForTimeout(400);
@@ -518,6 +518,102 @@ T('MB06', 'Phone', 'Full screen: on a phone the first tap fills the screen (no a
   ok(await q.evaluate(() => !document.getElementById('btnFS').hidden), 'iPhone: button shown'); await q.tap('#btnFS'); await q.waitForTimeout(200);
   ok(await q.evaluate(() => document.getElementById('toast').classList.contains('show') && /Home Screen/.test(document.getElementById('toast').textContent)), 'iPhone: button explains Add to Home Screen');
   await ctx.close();
+});
+
+// ================================================================== new tools: undo, check wiring, share link, signal names
+T('UN01', 'Undo', 'Undo / Redo: leads, knobs, probes and a loaded experiment come back in steps; the scope is left alone; Ctrl+Z / Ctrl+Y; not while typing', async p => {
+  eq(await app(p, () => [document.getElementById('btnUndo').disabled, document.getElementById('btnRedo').disabled]), [true, true], 'nothing to undo at start');
+  await wire(p, 'master.SINE2', 'adder.A'); await p.waitForTimeout(500);
+  ok(await app(p, () => !document.getElementById('btnUndo').disabled), 'Undo lights up');
+  await p.click('#btnUndo'); eq(await app(p, () => __app.sim.leads.length), 0, 'Undo removes the lead');
+  ok(await app(p, () => !document.getElementById('btnRedo').disabled), 'Redo lights up');
+  await p.click('#btnRedo'); eq(await app(p, () => __app.sim.leads.map(l => l.a + ' ' + l.b)), ['master.SINE2 adder.A'], 'Redo brings it back');
+  await app(p, () => { for (let i = 1; i <= 10; i++) __app.panel.setKnob('adder', 'G', 0.5 + i * 0.03); }); await p.waitForTimeout(550);
+  await p.keyboard.press('Control+z'); eq(await app(p, () => __app.sim.mods.adder.p.G), 0.5, 'one Ctrl+Z puts a whole knob turn back');
+  await p.keyboard.press('Control+y'); ok(Math.abs(await app(p, () => __app.sim.mods.adder.p.G) - 0.8) < 1e-9, 'Ctrl+Y turns it again');
+  await app(p, () => __app.wires.setProbe('CH1', 'adder.OUT')); await p.waitForTimeout(500);
+  await p.keyboard.press('Control+z'); eq(await app(p, () => __app.sim.probes.CH1), null, 'probe undone');
+  await loadSetup(p, 'Term1/01-Exp1-AM-Modulation'); eq(await app(p, () => __app.sim.leads.length), 4, 'experiment loaded');
+  const td = await app(p, () => __app.scope.st.td);
+  await p.click('#btnUndo'); eq(await app(p, () => __app.sim.leads.map(l => l.a + ' ' + l.b)), ['master.SINE2 adder.A'], 'Undo goes back to before the load');
+  eq(await app(p, () => __app.scope.st.td), td, 'scope settings left as they are');
+  await p.click('#btnBug'); await p.fill('#bugWhat', 'abc'); await p.keyboard.press('Control+z'); await p.waitForTimeout(100);
+  eq(await app(p, () => __app.sim.leads.length), 1, 'Ctrl+Z while typing leaves the kit alone'); await p.keyboard.press('Escape');
+  await app(p, () => __app.wires.clearAll()); await p.waitForTimeout(500); await p.click('#btnUndo'); eq(await app(p, () => __app.sim.leads.length), 1, '"Remove all leads" can be undone');
+});
+T('CW01', 'Lab sheet', 'Check my wiring (a figure step): missing, wrong and extra leads, wrong probe, two outputs joined; red marks; turns green when it matches', async p => {
+  await p.click('#btnGuide'); await p.click('.explist [data-e="exp3"]');
+  const iE = await app(p, () => __app.sheets.find(x => x.id === 'exp3').steps.findIndex(s => s.w === 'Term1/03-Exp3-PartE-Product-Detector'));
+  ok(iE > 0, 'Part E figure step'); await p.click(`.stepbar button[data-i="${iE}"]`);
+  await p.click('#gCheck'); await p.waitForTimeout(100);
+  const kinds = () => app(p, () => [...document.querySelectorAll('.wcheck li')].map(li => li.className));
+  eq((await kinds()).filter(k => k === 'miss').length, 9, 'empty kit: 7 leads and 2 probes missing');
+  await app(p, () => __app.restore(__app.setups['Term1/03-Exp3-PartE-Product-Detector'])); await p.waitForTimeout(200);
+  ok(await app(p, () => !!document.querySelector('.wcheck.good') && !document.querySelector('.badLead')), 'wired as Figure 8: matches, no red marks: ' + await app(p, () => document.querySelector('.wcheck').textContent));
+  await app(p, () => { const w = __app.wires, l = __app.sim.leads.find(l => l.b === 'mult1.YAC'); w.removeLead(l.id); w.addLead('master.SINE2', 'mult1.YAC', 'red'); w.addLead('master.DIG2', 'exor.A', 'blue'); w.addLead('master.DIG8', 'master.DIG2', 'green'); w.setProbe('CH2', 'util.RC'); });
+  await p.waitForFunction(() => document.querySelectorAll('.wcheck li').length >= 4, null, { timeout: 8000 });
+  const k = await kinds(); for (const want of ['miss', 'wrong', 'extra', 'short']) ok(k.includes(want), `reports "${want}": ${k.join(',')}`);
+  ok(await app(p, () => /CH2/.test(document.querySelector('.wcheck').textContent) && /2kHz SINE/.test(document.querySelector('.wcheck').textContent)), 'names the probe and the wrong socket');
+  ok(await app(p, () => document.querySelectorAll('.badLead').length) >= 3, 'red marks on the wrong, extra and shorting leads');
+  await app(p, () => __app.restore(__app.setups['Term1/03-Exp3-PartE-Product-Detector'])); await p.waitForTimeout(200);
+  ok(await app(p, () => !!document.querySelector('.wcheck.good')), 'fixed: green again');
+  await p.click('#gNext'); ok(await app(p, () => !document.querySelector('.wcheck') && !!document.querySelector('#gCheck')), 'next step starts unchecked');
+  await app(p, () => __app.setLang('ar')); await p.click('#gCheck'); ok(await app(p, () => /توصيلك|يجب إصلاح/.test(document.querySelector('.wcheck').textContent)), 'Arabic report'); await app(p, () => __app.setLang('en'));
+});
+T('CW02', 'Lab sheet', 'Check my wiring (a step that lists only new connections): an input joined to the wrong place is reported, older leads are not', async p => {
+  await app(p, () => __app.restore(__app.setups['Term1/01-Exp1-AM-Modulation'])); await p.waitForTimeout(200);
+  await p.click('#btnGuide'); await p.click('.explist [data-e="exp3"]');
+  const iB = await app(p, () => __app.sheets.find(x => x.id === 'exp3').steps.findIndex(s => s.head.en.startsWith('Part B') && s.c));
+  await p.click(`.stepbar button[data-i="${iB}"]`); await app(p, () => __app.wires.addLead('master.SINE100', 'util.RECT_IN', 'red')); await p.click('#gCheck'); await p.waitForTimeout(150);
+  const r = await app(p, () => ({ k: [...document.querySelectorAll('.wcheck li')].map(li => li.className), txt: document.querySelector('.wcheck').textContent }));
+  ok(r.k.includes('wrong') && /RECTIFIER/.test(r.txt) && /100kHz SINE/.test(r.txt), 'RECTIFIER input on the carrier is wrong: ' + r.txt.slice(0, 160));
+  ok(!r.k.includes('extra'), 'leads from Part A are not called extra'); ok(/earlier steps/.test(r.txt), 'says older leads are not checked');
+});
+T('SH01', 'Share', 'Share as a link: a fresh page opens the same leads, knobs, probes and scope; Settings copies the link; a pasted link opens; a bad link says so', async p => {
+  await loadSetup(p, 'Term1/03-Exp3-PartE-Product-Detector');
+  await app(p, () => { __app.panel.setKnob('adder', 'g', 0.61); __app.scope.st.td = 9; __app.scope.st.ch.CH2.pos = 1.5; });
+  const code = await app(p, () => __app.shareCode()); ok(/^[zj][A-Za-z0-9_-]+$/.test(code) && code.length < 1200, 'short code: ' + code.length);
+  const state = q => app(q, () => { const s = __app.snapshot(); return JSON.stringify([s.leads.map(l => [l.a, l.b, l.color]), s.probes, s.mods, s.scope.td, s.scope.ch, s.scope.trig]); });
+  const want = await state(p);
+  const q = await open(); await q.goto(URL + '#s=' + code); await q.waitForFunction(() => window.__app); await q.waitForTimeout(400);
+  eq(await state(q), want, 'same setup on the other page'); ok(!/#s=/.test(await q.evaluate(() => location.href)), 'address cleaned after opening');
+  await app(p, () => { navigator.clipboard.writeText = t => { window.__clip = t; return Promise.resolve(); }; });
+  await p.click('#btnSettings'); await p.click('#btnShare'); await p.waitForTimeout(200);
+  const link = await app(p, () => window.__clip); ok(/^https:\/\/ahmed-atef-tech\.github\.io\/ETT101-Simulator\/app\/#s=[zj]/.test(link), 'copied link ' + String(link).slice(0, 70));
+  ok(await app(p, () => /copied/i.test(document.getElementById('toast').textContent)), 'tells the link was copied');
+  await app(q, () => __app.wires.clearAll()); await q.click('#btnSettings'); await q.click('#btnOpenLink');
+  await q.fill('#linkIn', 'hello'); await q.click('#linkForm button'); ok(/not a setup link/.test(await q.textContent('#linkErr')), 'not a link: says so');
+  await q.fill('#linkIn', link); await q.click('#linkForm button'); await q.waitForTimeout(400);
+  eq(await state(q), want, 'pasted link opens the same setup'); ok(!(await app(q, () => document.getElementById('modal').classList.contains('open'))), 'dialog closes');
+  q.dialogAnswer = false; await q.evaluate(() => { location.hash = '#s=' + 'zAAAA'; }); await q.waitForTimeout(400);
+  ok(await app(q, () => /not complete/.test(document.getElementById('toast').textContent)), 'broken link says so');
+  await q.evaluate(c => { location.hash = '#s=' + c; }, code); await q.waitForTimeout(400);
+  ok(q.dialogs.some(d => /replaces the leads/.test(d)), 'asks before replacing wiring'); eq(await app(q, () => __app.sim.leads.length), 7, 'Cancel keeps the wiring');
+  await app(p, () => __app.wires.clearAll()); await p.click('#btnSettings'); await p.click('#btnShare'); ok(await app(p, () => /Nothing to share/.test(document.getElementById('toast').textContent)), 'empty kit: nothing to share');
+  await q.context().close();
+});
+T('SG01', 'Signals', 'Socket tips name the signal from the wiring (AM, DSBSC, SSB, FM, ASK, BPSK, QPSK, PWM, product detector, recovered message)', async p => {
+  const kinds = (f, ss) => app(p, ([f, ss]) => { __app.restore(__app.setups[f]); return ss.map(s => __app.signalKind(s)); }, [f, ss]);
+  eq(await kinds('Term1/01-Exp1-AM-Modulation', ['adder.OUT', 'mult2.KXY']), ['msgdc', 'am'], 'Exp 1');
+  eq(await kinds('Term1/02-Exp2-DSBSC-Modulation', ['mult1.KXY']), ['dsb'], 'Exp 2');
+  eq(await kinds('Term1/03-Exp3-AM-Demodulation', ['util.RECT', 'util.RC']), ['rect', 'rec'], 'Exp 3 envelope detector');
+  eq(await kinds('Term1/03-Exp3-PartE-Product-Detector', ['mult1.KXY', 'util.RC']), ['pd', 'rec'], 'Exp 3 Part E');
+  eq(await kinds('Term1/05-Exp5-SSB-Demodulation', ['adder.OUT', 'mult3.KXY', 'tlpf.OUT']), ['ssb', 'pd', 'rec'], 'Exp 5 SSB');
+  eq(await kinds('Term1/06-Exp6-FM-Modulation', ['vco.SINE']), ['fm'], 'Exp 6 FM of a squarewave');
+  eq(await kinds('Term1/07-Exp7-PartD-Sine-Message', ['tpg.Q1', 'channel.BB']), ['zcd', 'rec'], 'Exp 7 ZCD');
+  eq(await kinds('Term2/04-Exp15-B-ASK-Envelope-Detection', ['das.OUT', 'tlpf.OUT']), ['ask', 'recd'], 'ASK');
+  eq(await kinds('Term2/01-Exp11-A-Natural-Sampling', ['das.OUT']), ['samp'], 'sampling');
+  eq(await kinds('Term2/06-Exp17-C-BPSK-Comparator', ['mult2.KXY', 'tlpf.OUT']), ['bpsk', 'recd'], 'BPSK');
+  eq(await kinds('Term2/07-Exp18-A-QPSK-Generation', ['adder.OUT']), ['qpsk'], 'QPSK');
+  eq(await kinds('Term2/08-Exp19-C-DSSS-Demodulation', ['mult3.KXY', 'mult1.KXY']), ['dsss', 'msg'], 'DSSS');
+  eq(await kinds('Term2/08-Exp19-C-DSSS-Wrong-Code', ['mult1.KXY']), ['other'], 'DSSS with the wrong code is not called the message');
+  eq(await kinds('Term2/09-Exp6-Vol2-C-PWM-Sine-Message', ['util.DIODE', 'util.COMP']), ['saw', 'pwm'], 'PWM');
+  // the tip shows it
+  await app(p, () => __app.restore(__app.setups['Term1/01-Exp1-AM-Modulation'])); await p.waitForTimeout(200);
+  const c = await sock(p, 'mult2.KXY'); await p.mouse.move(c.x, c.y); await p.waitForTimeout(450);
+  ok(await app(p, () => /AM signal/.test(document.getElementById('tip').textContent) && /k·X·Y/.test(document.getElementById('tip').textContent)), 'tip: ' + await app(p, () => document.getElementById('tip').textContent));
+  await app(p, () => __app.setLang('ar')); await p.mouse.move(c.x + 40, c.y + 40); await p.mouse.move(c.x, c.y); await p.waitForTimeout(450);
+  ok(await app(p, () => /إشارة AM/.test(document.getElementById('tip').textContent)), 'Arabic tip'); await app(p, () => __app.setLang('en'));
 });
 
 // ================================================================== 5. rail panels
@@ -567,16 +663,16 @@ T('RL02', 'Rail', 'Lab sheet ticks a step when its wiring is on the kit', async 
   await p.click('#btnGuide'); await app(p, () => document.querySelector('.explist [data-e="exp1"]').click()); await p.waitForTimeout(800);
   ok(await app(p, () => document.querySelectorAll('.stepbar button.done').length) >= 2, 'no steps ticked with the AM wiring loaded');
 });
-T('RL03', 'Rail', 'Load experiment: tabs show 12 / 46 / 10, every row has a page, search works', async p => {
+T('RL03', 'Rail', 'Load experiment: tabs show 13 / 46 / 10, every row has a page, search works', async p => {
   await p.click('#btnLib'); const cnt = {};
   for (const t of ['t1', 't2', 'x']) { await p.click(`.ltab[data-tab="${t}"]`); cnt[t] = await app(p, () => document.querySelectorAll('.lrow').length);
     ok(await app(p, () => [...document.querySelectorAll('.lrow')].every(r => /PDF \d+/.test(r.querySelector('.lpage').textContent))), t + ' row without page'); }
-  eq(cnt, { t1: 12, t2: 46, x: 10 }, 'rows per tab');
+  eq(cnt, { t1: 13, t2: 46, x: 10 }, 'rows per tab');
   await p.fill('#libQ', 'fsk'); ok(await app(p, () => document.querySelectorAll('.lrow').length) === 3, 'search fsk');
   await p.fill('#libQ', 'zzzz'); ok(await app(p, () => !!document.querySelector('.lnone')), 'no-match message');
   await p.fill('#libQ', ''); await p.keyboard.press('Escape'); ok(!(await app(p, () => document.querySelector('#lib').classList.contains('open'))), 'Esc closes');
 });
-T('RL04', 'Rail', 'Load experiment loads all 68 exactly as their files', async p => {
+T('RL04', 'Rail', 'Load experiment loads all 69 exactly as their files', async p => {
   await p.click('#btnLib'); const all = [];
   for (const t of ['t1', 't2', 'x']) { await p.click(`.ltab[data-tab="${t}"]`); all.push(...await app(p, () => [...document.querySelectorAll('.lrow')].map(r => r.dataset.f))); }
   await p.click('#libX');

@@ -20,7 +20,8 @@ export const GROUPS = [
   { tab: 't1', book: 't1', n: 2, en: 'DSBSC Modulation', ar: 'DSBSC Modulation', pages: '15–25', guide: 'exp2', items: [
     E('Term1/02-Exp2-DSBSC-Modulation', 'A', 'Fig. 4', 19, 'DSBSC signal from a simple message', 'توليد إشارة DSBSC برسالة بسيطة')] },
   { tab: 't1', book: 't1', n: 3, en: 'AM Demodulation', ar: 'AM Demodulation', pages: '26–37', guide: 'exp3', items: [
-    E('Term1/03-Exp3-AM-Demodulation', 'B', 'Fig. 4', 31, 'Recovering the message with an envelope detector', 'استرجاع الرسالة بكاشف الغلاف (envelope detector)')] },
+    E('Term1/03-Exp3-AM-Demodulation', 'B', 'Fig. 4', 31, 'Recovering the message with an envelope detector', 'استرجاع الرسالة بكاشف الغلاف (envelope detector)'),
+    E('Term1/03-Exp3-PartE-Product-Detector', 'E', 'Fig. 8', 37, 'The mathematics of AM demodulation: AM times the carrier, then a low-pass filter', 'رياضيات فك تعديل AM: إشارة AM مضروبة في الحامل ثم مرشِّح تمرير منخفض')] },
   { tab: 't1', book: 't1', n: 4, en: 'DSBSC Demodulation', ar: 'DSBSC Demodulation', pages: '38–50', guide: 'exp4', items: [
     E('Term1/04-Exp4-DSBSC-Demodulation', 'B', 'Fig. 4', 44, 'Recovering the message with a product detector', 'استرجاع الرسالة بكاشف الضرب (product detector)'),
     E('Term1/04-Exp4-PartC-Buffer', 'C', 'Fig. 7', 46, "The message's amplitude and the recovered message (BUFFER)", 'تأثير سعة الرسالة على الخرج (BUFFER)'),

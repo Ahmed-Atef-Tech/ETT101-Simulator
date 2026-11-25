@@ -67,6 +67,9 @@ const T1 = 'Term1';
     { CH1: 'master.SINE2', CH2: 'mult1.KXY' }, {}, scope({ vd: V[1], pos: 2 }, { vd: V[2], pos: -1.5 }, '100u')));
   add(T1, 'Exp3-AM-Demodulation', derive(am, 'Term 1 Exp 3 AM demodulation: envelope detector (RECTIFIER then RC LPF)',
     { add: [['mult2.KXY', 'util.RECT_IN'], ['util.RECT', 'util.RC_IN']], probes: { CH2: 'util.RC' }, scope: scope({ vd: V[0.5], pos: 1 }, { vd: V[0.5], pos: -3 }, '100u', TRIG('CH1', 1)) }));
+  // Part E (Figure 8): the AM signal times a 100 kHz sinewave on the other MULTIPLIER, then the RC LPF; CH2 on the multiplier output
+  add(T1, 'Exp3-PartE-Product-Detector', derive(am, 'Term 1 Exp 3 Part E: AM signal x 100 kHz carrier (MULTIPLIER), then the RC LPF picks out the message',
+    { add: [['master.SINE100', 'mult1.XAC'], ['mult2.KXY', 'mult1.YAC'], ['mult1.KXY', 'util.RC_IN']], probes: { CH2: 'mult1.KXY' }, scope: scope({ vd: V[0.5], pos: 1.2 }, { vd: V[2], pos: -1 }, '100u', TRIG('CH1', 1)) }));
 }
 { // Exp 4 DSBSC demodulation (Figure 4: product detector), Part C (Figure 7: BUFFER at 1/4), steps 33-38 (Figure 12: VCO carrier)
   const d = add(T1, 'Exp4-DSBSC-Demodulation', S('Term 1 Exp 4 Part B: product detector recovers the 2 kHz message (TUNEABLE LPF gain middle, fc fully clockwise)',

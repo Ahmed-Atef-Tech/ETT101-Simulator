@@ -29,6 +29,8 @@ const CHECKS = {
   'Term1/Exp1-AM-Modulation': s => { const [a, m] = rd(s, ['adder.OUT', 'mult2.KXY']); return [Math.abs(avg(a) - 1) < 0.03 && Math.abs(pp(a) - 1) < 0.05, `ADDER ${avg(a).toFixed(3)} V DC + ${pp(a).toFixed(3)} Vp-p, AM ${pp(m).toFixed(2)} Vp-p`]; },
   'Term1/Exp2-DSBSC-Modulation': s => { const [m] = rd(s, ['mult1.KXY']); return [Math.abs(pp(m) - 8) < 0.3, `DSBSC ${pp(m).toFixed(2)} Vp-p`]; },
   'Term1/Exp3-AM-Demodulation': s => { const [a, r] = rd(s, ['master.SINE2', 'util.RC']); const [c] = lagCorr(a, r); return [c > 0.98, `recovered message correlation ${c.toFixed(3)}`]; },
+  // Part E: the multiplier output has the message in it (it correlates poorly), the RC LPF output follows the message
+  'Term1/Exp3-PartE-Product-Detector': s => { const [a, r] = rd(s, ['master.SINE2', 'util.RC']); const [c] = lagCorr(a, r); return [c > 0.98, `RC LPF output vs message correlation ${c.toFixed(3)}, ${pp(r).toFixed(2)} Vp-p`]; },
   'Term1/Exp4-DSBSC-Demodulation': s => { const [a, r] = rd(s, ['master.SINE2', 'tlpf.OUT']); const [c] = lagCorr(a, r); return [c > 0.99, `recovered message correlation ${c.toFixed(3)}, ${pp(r).toFixed(2)} Vp-p`]; },
   'Term1/Exp4-PartC-Buffer': s => { const [b, r] = rd(s, ['buffer.OUT', 'tlpf.OUT']); const [c] = lagCorr(b, r); return [Math.abs(c) > 0.99, `BUFFER ${pp(b).toFixed(2)} Vp-p, recovered correlation ${c.toFixed(3)}`]; },
   'Term1/Exp4-VCO-Carrier': s => { const [v] = rd(s, ['vco.SINE']); return [Math.abs(freq(v) - 100e3) < 500, `VCO ${(freq(v) / 1e3).toFixed(2)} kHz`]; },

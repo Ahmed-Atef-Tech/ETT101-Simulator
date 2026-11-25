@@ -103,6 +103,13 @@ const RAW = [
     S(H('D'), [P.tb(22, '2 ms/div'), P.bufMin(23), P.hp(24),
       A(26, 'Raise the gain to a comfortable level.', 'ارفع GAIN إلى مستوى صوت مريح.'),
       A(27, 'Talk, sing or hum while you watch and listen.', 'تكلّم أو غنِّ أو دندن وأنت تراقب وتستمع.')]),
+    S(H('E', 7), [A(28, 'Go back to the AM modulator alone, with the 2kHz SINE as the message (as in Part A).', 'ارجع إلى مُعدِّل AM وحده، مع 2kHz SINE كرسالة (كما في الجزء A).'),
+      A(29, 'Check that the message is 1 Vp-p; if not, adjust the ADDER G. Put the timebase back if you changed it.', 'تأكد أن الرسالة 1Vp-p، وإلا فاضبط G في ADDER. وأعِد القاعدة الزمنية إذا كنت غيّرتها.')],
+      { c: [['master.SINE2', 'adder.A'], ['vdc.VDC', 'adder.B'], ['adder.OUT', 'mult2.XDC'], ['master.SINE100', 'mult2.YDC']], p: { CH1: 'adder.OUT', CH2: 'mult2.KXY' } }),
+    S(H('E', 8), [M(30, 8)], { w: 'Term1/03-Exp3-PartE-Product-Detector',
+      q: Q('The MULTIPLIER output holds several sinewaves. Which of them is at the message frequency, and why does the RC LPF keep it while it removes the others?', 'خرج MULTIPLIER يحتوي على عدة موجات جيبية. أيّها عند تردد الرسالة؟ ولماذا يُبقيها RC LPF ويحذف الباقي؟') }),
+    S(H('E'), [A(null, 'Not in the book: move CH2 to the RC LPF output to see the message that the filter picks out, and compare it with CH1.', 'ليست في الكتاب: انقل CH2 إلى مخرج RC LPF لترى الرسالة التي يلتقطها المرشِّح، وقارنها بـ CH1.')],
+      { p: { CH2: 'util.RC' } }),
   ] },
   { id: 'exp4', title: { en: 'DSBSC demodulation', ar: 'DSBSC Demodulation' }, steps: [
     S(H('A', 2), [B(3, 2)], { c: [['master.SINE100', 'mult1.XAC'], ['master.SINE2', 'mult1.YAC']], p: { CH1: 'master.SINE2', CH2: 'mult1.KXY' } }),

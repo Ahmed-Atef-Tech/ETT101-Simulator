@@ -9,9 +9,11 @@ import { Audio } from './ui/audio.js';
 import { SOCKET_NAME, SOCKET_POS, BLOCKS } from './ui/layout.js';
 import { MODULE_INFO, HELP_LINKS, HELP, NOTICE } from './ui/content.js';
 import { SHEETS, SECTIONS } from './ui/sheets.js';
+import SETUPS from 'virtual:setups';
 import { startTour, tourOpen, endTour, tourReframe } from './ui/tour.js';
 import { t, tr, trb, bidi, getLang, setLang } from './ui/i18n.js';
 import { initLibrary } from './ui/library.js';
+import { describeSignal, signalKind } from './ui/signals.js';
 
 const $ = s => document.querySelector(s);
 const sim = new Sim();
@@ -49,17 +51,17 @@ const HPX = 1560, HPY = 690; const hpG = el('g', { id: 'hp', transform: `transla
 
 let dragKnob = false, hoverKnobOn = false; // dragKnob: a knob is being turned with the mouse held down
 const hooks = {
-  changed: () => { },
+  changed: () => histLater(),
   click: () => audio.ensure(),
   info: id => showInfo(id),
   knobTip: (mod, p, e, wheel) => showKnobTip(mod, p, e, wheel),
   hoverKnob: (mod, p, e) => { hoverKnobOn = !!mod; if (mod) { if (training) showTip(`<b dir="ltr">${knobReadout(sim, mod, p)}</b>`, e); } else if (!dragKnob) hideTip(); },
-  toggleHeadphones: () => { audio.ensure(); sim.setHeadphones(!sim.headphones); drawHeadphones(); },
+  toggleHeadphones: () => { audio.ensure(); sim.setHeadphones(!sim.headphones); drawHeadphones(); histLater(); },
   screenshot: cv => saveImage(cv),
   scopeHelp: () => showModal(t('scopeHelp'), HELP[getLang()].scope, links.scope),
   plugged: () => audio.ensure(),
   hoverTarget: () => { },
-  hoverLead: (l, e) => { if (l && training) showTip(l.probe ? `<bdi>${l.probe}</bdi> ⟷ <bdi>${SOCKET_NAME[sim.probes[l.probe]] || ''}</bdi><br><span class="dim">${t('probeTip')}</span>` : `<bdi>${SOCKET_NAME[l.a]}</bdi> ⟷ <bdi>${SOCKET_NAME[l.b]}</bdi><br><span class="dim">${t('leadTip')}</span>`, e); else hideTip(); },
+  hoverLead: (l, e) => { if (l && training) showTip(l.probe ? `<bdi>${l.probe}</bdi> ⟷ <bdi>${SOCKET_NAME[sim.probes[l.probe]] || ''}</bdi>${sigHtml(sim.probes[l.probe])}<span class="dim">${t('probeTip')}</span>` : `<bdi>${SOCKET_NAME[l.a]}</bdi> ⟷ <bdi>${SOCKET_NAME[l.b]}</bdi>${sigHtml(l.a)}<span class="dim">${t('leadTip')}</span>`, e); else hideTip(); },
   leadMenu: (l, e) => leadMenu(l, e),
   socketMenu: (hit, e) => socketMenu(hit, e),
   pendingDone: ok => { $('#pendBar').hidden = true; if (ok) toast(t('connected')); },
@@ -206,6 +208,8 @@ svg.addEventListener('pointerout', e => { // leaving a socket for something that
   hoverSock = null; sim.setProbe('HOV', null); if (!dragKnob) hideTip();
 });
 for (const ev of ['pointerleave', 'blur']) (ev === 'blur' ? window : document.documentElement).addEventListener(ev, () => { if (!dragKnob) hideTip(); });
+// the signal's name and what made it (signals.js), e.g. "DSBSC signal / from k·X·Y"
+function sigHtml(sock) { const d = describeSignal(sim, sock, getLang()); return d ? `<div class="sig"><b>${bidi(d.lines[0])}</b>${d.lines[1] ? `<br><span class="dim" dir="auto">${bidi(d.lines[1])}</span>` : ''}</div>` : ''; }
 function showSockTip(e) {
   const id = hoverSock; const [, , dir, kind] = SOCKETS[id];
   const dirTxt = dir === 'in' ? t('input') : dir === 'out' ? t('output') : t('ground');
@@ -222,7 +226,7 @@ function showSockTip(e) {
       if (st === 'short') meas += `<br><span class="warn">${t('shorted')}</span>`;
     }
   }
-  showTip(`<b><bdi>${SOCKET_NAME[id]}</bdi></b><br><span class="dim">${dirTxt}, ${kind === 'd' ? t('digital') : t('analog')}</span><br>${meas}`, e);
+  showTip(`<b><bdi>${SOCKET_NAME[id]}</bdi></b><br><span class="dim">${dirTxt}, ${kind === 'd' ? t('digital') : t('analog')}</span>${sigHtml(id)}<br>${meas}`, e);
 }
 
 // =============================================== lead menu ===============================================
@@ -249,7 +253,7 @@ function socketMenu(hit, e) {
   const P = sim.probes;
   if (hit.sock) {
     const ch = c => P[c] === hit.sock ? `<button data-off="${c}">${t('probeOff').replace('{ch}', c === 'EXT' ? 'EXT TRIG' : c)}</button>` : `<button data-ch="${c}">${t('probeTo').replace('{ch}', c === 'EXT' ? 'EXT TRIG' : c)}</button>`;
-    m.innerHTML = `<div class="mh"><bdi>${SOCKET_NAME[hit.sock] || hit.sock}</bdi></div>${ch('CH1')}${ch('CH2')}${ch('EXT')}<button data-lead="1">${t('leadToOther')}</button>`;
+    m.innerHTML = `<div class="mh"><bdi>${SOCKET_NAME[hit.sock] || hit.sock}</bdi>${sigHtml(hit.sock)}</div>${ch('CH1')}${ch('CH2')}${ch('EXT')}<button data-lead="1">${t('leadToOther')}</button>`;
   } else m.innerHTML = `<div class="mh"><bdi>${hit.bnc === 'EXT' ? 'EXT TRIG' : hit.bnc}</bdi></div><button data-lead="1">${t('probeToSocket')}</button>` + (P[hit.bnc] ? `<button data-off="${hit.bnc}">${t('removeProbe')}</button>` : '');
   m.addEventListener('click', ev => {
     const b = ev.target.closest('button'); if (!b) return;
@@ -294,7 +298,7 @@ function showInfo(id) {
 function flash([x1, y1, x2, y2]) { const r = el('rect', { x: x1 + 2, y: y1 + 2, width: x2 - x1 - 4, height: y2 - y1 - 4, fill: 'rgba(242,194,27,.16)', stroke: '#f2c21b', 'stroke-width': 3 }, world); setTimeout(() => r.remove(), 1600); }
 
 // =============================================== lab sheet (experiment guide) ===============================================
-let exp = null, stepI = 0, ghost = false;
+let exp = null, stepI = 0, ghost = false, checking = false; // checking: 'Check my wiring' is on for this step
 // every lab sheet (sheets.js), looked up by id
 const ALL_SHEETS = SHEETS;
 const SHEET_BY_ID = Object.fromEntries(ALL_SHEETS.map(x => [x.id, x]));
@@ -302,6 +306,40 @@ const sameNet = (a, b) => sim.netOf(a) === sim.netOf(b);
 const probeOk = (ch, s) => sim.probes[ch] && sameNet(sim.probes[ch], s);
 const stepDone = st => (st.c || st.p) && (st.c || []).every(([a, b]) => sameNet(a, b)) && Object.entries(st.p || {}).every(([ch, s]) => probeOk(ch, s));
 const X_ICON = '<svg width="12" height="12" viewBox="0 0 12 12" stroke="currentColor" stroke-width="1.6"><path d="M2 2l8 8M10 2l-8 8"/></svg>';
+// ---------- Check my wiring ----------
+// What the step needs: a step with a ready-made setup (`w`) needs that whole figure, so a lead that is not in it is
+// reported too; other steps only know the connections they list (`c`, `p`), so only an INPUT joined to the wrong place
+// is reported there (outputs may feed several inputs). Two outputs joined together are always reported.
+function wiringReport(st) {
+  const fig = st.w && SETUPS[st.w], need = fig ? fig.leads.map(l => [l.a, l.b]) : (st.c || []);
+  const needP = fig ? Object.fromEntries(Object.entries(fig.probes || {}).filter(([k, v]) => v && k !== 'EXT')) : { ...(st.p || {}) };
+  const par = {}, find = x => { if (!(x in par)) par[x] = x; while (par[x] !== x) x = par[x] = par[par[x]]; return x; };
+  for (const [a, b] of need) par[find(a)] = find(b);
+  const inGroup = s => s in par; const sameGroup = (a, b) => inGroup(a) && inGroup(b) && find(a) === find(b);
+  const isIn = s => SOCKETS[s][2] === 'in', N = s => `<bdi>${SOCKET_NAME[s]}</bdi>`;
+  const items = [], bad = new Set(), miss = [];
+  for (const [a, b] of need) if (!sameNet(a, b)) { miss.push([a, b]); items.push({ k: 'miss', txt: tr({ en: `Missing: ${N(a)} → ${N(b)}`, ar: `ناقص: ${N(a)} ← ${N(b)}` }) }); }
+  for (const l of sim.leads) {
+    if (sameGroup(l.a, l.b)) continue;
+    // an input that this step uses, joined to something it should not be joined to
+    const wrongIn = [l.a, l.b].find(s => isIn(s) && inGroup(s) && !sameGroup(s, s === l.a ? l.b : l.a));
+    if (wrongIn) { const other = wrongIn === l.a ? l.b : l.a; bad.add(l.id); items.push({ k: 'wrong', txt: tr({ en: `Wrong lead: ${N(wrongIn)} goes to ${N(other)}; it is not in this step`, ar: `سلك خطأ: ${N(wrongIn)} موصّل بـ ${N(other)}، وهذا ليس في هذه الخطوة` }) }); }
+    else if (fig) { bad.add(l.id); items.push({ k: 'extra', txt: tr({ en: `Extra lead: ${N(l.a)} → ${N(l.b)} is not in this figure`, ar: `سلك زائد: ${N(l.a)} ← ${N(l.b)} ليس في هذا الشكل` }) }); }
+  }
+  for (const [ch, s] of Object.entries(needP)) if (!probeOk(ch, s)) items.push({ k: sim.probes[ch] ? 'wrong' : 'miss', txt: sim.probes[ch]
+    ? tr({ en: `${ch} is on ${N(sim.probes[ch])}; it should be on ${N(s)}`, ar: `${ch} على ${N(sim.probes[ch])}، والمطلوب ${N(s)}` })
+    : tr({ en: `${ch} is not connected; it should be on ${N(s)}`, ar: `${ch} غير موصّل، والمطلوب ${N(s)}` }) });
+  const seen = new Set();
+  for (const n of sim.nets) if (n.state === 'short' && !seen.has(n)) { seen.add(n); const outs = n.drivers.length ? n.drivers : n.members.filter(s => SOCKETS[s][2] !== 'in');
+    items.push({ k: 'short', txt: n.drivers.length > 1 ? tr({ en: `Two outputs joined: ${outs.map(N).join(' + ')}`, ar: `مخرجان موصّلان معاً: ${outs.map(N).join(' + ')}` }) : tr({ en: `Output joined to GND: ${outs.filter(s => SOCKETS[s][2] === 'out').map(N).join(', ')}`, ar: `مخرج موصّل بالأرضي GND: ${outs.filter(s => SOCKETS[s][2] === 'out').map(N).join('، ')}` }) });
+    for (const l of sim.leads) if (n.members.includes(l.a)) bad.add(l.id); }
+  return { items, bad, miss, ok: !items.length, full: !!fig };
+}
+function drawCheck(rep) {
+  for (const id of rep.bad) { const l = sim.leads.find(x => x.id === id); if (!l) continue; const a = wires.pos(l.a), b = wires.pos(l.b);
+    el('path', { d: l.bend ? wires.through(a, b, l.bend) : wires.curve(a, b), stroke: '#ff3b30', 'stroke-width': 11, 'stroke-linecap': 'round', fill: 'none', opacity: .55, class: 'badLead' }, ghostLayer); }
+  for (const [a, b] of rep.miss) { const pa = SOCKET_POS[a], pb = SOCKET_POS[b]; el('path', { d: wires.curve(pa, pb), stroke: '#f2c21b', 'stroke-width': 4, 'stroke-dasharray': '10 7', fill: 'none' }, ghostLayer); for (const p of [pa, pb]) el('circle', { cx: p[0], cy: p[1], r: 15, fill: 'none', stroke: '#f2c21b', 'stroke-width': 3, class: 'ghostRing' }, ghostLayer); }
+}
 function renderGuide() {
   const g = $('#guide');
   const head = title => `<div class="sheetHead"><h2>${title}</h2><button class="x" id="gClose" aria-label="${t('close')}">${X_ICON}</button></div>`;
@@ -329,32 +367,37 @@ function renderGuide() {
       <ol class="acts">${st.acts.map(([n, en, ar]) => `<li class="${n == null ? 'note' : ''}"><span class="n">${n ?? ''}</span><span class="a">${trb({ en, ar })}</span></li>`).join('')}</ol>
       ${st.acts.some(a => a[0] != null) ? `<p class="bookSteps">${t('bookSteps')}</p>` : ''}
       ${checks.length ? `<div class="connHead">${t('connections')}</div><ul class="checks" dir="ltr">${checks.map(([ok, txt]) => `<li class="${ok ? 'ok' : ''}"><span class="box">${ok ? '✓' : ''}</span><span>${txt}</span></li>`).join('')}</ul>` : ''}
+      ${checks.length ? (checking ? (rep => `<div class="wcheck ${rep.ok ? 'good' : ''}" role="status"><div class="wcHead"><b>${rep.ok ? t('wiringOk') : t('wiringProblems').replace('{n}', rep.items.length)}</b><button id="gCheckOff" class="link">${t('hide')}</button></div>${rep.ok ? '' : `<ul>${rep.items.map(i => `<li class="${i.k}">${i.txt}</li>`).join('')}</ul>`}${rep.full ? '' : `<p class="small">${t('wiringPartial')}</p>`}</div>`)(wiringReport(st)) : `<button id="gCheck" class="checkBtn">${t('checkWiring')}</button>`) : ''}
       ${st.q ? `<div class="question">${trb(st.q)}<div class="lines"></div></div>` : ''}
       <div class="sheetNav"><button id="gPrev" ${stepI === 0 ? 'disabled' : ''}>${t('prev')}</button>
         <label><input type="checkbox" id="gGhost" ${ghost ? 'checked' : ''}> ${t('showWiring')}</label>
         ${links[exp.id] ? `<button class="video" id="gVideo">${t('watch')}</button>` : ''}
         <button id="gNext" class="primary" ${stepI === exp.steps.length - 1 ? 'disabled' : ''}>${t('next')}</button></div>`;
-    $('#gBack').onclick = () => { exp = null; renderGuide(); };
-    $('#gPrev').onclick = () => { stepI--; renderGuide(); }; $('#gNext').onclick = () => { stepI++; renderGuide(); };
+    $('#gBack').onclick = () => { exp = null; checking = false; renderGuide(); };
+    $('#gPrev').onclick = () => { stepI--; checking = false; renderGuide(); }; $('#gNext').onclick = () => { stepI++; checking = false; renderGuide(); };
     $('#gGhost').onchange = e => { ghost = e.target.checked; drawGhost(); };
+    if ($('#gCheck')) $('#gCheck').onclick = () => { checking = true; renderGuide(); };
+    if ($('#gCheckOff')) $('#gCheckOff').onclick = () => { checking = false; renderGuide(); };
     if ($('#gVideo')) $('#gVideo').onclick = () => openLink(links[exp.id]);
-    g.querySelectorAll('.stepbar button').forEach(b => b.onclick = () => { stepI = +b.dataset.i; renderGuide(); });
+    g.querySelectorAll('.stepbar button').forEach(b => b.onclick = () => { stepI = +b.dataset.i; checking = false; renderGuide(); });
   }
   $('#gClose').onclick = () => { g.classList.remove('open'); drawGhost(); };
   drawGhost();
 }
 function drawGhost() {
-  ghostLayer.innerHTML = ''; if (!exp || !ghost || !$('#guide').classList.contains('open')) return;
+  ghostLayer.innerHTML = ''; if (!exp || !$('#guide').classList.contains('open')) return;
   const st = exp.steps[stepI];
+  if (checking) { drawCheck(wiringReport(st)); return; }
+  if (!ghost) return;
   for (const [a, b] of st.c || []) { if (sameNet(a, b)) continue; const pa = SOCKET_POS[a], pb = SOCKET_POS[b]; el('path', { d: wires.curve(pa, pb), stroke: '#f2c21b', 'stroke-width': 4, 'stroke-dasharray': '10 7', fill: 'none' }, ghostLayer); for (const p of [pa, pb]) el('circle', { cx: p[0], cy: p[1], r: 15, fill: 'none', stroke: '#f2c21b', 'stroke-width': 3, class: 'ghostRing' }, ghostLayer); }
   for (const [ch, s] of Object.entries(st.p || {})) { if (probeOk(ch, s)) continue; const pa = scope.bncPos(ch), pb = SOCKET_POS[s]; el('path', { d: wires.curve(pa, pb, true), stroke: '#7fd3ff', 'stroke-width': 4, 'stroke-dasharray': '10 7', fill: 'none' }, ghostLayer); el('circle', { cx: pb[0], cy: pb[1], r: 15, fill: 'none', stroke: '#7fd3ff', 'stroke-width': 3, class: 'ghostRing' }, ghostLayer); }
 }
 
 // =============================================== rail & settings ===============================================
 function fitRail() {
-  const r = $('#rail'); r.classList.remove('c1', 'c2', 'c3', 'c4', 'c5', 'c6'); $('#colors').classList.remove('open');
+  const r = $('#rail'); r.classList.remove('c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8', 'c9'); $('#colors').classList.remove('open');
   const fits = () => { const box = r.getBoundingClientRect(), pad = 6; return r.scrollWidth <= r.clientWidth && [...r.children].every(el => { if (el.hidden || el.type === 'file') return true; const b = el.getBoundingClientRect(); return !b.width || (b.left >= box.left + pad - 1 && b.right <= box.right - pad + 1); }); };
-  for (const c of ['c1', 'c2', 'c3', 'c4', 'c5', 'c6']) { if (fits()) break; r.classList.add(c); }
+  for (const c of ['c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8', 'c9']) { if (fits()) break; r.classList.add(c); }
 }
 window.addEventListener('resize', fitRail);
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitRail);
@@ -427,16 +470,17 @@ function snapshot() {
   const pb = {}, pc = {}; for (const k of ['CH1', 'CH2', 'EXT']) { if (wires.probeBend[k] && sim.probes[k]) pb[k] = wires.probeBend[k]; if (wires.probeColor[k] && wires.probeColor[k] !== 'black' && sim.probes[k]) pc[k] = wires.probeColor[k]; }
   return { v: 2, leads: sim.leads.map(({ a, b, color, bend }) => (bend ? { a, b, color, bend } : { a, b, color })), probes: { CH1: sim.probes.CH1, CH2: sim.probes.CH2, EXT: sim.probes.EXT }, probeBend: pb, probeColor: pc, mods, scope: { ...scope.st, ref: { ...scope.st.ref, data: null, on: false } }, headphones: sim.headphones }; // the stored reference wave is not saved
 }
-function restore(s) {
+function restore(s, kitOnly = false) {
   const okPt = p => Array.isArray(p) && p.length === 2 && p.every(Number.isFinite);
   sim.leads = []; for (const l of s.leads || []) if (SOCKETS[l.a] && SOCKETS[l.b]) { const n = { id: 'L' + Math.random().toString(36).slice(2, 9), a: l.a, b: l.b, color: LEAD_COLORS[l.color] ? l.color : 'red' }; if (okPt(l.bend)) n.bend = l.bend; sim.leads.push(n); }
   wires.probeBend = {}; wires.probeColor = {}; for (const k of ['CH1', 'CH2', 'EXT']) { const p = (s.probeBend || {})[k]; if (okPt(p)) wires.probeBend[k] = p; const c = (s.probeColor || {})[k]; if (typeof c === 'string' && LEAD_COLORS.hasOwnProperty(c)) wires.probeColor[k] = c; }
   for (const k of ['CH1', 'CH2', 'EXT']) { const v = (s.probes || {})[k]; sim.probes[k] = v && SOCKETS[v] ? v : null; }
-  sim.resetState(); for (const id in MOD_DEFAULT) for (const p in MOD_DEFAULT[id]) sim.mods[id].set(p, MOD_DEFAULT[id][p]);
-  { const d = JSON.parse(SCOPE_DEFAULT); for (const k in d) scope.st[k] = d[k]; }
+  if (!kitOnly) sim.resetState(); for (const id in MOD_DEFAULT) for (const p in MOD_DEFAULT[id]) sim.mods[id].set(p, MOD_DEFAULT[id][p]);
+  if (!kitOnly) { const d = JSON.parse(SCOPE_DEFAULT); for (const k in d) scope.st[k] = d[k]; }
   // knobs and switches are 0..1; a file can only set parameters the module really has
   for (const id in s.mods || {}) if (sim.mods[id]) for (const p in s.mods[id]) { const v = +s.mods[id][p]; if (p in sim.mods[id].p && Number.isFinite(v)) sim.mods[id].set(p, Math.max(0, Math.min(1, v))); }
   // v1 files: the V/div list started at 2 mV; v2 adds 1 mV/div in front (UTD2000: 1 mV .. 20 V/div)
+  if (kitOnly) s = { ...s, scope: null };
   if (s.scope && !(s.v >= 2)) { s = JSON.parse(JSON.stringify(s)); for (const k of ['CH1', 'CH2']) if (s.scope.ch && s.scope.ch[k] && typeof s.scope.ch[k].vd === 'number') s.scope.ch[k].vd += 1; }
   if (s.scope && s.scope.math) delete s.scope.math.fz;
   if (s.scope && typeof s.scope === 'object') {
@@ -455,8 +499,26 @@ function restore(s) {
     d.run = true;
   }
   sim.headphones = !!s.headphones; sim.rebuild(); wires.render(); panel.refreshAll(); drawHeadphones();
+  if (!kitOnly) histCommit(); // loading a file, an experiment or a shared link can be undone
+  if (exp && $('#guide').classList.contains('open')) renderGuide(); // the step's ticks and the wiring check follow at once
 }
-function openGuideFor(id) { exp = SHEET_BY_ID[id] || null; stepI = 0; if (!training) setTraining(true); $('#guide').classList.add('open'); renderGuide(); }
+
+// ---------- undo / redo: leads, probes, knobs, switches and headphones (the scope settings are left alone) ----------
+const HIST_MAX = 80;
+let hist = [], fut = [], histCur = null, histT = 0;
+const kitKey = () => { const s = snapshot(); return JSON.stringify({ leads: s.leads, probes: s.probes, probeBend: s.probeBend, probeColor: s.probeColor, mods: s.mods, headphones: s.headphones }); };
+function histCommit() {
+  clearTimeout(histT); if (histCur === null) return; const k = kitKey(); if (k === histCur) return;
+  hist.push(histCur); if (hist.length > HIST_MAX) hist.shift(); fut = []; histCur = k; histButtons();
+}
+function histLater() { clearTimeout(histT); histT = setTimeout(histCommit, 400); } // a knob turn is one step, not one per pixel
+function histGo(back) {
+  histCommit(); const from = back ? hist : fut, to = back ? fut : hist; if (!from.length) return false;
+  to.push(histCur); histCur = from.pop(); restore(JSON.parse(histCur), true); histButtons(); if (exp) renderGuide(); return true;
+}
+function histButtons() { const u = $('#btnUndo'), r = $('#btnRedo'); if (u) { u.disabled = !hist.length; r.disabled = !fut.length; } }
+const undo = () => { if (!histGo(true)) toast(t('nothingUndo')); }, redo = () => { if (!histGo(false)) toast(t('nothingRedo')); };
+function openGuideFor(id) { exp = SHEET_BY_ID[id] || null; stepI = 0; checking = false; if (!training) setTraining(true); $('#guide').classList.add('open'); renderGuide(); }
 let lastLoaded = null; // the ready-made experiment on the kit, until the wiring changes
 const library = initLibrary({ restore, toast, hasWork: () => sim.leads.length > 0 || !!(sim.probes.CH1 || sim.probes.CH2), openGuide: openGuideFor, onLoaded: x => { lastLoaded = { ...x, leads: JSON.stringify(sim.leads.map(l => [l.a, l.b])) }; } });
 
@@ -489,7 +551,7 @@ function setBugKind(k) {
 document.querySelectorAll('.bugKind button').forEach(b => b.onclick = () => { setBugKind(b.dataset.kind); $('#bugWhat').focus(); });
 function openBug() { setBugKind(bugKind); closeMenus(); $('#settings').classList.remove('open'); $('#bugErr').textContent = ''; $('#bugFallback').classList.remove('show'); $('#bugWhat').removeAttribute('aria-invalid'); $('#bugDlg').classList.add('open'); setTimeout(() => $('#bugWhat').focus(), 30); }
 function closeBug() { $('#bugDlg').classList.remove('open'); }
-$('#btnBug').onclick = openBug; $('#bugX').onclick = closeBug;
+$('#btnBug').onclick = openBug; $('#bugMi').onclick = openBug; $('#bugX').onclick = closeBug;
 $('#bugDlg').addEventListener('pointerdown', e => { if (e.target.id === 'bugDlg') closeBug(); });
 $('#bugWhat').addEventListener('input', () => { if ($('#bugWhat').value.trim()) { $('#bugErr').textContent = ''; $('#bugWhat').removeAttribute('aria-invalid'); } });
 $('#bugForm').onsubmit = e => {
@@ -506,11 +568,62 @@ $('#bugForm').onsubmit = e => {
   // could not open a window: keep the form and offer the link and the text instead
   $('#bugLink').href = url; $('#bugCopy').onclick = () => copyText(msg); $('#bugFallback').classList.add('show');
 };
-function copyText(txt) {
-  const done = () => toast(t('bugCopied'));
+function copyText(txt, msg) {
+  const done = () => toast(msg || t('bugCopied'));
   const old = () => { const ta = document.createElement('textarea'); ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); done(); } catch (e) { } ta.remove(); };
   if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done, old); else old();
 }
+// ---------- share the setup as a link ----------
+// The link carries the wiring, the knobs and the scope settings (only what differs from a fresh kit), compressed, after
+// the '#' so it never reaches a server. Anyone who opens it gets the same setup, on any device.
+const APP_URL = 'https://ahmed-atef-tech.github.io/ETT101-Simulator/app/';
+const b64u = u8 => { let s = ''; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); };
+const unb64u = s => { const b = atob(s.replace(/-/g, '+').replace(/_/g, '/')); const u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; };
+async function pipe(u8, stream) { return new Uint8Array(await new Response(new Blob([u8]).stream().pipeThrough(stream)).arrayBuffer()); }
+function diffObj(cur, def) {
+  if (cur && def && typeof cur === 'object' && typeof def === 'object' && !Array.isArray(cur) && !Array.isArray(def)) {
+    const o = {}; for (const k in cur) { const d = diffObj(cur[k], def[k]); if (d !== undefined) o[k] = d; } return Object.keys(o).length ? o : undefined; }
+  return JSON.stringify(cur) === JSON.stringify(def) ? undefined : cur;
+}
+async function shareCode() {
+  const s = snapshot(), sc = diffObj(s.scope, JSON.parse(SCOPE_DEFAULT)) || {}; sc.tdVer = s.scope.tdVer; // tdVer marks the current time/div list
+  const o = { v: s.v, l: s.leads.map(l => l.bend ? [l.a, l.b, l.color, l.bend.map(Math.round)] : [l.a, l.b, l.color]), p: Object.fromEntries(Object.entries(s.probes).filter(([, v]) => v)),
+    m: diffObj(s.mods, MOD_DEFAULT), s: sc, h: s.headphones ? 1 : undefined, pb: Object.keys(s.probeBend).length ? s.probeBend : undefined, pc: Object.keys(s.probeColor).length ? s.probeColor : undefined };
+  const raw = new TextEncoder().encode(JSON.stringify(o));
+  if (typeof CompressionStream === 'function') { try { return 'z' + b64u(await pipe(raw, new CompressionStream('deflate-raw'))); } catch (e) { } }
+  return 'j' + b64u(raw);
+}
+async function decodeShare(code) {
+  let u = unb64u(code.slice(1));
+  if (code[0] === 'z') u = await pipe(u, new DecompressionStream('deflate-raw')); else if (code[0] !== 'j') throw new Error('bad');
+  const o = JSON.parse(new TextDecoder().decode(u)); if (!Array.isArray(o.l)) throw new Error('bad');
+  return { v: o.v || 2, leads: o.l.map(([a, b, color, bend]) => (bend ? { a, b, color, bend } : { a, b, color })), probes: o.p || {}, mods: o.m || {}, scope: o.s || {}, headphones: !!o.h, probeBend: o.pb || {}, probeColor: o.pc || {} };
+}
+async function shareSetup() {
+  $('#settings').classList.remove('open');
+  if (!sim.leads.length && !sim.probes.CH1 && !sim.probes.CH2) { toast(t('shareEmpty')); return; }
+  const url = APP_URL + '#s=' + await shareCode();
+  if (touchUI && navigator.share) { try { await navigator.share({ title: t('shareTitle'), text: t('shareText'), url }); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
+  copyText(url, t('linkCopied'));
+}
+// a link from the share button, opened here (on load, when the address changes, or pasted in Settings)
+async function openShared(code, fromPaste) {
+  try { const s = await decodeShare(code);
+    if ((sim.leads.length || sim.probes.CH1 || sim.probes.CH2) && !confirm(t('sharedReplace'))) return false;
+    restore(s); toast(t('sharedOpened')); return true;
+  } catch (e) { toast(t('sharedBad'), 4000); return false; }
+}
+function codeFrom(text) { const m = String(text).match(/#s=([A-Za-z0-9_-]+)/); return m ? m[1] : null; }
+async function openFromAddress() { const c = codeFrom(location.hash); if (!c) return; history.replaceState(null, '', location.pathname + location.search); await openShared(c); }
+window.addEventListener('hashchange', openFromAddress);
+$('#btnShare').onclick = shareSetup;
+$('#btnOpenLink').onclick = () => {
+  $('#settings').classList.remove('open');
+  showModal(t('openLink'), `<p>${t('openLinkText')}</p><form id="linkForm" class="linkForm"><label class="fl" for="linkIn">${t('linkLabel')}</label><input id="linkIn" type="text" inputmode="url" dir="ltr" autocomplete="off" spellcheck="false" placeholder="https://…/app/#s=…"><p class="ferr" id="linkErr" aria-live="polite"></p><button type="submit" class="primary">${t('openLinkGo')}</button></form>`, false);
+  const f = $('#linkForm'), inp = $('#linkIn'); setTimeout(() => inp.focus(), 30);
+  inp.oninput = () => { $('#linkErr').textContent = ''; };
+  f.onsubmit = async e => { e.preventDefault(); const c = codeFrom(inp.value.trim()); if (!c) { $('#linkErr').textContent = t('linkNotShare'); inp.focus(); return; } if (await openShared(c, true)) closeModal(); };
+};
 $('#btnLib').onclick = () => library.toggleLib();
 $('#btnRef').onclick = () => library.toggleRef();
 $('#btnSave').onclick = () => { $('#settings').classList.remove('open'); download(new Blob([JSON.stringify(snapshot(), null, 1)], { type: 'application/json' }), `setup-${stamp()}.ett.json`); toast(t('savedSetup')); };
@@ -522,8 +635,13 @@ function saveImage(cv) { cv.toBlob(b => download(b, `scope-${stamp()}.png`)); to
 function toast(msg, ms = 1800) { const d = $('#toast'); d.textContent = msg; d.classList.add('show'); clearTimeout(d._t); d._t = setTimeout(() => d.classList.remove('show'), ms); }
 setInterval(() => { try { localStorage.setItem('ett.autosave', JSON.stringify(snapshot())); } catch (e) { } }, 3000);
 try { const a = localStorage.getItem('ett.autosave'); if (a) restore(JSON.parse(a)); } catch (e) { }
+histCur = kitKey(); hist = []; fut = []; histButtons(); // history starts at what was on the kit when the app opened
+$('#btnUndo').onclick = undo; $('#btnRedo').onclick = redo;
+openFromAddress(); // opened from a shared link
 
 window.addEventListener('keydown', e => {
+  const typing = e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA';
+  if ((e.ctrlKey || e.metaKey) && !e.altKey && !typing && /^[zy]$/i.test(e.key)) { e.preventDefault(); if (e.key.toLowerCase() === 'y' || e.shiftKey) redo(); else undo(); return; }
   if (e.key === 'Escape') { closeModal(); closeMenus(); $('#settings').classList.remove('open'); library.close(); closeBug(); if (wires.sel) wires.select(null); }
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.ctrlKey || e.altKey || e.metaKey) return;
   if (e.key === '1') setView('kit'); if (e.key === '2') setView('both'); if (e.key === '3') setView('scope');
@@ -578,4 +696,4 @@ function loop(now) {
 }
 requestAnimationFrame(loop);
 window.__sim = sim; window.__perf = () => loadAvg; window.__fps = () => ({ fps: 1000 / msAvg, scopeEvery });
-window.__app = { sim, wires, scope, panel, restore, snapshot, setView, tour: { start: runTour, open: tourOpen, end: endTour }, sheets: ALL_SHEETS, sections: SECTIONS, setLang: l => { setLang(l); applyTexts(); } };
+window.__app = { sim, wires, scope, panel, restore, snapshot, setView, signalKind: s => signalKind(sim, s), undo, redo, shareCode, setups: SETUPS, histLen: () => [hist.length, fut.length], tour: { start: runTour, open: tourOpen, end: endTour }, sheets: ALL_SHEETS, sections: SECTIONS, setLang: l => { setLang(l); applyTexts(); } };

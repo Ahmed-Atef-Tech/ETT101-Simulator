@@ -1,8 +1,12 @@
-- **Lab-sheet questions reworded:** the questions in the lab sheets now use the simulator's own wording; they ask the same things as before.
-- **Extra DATEx experiments:** their ready-made wiring stays in *Load experiment*; they no longer have a written lab sheet.
-- **Unofficial and not affiliated:** the title now says *unofficial simulator*, and the download page says clearly that the simulator is not affiliated with Emona Instruments or UNI-T.
-- **Font licences:** the licence of the two fonts the app uses (SIL Open Font License) now comes with the app and the web version, and *About* credits them.
-- **أسئلة أوراق التجارب بصياغة جديدة:** أصبحت الأسئلة بصياغة البرنامج نفسه، وتسأل عن نفس الأشياء كما كانت.
-- **تجارب DATEx الإضافية:** بقيت توصيلاتها الجاهزة في «تحميل تجربة»، ولم تعد لها ورقة تجربة مكتوبة.
-- **غير رسمي وغير تابع:** أصبح العنوان «محاكي غير رسمي»، وتوضح صفحة التحميل أن البرنامج غير تابع لشركة Emona Instruments أو UNI-T.
-- **تراخيص الخطوط:** أصبح ترخيص الخطين المستخدمين في البرنامج (SIL Open Font License) مرفقاً بالبرنامج ونسخة الويب، ويذكرهما قسم «حول البرنامج».
+- **Check my wiring:** in a lab sheet, a new button lists what is missing, a lead in the wrong place or an extra one, a probe on the wrong socket and two outputs joined together. The wrong leads turn red on the kit, and the list updates as you fix them.
+- **Share as a link:** Settings → *Share as a link* makes a link with your leads, knobs and scope settings, ready to paste in WhatsApp. Whoever opens it gets the same setup on a phone or a computer. *Open a shared link* opens a pasted link in the desktop app.
+- **What is on this socket?** The socket tip (or the top of a socket's menu on a phone) now names the signal from the wiring: AM, DSBSC, SSB, FM, ASK, FSK, BPSK, QPSK, PWM, carrier, product-detector output, recovered message and more.
+- **Undo / Redo:** two new buttons at the top (and Ctrl+Z / Ctrl+Y) take back a lead, a probe, a knob turn, *Remove all leads* or a loaded experiment.
+- **Term 1 Exp 3, Part E:** the last part of AM demodulation (Figures 7 and 8) now has its lab sheet and a ready-made setup.
+- **Fix:** the full-screen setting and button no longer show on a computer.
+- **افحص توصيلي:** في ورقة التجربة زر جديد يعرض ما ينقص، والسلك الموصّل في مكان خطأ أو الزائد، والمجسّ على مقبس خطأ، والمخرجين الموصّلين معاً. وتظهر الأسلاك الخطأ باللون الأحمر على الجهاز، وتتحدّث القائمة وأنت تصلحها.
+- **مشاركة كرابط:** من الإعدادات ← «مشاركة كرابط» تحصل على رابط فيه أسلاكك والمقابض وضبط راسم الإشارة، جاهز للصقه في واتساب. ومن يفتحه يحصل على نفس التوصيلات على الهاتف أو الكمبيوتر. و«فتح رابط مُشارَك» يفتح رابطاً منسوخاً في برنامج الكمبيوتر.
+- **ما الذي على هذا المقبس؟** تلميح المقبس (أو أعلى قائمة المقبس على الهاتف) يذكر الآن اسم الإشارة حسب التوصيل: AM و DSBSC و SSB و FM و ASK و FSK و BPSK و QPSK و PWM والحامل وخرج كاشف الضرب والرسالة المسترجعة وغيرها.
+- **تراجع وإعادة:** زران جديدان في الأعلى (و Ctrl+Z و Ctrl+Y) يلغيان آخر سلك أو مجسّ أو تدوير لمقبض أو «إزالة كل الأسلاك» أو تجربة تم تحميلها.
+- **الترم الأول، التجربة 3، الجزء E:** أصبح للجزء الأخير من فك تعديل AM (الشكلان 7 و8) ورقة تجربة وتوصيلات جاهزة.
+- **إصلاح:** لم يعد إعداد ملء الشاشة وزره يظهران على الكمبيوتر.

@@ -102,7 +102,11 @@ export const HELP = {
 <li><b>Knobs:</b> drag around the knob, sideways or up and down, or use the mouse wheel. Hold Shift for fine steps.</li>
 <li><b>View:</b> Kit, Both and Scope fit that part to the screen. Ctrl + wheel zooms at the cursor; drag the empty bench to move around. Keys 1, 2, 3 switch views.</li>
 <li><b>Headphones:</b> click the headphone socket on the BUFFER. Sound comes out of the computer speakers.</li>
-<li><b>Guidance</b> (switch at the top) shows the <b>i</b> button on every module, socket names with a live reading, and knob values. Turn it off to practise like the real exam.</li></ul>`,
+<li><b>Guidance</b> (switch at the top) shows the <b>i</b> button on every module, socket names with a live reading, and knob values. Turn it off to practise like the real exam.</li>
+<li><b>Undo / Redo:</b> the arrow buttons at the top (or Ctrl+Z and Ctrl+Y) take back a lead, a probe, a knob turn or a loaded experiment. The scope settings are not changed.</li>
+<li><b>What is on this socket?</b> With Guidance on, a socket's tip names the signal from the way the kit is wired (for example AM signal, DSBSC signal, recovered message) and says what the module does with its inputs.</li>
+<li><b>Check my wiring:</b> in a lab sheet, this button lists what is missing, a lead in the wrong place or an extra one, a probe on the wrong socket and two outputs joined together, and marks the wrong leads in red on the kit.</li>
+<li><b>Share as a link</b> (Settings): makes a link with your leads, knobs and scope settings. Whoever opens it gets the same setup, on a phone or a computer. <b>Open a shared link</b> opens a link pasted from somewhere else.</li></ul>`,
     appTouch: `<h3>How to use it on a phone or tablet</h3><ul>
 <li><b>Zoom:</b> pinch with two fingers, right where you want to look. Drag an empty part of the bench with one finger to move around. The centre button brings everything back.</li>
 <li><b>Views:</b> Kit, Both and Scope fit that part to the screen. On a phone, Kit and Scope are the easiest.</li>
@@ -111,6 +115,10 @@ export const HELP = {
 <li><b>Knobs:</b> drag around the knob to turn it. Scope keys and switches: tap them.</li>
 <li><b>Headphones:</b> tap the headphone socket on the BUFFER; the sound comes out of the phone.</li>
 <li><b>Turn the phone sideways:</b> the kit and the scope need a wide screen.</li>
+<li><b>Undo / Redo:</b> the arrow buttons at the top take back a lead, a probe, a knob turn or a loaded experiment. The scope settings are not changed.</li>
+<li><b>What is on this socket?</b> Hold a socket: the top of its menu names the signal from the way the kit is wired (for example AM signal, DSBSC signal, recovered message) and says what the module does with its inputs.</li>
+<li><b>Check my wiring:</b> in a lab sheet, this button lists what is missing, a lead in the wrong place or an extra one, a probe on the wrong socket and two outputs joined together, and marks the wrong leads in red on the kit.</li>
+<li><b>Share as a link</b> (Settings): makes a link with your leads, knobs and scope settings. Whoever opens it gets the same setup, on a phone or a computer. <b>Open a shared link</b> opens a link pasted from somewhere else.</li>
 <li><b>Full screen:</b> on Android the page fills the screen (no address bar) after your first tap; swipe from the edge and tap Back to leave it, and the full-screen button in the toolbar brings it back. Settings → Full screen turns it on or off. On iPhone, add it to the home screen and open it from there.</li>
 <li><b>Add it to your home screen</b> to open it like an app and use it without the internet: in Chrome, menu → Add to Home screen; on iPhone, Share → Add to Home Screen.</li></ul>`,
     scope: `<h3>The oscilloscope (UTD2102CEL style)</h3><ul>
@@ -132,7 +140,11 @@ export const HELP = {
 <li><b>المقابض:</b> أدِر حول المقبض، أو اسحب يميناً ويساراً أو لأعلى ولأسفل، أو استخدم عجلة الفأرة. اضغط Shift للحركة الدقيقة.</li>
 <li><b>العرض:</b> الأزرار Kit و Both و Scope تُكبّر الجزء المطلوب على الشاشة. Ctrl مع عجلة الفأرة للتكبير عند المؤشر، واسحب في المساحة الفارغة للتحرّك. المفاتيح 1 و 2 و 3 تبدّل طريقة العرض.</li>
 <li><b>السماعة:</b> انقر على مقبس السماعة في BUFFER، ويخرج الصوت من سماعات الحاسوب.</li>
-<li><b>الإرشادات</b> (المفتاح في الأعلى) تُظهر زر <b>i</b> على كل وحدة، وأسماء المقابس مع قراءاتها اللحظية، وقيم المقابض. أوقفها لتتدرّب كما في الامتحان.</li></ul>`,
+<li><b>الإرشادات</b> (المفتاح في الأعلى) تُظهر زر <b>i</b> على كل وحدة، وأسماء المقابس مع قراءاتها اللحظية، وقيم المقابض. أوقفها لتتدرّب كما في الامتحان.</li>
+<li><b>تراجع وإعادة:</b> زرا الأسهم في الأعلى (أو Ctrl+Z و Ctrl+Y) يلغيان آخر سلك أو مجسّ أو تدوير لمقبض أو تجربة تم تحميلها. ولا يتغيّر ضبط راسم الإشارة.</li>
+<li><b>ما الذي على هذا المقبس؟</b> مع تشغيل الإرشادات يذكر تلميح المقبس اسم الإشارة حسب طريقة التوصيل (مثل إشارة AM أو إشارة DSBSC أو الرسالة المسترجعة)، وما الذي تفعله الوحدة بمدخلاتها.</li>
+<li><b>افحص توصيلي:</b> في ورقة التجربة يعرض هذا الزر ما ينقص، والسلك الموصّل في مكان خطأ أو الزائد، والمجسّ على مقبس خطأ، والمخرجين الموصّلين معاً، ويُظهر الأسلاك الخطأ باللون الأحمر على الجهاز.</li>
+<li><b>مشاركة كرابط</b> (من الإعدادات): يصنع رابطاً فيه أسلاكك والمقابض وضبط راسم الإشارة. ومن يفتحه يحصل على نفس التوصيلات على الهاتف أو الكمبيوتر. و<b>فتح رابط مُشارَك</b> يفتح رابطاً منسوخاً من مكان آخر.</li></ul>`,
     appTouch: `<h3>طريقة الاستخدام على الهاتف أو التابلت</h3><ul>
 <li><b>التكبير:</b> باعِد بين إصبعين أو قرّبهما عند المكان الذي تريد رؤيته. واسحب بإصبع واحدة في مكان فارغ لتتحرك في المساحة. وزر التوسيط يعيد كل شيء إلى مكانه.</li>
 <li><b>طرق العرض:</b> الجهاز وكلاهما وراسم الإشارة تجعل الجزء المطلوب يملأ الشاشة. وعلى الهاتف يكون عرض الجهاز وحده أو راسم الإشارة وحده الأسهل.</li>
@@ -141,6 +153,10 @@ export const HELP = {
 <li><b>المقابض:</b> اسحب حول المقبض لتديره. وأزرار راسم الإشارة والمفاتيح: اضغط عليها.</li>
 <li><b>السماعة:</b> اضغط على مقبس السماعة في BUFFER، ويخرج الصوت من الهاتف.</li>
 <li><b>أدِر الهاتف بالعرض:</b> يحتاج الجهاز وراسم الإشارة إلى شاشة عريضة.</li>
+<li><b>تراجع وإعادة:</b> زرا الأسهم في الأعلى يلغيان آخر سلك أو مجسّ أو تدوير لمقبض أو تجربة تم تحميلها. ولا يتغيّر ضبط راسم الإشارة.</li>
+<li><b>ما الذي على هذا المقبس؟</b> عند الضغط المطوّل على المقبس يظهر في أعلى قائمته اسم الإشارة حسب طريقة التوصيل (مثل إشارة AM أو إشارة DSBSC أو الرسالة المسترجعة)، وما الذي تفعله الوحدة بمدخلاتها.</li>
+<li><b>افحص توصيلي:</b> في ورقة التجربة يعرض هذا الزر ما ينقص، والسلك الموصّل في مكان خطأ أو الزائد، والمجسّ على مقبس خطأ، والمخرجين الموصّلين معاً، ويُظهر الأسلاك الخطأ باللون الأحمر على الجهاز.</li>
+<li><b>مشاركة كرابط</b> (من الإعدادات): يصنع رابطاً فيه أسلاكك والمقابض وضبط راسم الإشارة. ومن يفتحه يحصل على نفس التوصيلات على الهاتف أو الكمبيوتر. و<b>فتح رابط مُشارَك</b> يفتح رابطاً منسوخاً من مكان آخر.</li>
 <li><b>ملء الشاشة:</b> على أندرويد تملأ الصفحة الشاشة (بدون شريط العنوان) بعد أول ضغطة، وللخروج اسحب من حافة الشاشة واضغط رجوع، وزر ملء الشاشة في شريط الأدوات يعيده. ومن الإعدادات ← ملء الشاشة تشغّله أو توقفه. وعلى آيفون أضِفه إلى الشاشة الرئيسية وافتحه من هناك.</li>
 <li><b>أضِفه إلى الشاشة الرئيسية</b> لتفتحه كتطبيق وتستخدمه من غير إنترنت: في Chrome من القائمة ثم «إضافة إلى الشاشة الرئيسية»، وفي آيفون من زر المشاركة ثم «إضافة إلى الشاشة الرئيسية».</li></ul>`,
     scope: `<h3>راسم الإشارة (على نمط UTD2102CEL)</h3><ul>

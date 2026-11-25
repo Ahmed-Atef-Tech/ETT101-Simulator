@@ -90,6 +90,23 @@ Scope: CH1: ADDER OUT, 0.5 V/div · CH2: RC LPF, 0.5 V/div · 100 µs/div
 - **The book expects:** The RC LPF output is a copy of the message
 - **The simulator shows:** correlation 0.997, 0.526 Vp-p, with a small carrier ripple like the real kit
 
+### Exp 3 · AM Demodulation (Part E) — the AM signal times the carrier, then a low-pass filter
+
+*Electrical Testing (6) lab manual, ELC414 (Term 1) · p. 37 · Fig. 8 · adapted from Emona Vol. 1 Exp 6*
+
+Setup file: [`setups/Term1/03-Exp3-PartE-Product-Detector.ett.json`](../../setups/Term1/03-Exp3-PartE-Product-Detector.ett.json)
+
+![Block diagram](img/Term1-03-Exp3-PartE-Product-Detector-block.png)
+
+![Wiring on the kit](img/Term1-03-Exp3-PartE-Product-Detector-kit.jpg)
+
+![Oscilloscope screen](img/Term1-03-Exp3-PartE-Product-Detector-scope.png)
+
+Scope: CH1: ADDER OUT, 0.5 V/div · CH2: MULTIPLIER kXY, 2 V/div · 100 µs/div
+
+- **The book expects:** the multiplier makes new sinewaves, two of them at the message frequency, and the RC LPF keeps the message while rejecting the others (the book's steps end at Figure 8)
+- **The simulator shows:** the multiplier output follows the message; moving CH2 to the RC LPF output shows the message, 1.58 Vp-p, correlation 0.999
+
 ### Exp 4 · DSBSC Demodulation — recovering the message with a product detector
 
 *Electrical Testing (6) lab manual, ELC414 (Term 1) · p. 44 · Fig. 4 · adapted from Emona Vol. 1 Exp 7*
