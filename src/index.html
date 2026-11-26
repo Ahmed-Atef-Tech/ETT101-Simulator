@@ -261,7 +261,7 @@ html[lang="ar"] .rintro, html[lang="ar"] .lnote { line-height: 1.85; }
 /* phones: tighter keys, then one colour button that opens the others */
 #rail.c4 { gap: 5px; padding: 0 5px; } #rail.c4 .key { padding: 0 8px; } #rail.c4 .tray .key { padding: 0 7px; gap: 5px; font-size: 13.5px; } #rail.c4 .toggle .state { display: none; } #rail.c4 .toggle { padding-inline-end: 8px; } #rail.c4 .leads { gap: 4px; }
 #rail.c5 #colors { position: relative; } #rail.c5 #colors .plugsw:not(.sel) { display: none; }
-#rail.c5 #colors.open { position: absolute; top: 44px; z-index: 30; padding: 8px; gap: 10px; background: var(--rail-hi); border: 1px solid var(--rail-edge); border-radius: 6px; box-shadow: 0 8px 20px rgba(0,0,0,.35); }
+#rail.c5 #colors.open { position: absolute; top: 44px; z-index: 30; padding: 8px; gap: 10px; flex-wrap: wrap; width: max-content; max-width: calc(100vw - 12px); background: var(--rail-hi); border: 1px solid var(--rail-edge); border-radius: 6px; box-shadow: 0 8px 20px rgba(0,0,0,.35); }
 #rail.c5 #colors.open .plugsw { display: block; width: 30px; height: 30px; }
 #rail.c6 #btnUndo, #rail.c6 #btnRedo, #rail.c6 #btnFull, #rail.c6 #btnFS { padding: 0 6px; } #rail.c6 { gap: 4px; }
 #rail.c7 #btnRedo { display: none; } /* the smallest phones keep Undo and lose Redo before anything else */

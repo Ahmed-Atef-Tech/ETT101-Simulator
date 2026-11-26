@@ -1,4 +1,4 @@
-- **Phone held upright:** the toolbar is now one wide button, *Turn the phone to show the tools*. On Android, tapping it goes full screen and turns the screen sideways for you; on iPhone (Safari does not allow that) it asks you to turn the phone.
-- **The "turn your phone" notice** at the start has the same *Full screen, sideways* button, next to *Continue anyway*.
-- **الهاتف طولي:** أصبح شريط الأدوات زراً واحداً عريضاً هو «اقلب الهاتف لإظهار الأدوات». على أندرويد يفتح الضغط عليه ملء الشاشة ويدير الشاشة بالعرض بنفسه، وعلى آيفون (لا يسمح Safari بذلك) يطلب منك إدارة الهاتف.
-- **رسالة «أدِر هاتفك بالعرض»** في البداية فيها نفس الزر «ملء الشاشة بالعرض» بجانب «متابعة على أي حال».
+- **Lead colours on phones:** on a narrow landscape screen the colour list ran off the right edge, so only the first colour could be seen. It now opens as one row inside the screen.
+- **Phones say "Tap":** the headphone note on the kit says *Tap* instead of *Click* on phones and tablets.
+- **ألوان الأسلاك على الهاتف:** على الشاشة الضيقة والهاتف بالعرض كانت قائمة الألوان تخرج من حافة الشاشة اليمنى فلا يظهر إلا أول لون. أصبحت تفتح كصف واحد داخل الشاشة.
+- **«اضغط» على الهاتف:** ملاحظة السماعة على الجهاز تقول «اضغط» بدلاً من «انقر» على الهاتف والتابلت.

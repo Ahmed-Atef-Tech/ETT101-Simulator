@@ -78,7 +78,7 @@ function drawHeadphones() {
   hpG.innerHTML = '';
   const [jx, jy] = [652, 468], rtl = getLang() === 'ar';
   const label = (txt, x, y) => el('text', { x, y, text: txt, fill: '#93a8ad', 'font-size': 20, 'font-family': rtl ? 'Plex Arabic, sans-serif' : 'Barlow SC, sans-serif', direction: rtl ? 'rtl' : 'ltr', 'text-anchor': 'start' }, hpG);
-  if (!sim.headphones) { label(t('hpOff'), rtl ? 640 : 0, 0); return; }
+  if (!sim.headphones) { label(t(matchMedia('(pointer: coarse)').matches ? 'hpOffTouch' : 'hpOff'), rtl ? 640 : 0, 0); return; }
   const g = el('g', {}, hpG);
   const cab = `M${jx - HPX},${jy - HPY} C${jx - HPX},${jy - HPY + 260} -60,160 0,60`;
   el('path', { d: cab, stroke: 'transparent', 'stroke-width': 18, fill: 'none' }, g); el('path', { d: cab, stroke: '#111', 'stroke-width': 6, fill: 'none' }, g);
@@ -395,7 +395,7 @@ function drawGhost() {
 
 // =============================================== rail & settings ===============================================
 function fitRail() {
-  const r = $('#rail'); r.classList.remove('c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8', 'c9'); $('#colors').classList.remove('open');
+  const r = $('#rail'); r.classList.remove('c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8', 'c9'); $('#colors').classList.remove('open'); $('#colors').style.transform = '';
   const fits = () => { const box = r.getBoundingClientRect(), pad = 6; return r.scrollWidth <= r.clientWidth && [...r.children].every(el => { if (el.hidden || el.type === 'file') return true; const b = el.getBoundingClientRect(); return !b.width || (b.left >= box.left + pad - 1 && b.right <= box.right - pad + 1); }); };
   for (const c of ['c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8', 'c9']) { if (fits()) break; r.classList.add(c); }
 }
@@ -475,7 +475,14 @@ $('#btnBeta').onclick = showAbout;
 $('#btnAbout').onclick = () => { $('#settings').classList.remove('open'); showAbout(); };
 const colorsEl = $('#colors');
 colorsEl.innerHTML = Object.keys(LEAD_COLORS).map(c => `<button class="plugsw ${c === wires.color ? 'sel' : ''}" data-c="${c}" style="background:${LEAD_COLORS[c]}"></button>`).join('');
-colorsEl.onclick = e => { const c = e.target.dataset.c; if (!c) return; if ($('#rail').classList.contains('c5') && !colorsEl.classList.contains('open')) { colorsEl.classList.add('open'); return; } colorsEl.classList.remove('open'); wires.color = c; if (wires.sel) wires.select(null); colorsEl.querySelectorAll('.plugsw').forEach(s => s.classList.toggle('sel', s.dataset.c === c)); };
+// on a narrow toolbar the colours fold into one swatch; the list it opens is kept inside the screen (on a phone it
+// opened at the swatch and ran off the right edge, so only the first colour could be seen)
+function placeColors() {
+  colorsEl.style.transform = ''; const r = colorsEl.getBoundingClientRect(), pad = 6;
+  let dx = 0; if (r.right > innerWidth - pad) dx = innerWidth - pad - r.right; if (r.left + dx < pad) dx = pad - r.left;
+  if (dx) colorsEl.style.transform = `translateX(${Math.round(dx)}px)`;
+}
+colorsEl.onclick = e => { const c = e.target.dataset.c; if (!c) return; if ($('#rail').classList.contains('c5') && !colorsEl.classList.contains('open')) { colorsEl.classList.add('open'); placeColors(); return; } colorsEl.style.transform = ''; colorsEl.classList.remove('open'); wires.color = c; if (wires.sel) wires.select(null); colorsEl.querySelectorAll('.plugsw').forEach(s => s.classList.toggle('sel', s.dataset.c === c)); };
 
 // save / open setups
 function snapshot() {

@@ -540,6 +540,20 @@ T('MB07', 'Phone', 'Phone held upright: the toolbar is one wide "Turn the phone 
   ok(await app(p, () => getComputedStyle(document.getElementById('rotBar')).display === 'none'), 'computer: never shown');
 });
 
+T('MB08', 'Phone', 'Narrow landscape phones: the folded lead-colour list opens fully on screen and picks a colour; the headphone note says Tap', async p => {
+  for (const [name, lang] of [['iPhone SE landscape', 'en'], ['iPhone SE landscape', 'ar'], ['Pixel 7 landscape', 'en']]) {
+    const q = await phone(p, name, lang);
+    if (await q.evaluate(() => document.getElementById('rail').classList.contains('c5'))) {
+      await q.tap('#colors .plugsw.sel'); await q.waitForTimeout(150);
+      ok(await q.evaluate(() => [...document.querySelectorAll('#colors .plugsw')].every(s => { const b = s.getBoundingClientRect(); return getComputedStyle(s).display !== 'none' && b.left >= 0 && b.right <= innerWidth && b.top >= 0 && b.bottom <= innerHeight; })), `${name} ${lang}: all five colours on screen`);
+      await q.tap('#colors .plugsw[data-c="green"]'); await q.waitForTimeout(100);
+      eq(await q.evaluate(() => [__app.wires.color, document.getElementById('colors').classList.contains('open')]), ['green', false], `${name} ${lang}: green picked, list closed`);
+    }
+    ok(await q.evaluate(() => [...document.querySelectorAll('#bench text')].some(x => /^Headphones unplugged\. Tap|^السماعة غير موصولة\. اضغط/.test(x.textContent))), `${name} ${lang}: headphone note says Tap`);
+    await q.ctxDone();
+  }
+});
+
 // ================================================================== new tools: undo, check wiring, share link, signal names
 T('UN01', 'Undo', 'Undo / Redo: leads, knobs, probes and a loaded experiment come back in steps; the scope is left alone; Ctrl+Z / Ctrl+Y; not while typing', async p => {
   eq(await app(p, () => [document.getElementById('btnUndo').disabled, document.getElementById('btnRedo').disabled]), [true, true], 'nothing to undo at start');
