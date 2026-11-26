@@ -1,8 +1,4 @@
-- **Licences in the desktop app:** the licence texts of Electron and Chromium (the engine the desktop app runs on) now come with the app on Mac too, as their licences ask; on Windows they were already there.
-- **Screen readers:** the *Lab sheets* and *Settings* buttons always have a name now, even when the toolbar is narrow and shows only their icons.
-- **Easier to read:** the *Beta* badge and the *Send* button in *Report or suggest* have stronger colours.
-- **The Windows file details** now name the app's author instead of the department, since the app is unofficial.
-- **التراخيص في برنامج الكمبيوتر:** أصبحت نصوص تراخيص Electron و Chromium (المحرك الذي يعمل عليه البرنامج) مرفقة بالبرنامج على Mac أيضاً كما تشترط تراخيصها، وكانت موجودة بالفعل على Windows.
-- **قارئات الشاشة:** أصبح لزرَّي «أوراق التجارب» و«الإعدادات» اسم دائماً، حتى عندما يضيق شريط الأدوات ولا يظهر منهما إلا الأيقونة.
-- **أسهل في القراءة:** أصبحت ألوان شارة «Beta» وزر «إرسال» في «مشكلة أو اقتراح» أوضح.
-- **بيانات ملف Windows:** أصبحت تذكر اسم صاحب البرنامج بدلاً من القسم، لأن البرنامج غير رسمي.
+- **Phone held upright:** the toolbar is now one wide button, *Turn the phone to show the tools*. On Android, tapping it goes full screen and turns the screen sideways for you; on iPhone (Safari does not allow that) it asks you to turn the phone.
+- **The "turn your phone" notice** at the start has the same *Full screen, sideways* button, next to *Continue anyway*.
+- **الهاتف طولي:** أصبح شريط الأدوات زراً واحداً عريضاً هو «اقلب الهاتف لإظهار الأدوات». على أندرويد يفتح الضغط عليه ملء الشاشة ويدير الشاشة بالعرض بنفسه، وعلى آيفون (لا يسمح Safari بذلك) يطلب منك إدارة الهاتف.
+- **رسالة «أدِر هاتفك بالعرض»** في البداية فيها نفس الزر «ملء الشاشة بالعرض» بجانب «متابعة على أي حال».

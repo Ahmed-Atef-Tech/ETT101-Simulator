@@ -114,7 +114,7 @@ export const HELP = {
 <li><b>Remove a lead:</b> tap it twice. <b>Hold your finger on it</b> for its menu (colour, shape, remove).</li>
 <li><b>Knobs:</b> drag around the knob to turn it. Scope keys and switches: tap them.</li>
 <li><b>Headphones:</b> tap the headphone socket on the BUFFER; the sound comes out of the phone.</li>
-<li><b>Turn the phone sideways:</b> the kit and the scope need a wide screen.</li>
+<li><b>Turn the phone sideways:</b> the kit and the scope need a wide screen. Held upright, the toolbar is one button, <i>Turn the phone to show the tools</i>: on Android it goes full screen and turns the screen sideways for you.</li>
 <li><b>Undo / Redo:</b> the arrow buttons at the top take back a lead, a probe, a knob turn or a loaded experiment. The scope settings are not changed.</li>
 <li><b>What is on this socket?</b> Hold a socket: the top of its menu names the signal from the way the kit is wired (for example AM signal, DSBSC signal, recovered message) and says what the module does with its inputs.</li>
 <li><b>Check my wiring:</b> in a lab sheet, this button lists what is missing, a lead in the wrong place or an extra one, a probe on the wrong socket and two outputs joined together, and marks the wrong leads in red on the kit.</li>
@@ -152,7 +152,7 @@ export const HELP = {
 <li><b>إزالة سلك:</b> اضغط عليه مرتين. و<b>اضغط عليه مطوّلاً</b> لتظهر قائمته (اللون والشكل والإزالة).</li>
 <li><b>المقابض:</b> اسحب حول المقبض لتديره. وأزرار راسم الإشارة والمفاتيح: اضغط عليها.</li>
 <li><b>السماعة:</b> اضغط على مقبس السماعة في BUFFER، ويخرج الصوت من الهاتف.</li>
-<li><b>أدِر الهاتف بالعرض:</b> يحتاج الجهاز وراسم الإشارة إلى شاشة عريضة.</li>
+<li><b>أدِر الهاتف بالعرض:</b> يحتاج الجهاز وراسم الإشارة إلى شاشة عريضة. والهاتف طولي يصبح شريط الأدوات زراً واحداً هو «اقلب الهاتف لإظهار الأدوات»، وعلى أندرويد يفتح ملء الشاشة ويدير الشاشة بالعرض بنفسه.</li>
 <li><b>تراجع وإعادة:</b> زرا الأسهم في الأعلى يلغيان آخر سلك أو مجسّ أو تدوير لمقبض أو تجربة تم تحميلها. ولا يتغيّر ضبط راسم الإشارة.</li>
 <li><b>ما الذي على هذا المقبس؟</b> عند الضغط المطوّل على المقبس يظهر في أعلى قائمته اسم الإشارة حسب طريقة التوصيل (مثل إشارة AM أو إشارة DSBSC أو الرسالة المسترجعة)، وما الذي تفعله الوحدة بمدخلاتها.</li>
 <li><b>افحص توصيلي:</b> في ورقة التجربة يعرض هذا الزر ما ينقص، والسلك الموصّل في مكان خطأ أو الزائد، والمجسّ على مقبس خطأ، والمخرجين الموصّلين معاً، ويُظهر الأسلاك الخطأ باللون الأحمر على الجهاز.</li>

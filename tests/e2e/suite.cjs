@@ -520,6 +520,26 @@ T('MB06', 'Phone', 'Full screen: on a phone the first tap fills the screen (no a
   await ctx.close();
 });
 
+T('MB07', 'Phone', 'Phone held upright: the toolbar is one wide "Turn the phone to show the tools" button that goes full screen sideways; iPhone asks to turn it; landscape shows the tools', async p => {
+  for (const [lang, txt] of [['en', /Turn the phone to show the tools/], ['ar', /اقلب الهاتف لإظهار الأدوات/]]) {
+    const q = await phone(p, 'Pixel 7', lang);
+    ok(await q.evaluate(() => getComputedStyle(document.getElementById('rotate')).display === 'flex' && !!document.getElementById('rotFull')), lang + ': turn-the-phone notice offers full screen sideways');
+    await q.tap('#rotOK'); await q.waitForTimeout(200);
+    eq(await q.evaluate(() => [...document.querySelectorAll('#rail > *')].filter(e => getComputedStyle(e).display !== 'none').map(e => e.id)), ['rotBar'], lang + ': only the wide button in the toolbar');
+    ok(txt.test(await q.textContent('#rotBar')), lang + ': button text');
+    ok(await q.evaluate(() => { const r = document.getElementById('rotBar').getBoundingClientRect(); return r.width > innerWidth * 0.8 && r.height >= 44; }), lang + ': wide and easy to tap');
+    await q.tap('#rotBar'); await q.waitForTimeout(500);
+    ok(await q.evaluate(() => !!document.fullscreenElement), lang + ': tapping it goes full screen'); await q.ctxDone();
+  }
+  const dev = { ...devices['iPhone 12'] }; delete dev.defaultBrowserType; const ctx = await browser.newContext(dev), q = await ctx.newPage();
+  await q.addInitScript(() => { delete Element.prototype.requestFullscreen; delete Element.prototype.webkitRequestFullscreen; localStorage.setItem('ett.notice', '1'); localStorage.setItem('ett.tour', '1'); });
+  await q.goto(WEB); await q.waitForFunction(() => window.__app); await q.tap('#rotFull'); await q.waitForTimeout(200);
+  ok(await q.evaluate(() => /sideways/.test(document.getElementById('toast').textContent) && getComputedStyle(document.getElementById('rotate')).display === 'none'), 'iPhone: asks to turn the phone, notice closes');
+  await ctx.close();
+  const r = await phone(p, 'Pixel 7 landscape'); ok(await r.evaluate(() => getComputedStyle(document.getElementById('rotBar')).display === 'none' && getComputedStyle(document.getElementById('btnLib')).display !== 'none'), 'landscape: tools, no wide button'); await r.ctxDone();
+  ok(await app(p, () => getComputedStyle(document.getElementById('rotBar')).display === 'none'), 'computer: never shown');
+});
+
 // ================================================================== new tools: undo, check wiring, share link, signal names
 T('UN01', 'Undo', 'Undo / Redo: leads, knobs, probes and a loaded experiment come back in steps; the scope is left alone; Ctrl+Z / Ctrl+Y; not while typing', async p => {
   eq(await app(p, () => [document.getElementById('btnUndo').disabled, document.getElementById('btnRedo').disabled]), [true, true], 'nothing to undo at start');

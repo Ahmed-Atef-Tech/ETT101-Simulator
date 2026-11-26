@@ -426,6 +426,19 @@ if (FSC.show) {
 $('#btnFS').onclick = () => { if (!FSC.can) { toast(t('fsIOS'), 8000); return; } FSC.auto = true; FSC.tried = true; try { localStorage.setItem('ett.fs', '1'); } catch (e) { } FSC.enter(); };
 document.querySelectorAll('[data-fs]').forEach(b => b.onclick = () => { FSC.auto = b.dataset.fs === '1'; FSC.tried = true; try { localStorage.setItem('ett.fs', FSC.auto ? '1' : '0'); } catch (e) { } if (FSC.auto) FSC.enter(); else FSC.exit(); applyTexts(); });
 ['fullscreenchange', 'webkitfullscreenchange'].forEach(ev => document.addEventListener(ev, () => applyTexts()));
+// "Turn the phone to show the tools": full screen, then turn the screen sideways (Android). Safari on iPhone allows
+// neither for a web page, so there (or if the phone refuses) it asks the person to turn the phone.
+async function goLandscape() {
+  document.documentElement.classList.add('rotateOK');
+  const de = document.documentElement, req = de.requestFullscreen || de.webkitRequestFullscreen;
+  if (req) {
+    FSC.auto = true; FSC.tried = true; try { localStorage.setItem('ett.fs', '1'); } catch (e) { }
+    try { if (!FSC.on()) await req.call(de, { navigationUI: 'hide' }); } catch (e) { }
+    try { await screen.orientation.lock('landscape'); return; } catch (e) { }
+  }
+  toast(t('rotateManual'), 6000);
+}
+$('#rotBar').onclick = goLandscape; $('#rotFull').onclick = goLandscape;
 function applyTexts() { if (typeof setBugKind === "function" && $("#bugTitle")) setBugKind(bugKind);
   document.querySelectorAll('[data-t]').forEach(n => { n.textContent = t(n.dataset.t); });
   document.querySelectorAll('[data-hint]').forEach(n => { n.title = t(n.dataset.hint); if (n.tagName === 'BUTTON') n.setAttribute('aria-label', t(n.dataset.hint)); });
