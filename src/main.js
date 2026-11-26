@@ -428,7 +428,7 @@ document.querySelectorAll('[data-fs]').forEach(b => b.onclick = () => { FSC.auto
 ['fullscreenchange', 'webkitfullscreenchange'].forEach(ev => document.addEventListener(ev, () => applyTexts()));
 function applyTexts() { if (typeof setBugKind === "function" && $("#bugTitle")) setBugKind(bugKind);
   document.querySelectorAll('[data-t]').forEach(n => { n.textContent = t(n.dataset.t); });
-  document.querySelectorAll('[data-hint]').forEach(n => { n.title = t(n.dataset.hint); });
+  document.querySelectorAll('[data-hint]').forEach(n => { n.title = t(n.dataset.hint); if (n.tagName === 'BUTTON') n.setAttribute('aria-label', t(n.dataset.hint)); });
   $('#btnFull').title = t('recentre');
   document.querySelectorAll('[data-lang]').forEach(b => b.classList.toggle('on', b.dataset.lang === getLang()));
   document.querySelectorAll('[data-snd]').forEach(b => b.classList.toggle('on', (b.dataset.snd === '1') === !audio.muted));

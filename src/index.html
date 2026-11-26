@@ -28,7 +28,7 @@ button { font: inherit; color: inherit; }
 .brand { display: flex; align-items: baseline; gap: 7px; white-space: nowrap; }
 .brand .name { font-weight: 700; font-size: 18px; letter-spacing: .1px; }
 .brand .sub { font-size: 14px; color: var(--ink-2); }
-.brand .beta { align-self: center; font: inherit; font-size: 11px; font-weight: 600; letter-spacing: .3px; color: var(--probe-deep); background: #fff6d6; border: 1px solid #ecd27a; border-radius: 4px; padding: 1px 6px; cursor: pointer; }
+.brand .beta { align-self: center; font: inherit; font-size: 11px; font-weight: 600; letter-spacing: .3px; color: #6a4b00; background: #fff6d6; border: 1px solid #ecd27a; border-radius: 4px; padding: 1px 6px; cursor: pointer; }
 .brand .beta:hover { background: #ffefb3; }
 .brand .beta:focus-visible { outline: 2px solid var(--probe-deep); outline-offset: 2px; }
 .grow { flex: 1; }
@@ -301,8 +301,8 @@ html[lang="ar"] .rintro, html[lang="ar"] .lnote { line-height: 1.85; }
 .ferr { color: var(--warn); font-size: 13.5px; min-height: 1.2em; margin: 3px 0 0; }
 .fchk { display: flex; gap: 8px; align-items: flex-start; font-size: 14px; margin: 12px 0 0; cursor: pointer; line-height: 1.45; }
 .fchk input { margin-top: 3px; }
-.send { display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 14px; border: 0; border-radius: 4px; background: #1f8f4e; color: #fff; font-weight: 600; font-size: 14.5px; cursor: pointer; }
-.send:hover { background: #18773f; }
+.send { display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 14px; border: 0; border-radius: 4px; background: #18773f; color: #fff; font-weight: 600; font-size: 14.5px; cursor: pointer; }
+.send:hover { background: #126333; }
 .send svg { width: 17px; height: 17px; }
 @media (max-width: 760px) { .rbody { grid-template-columns: 1fr; } .rtoc { display: none; } .lrow { grid-template-columns: 1fr auto; } .lpart, .lgo { display: none; } }
 @media (max-width: 1150px) { .leads .lbl, .brand .sub { display: none; } }
@@ -350,7 +350,7 @@ html[lang="ar"] #tour .tourCard p { line-height: 1.85; }
 <header id="rail" dir="ltr"><!-- same layout in both languages; only the labels are translated -->
   <div class="brand"><span class="name" data-t="appName"></span><span class="sub" data-t="appSub"></span><button class="beta" id="btnBeta" data-t="beta" data-hint="betaHint"></button></div>
   <button class="key toggle" id="tGuide" role="switch" aria-checked="true" data-hint="modeHint"><span data-t="guidance"></span><span class="track"><span class="thumb"></span></span><span class="state"></span></button>
-  <button class="key" id="btnGuide"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="1.5" width="10" height="13" rx="1"/><path d="M5.5 5h5M5.5 7.5h5M5.5 10h3"/></svg><span data-t="experiments"></span></button>
+  <button class="key" id="btnGuide" data-hint="experiments"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="1.5" width="10" height="13" rx="1"/><path d="M5.5 5h5M5.5 7.5h5M5.5 10h3"/></svg><span data-t="experiments"></span></button>
   <button class="key iconable" id="btnLib" data-hint="libHint"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M1.5 4.5V13a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1H8L6.5 3h-4a1 1 0 0 0-1 1.5z"/><path d="M8 7.5v4M6 9.5l2 2 2-2"/></svg><span data-t="library"></span></button>
   <button class="key iconable" id="btnRef" data-hint="refHint"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 3.5C6.5 2.5 4.5 2 2 2v10.5c2.5 0 4.5.5 6 1.5 1.5-1 3.5-1.5 6-1.5V2c-2.5 0-4.5.5-6 1.5z"/><path d="M8 3.5V14"/></svg><span data-t="reference"></span></button>
   <span class="grow"></span>
@@ -365,7 +365,7 @@ html[lang="ar"] #tour .tourCard p { line-height: 1.85; }
   <button class="key" id="btnFS" hidden data-hint="fullScreen"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 6V2h4M2 2l4 4M10 2h4v4M14 2l-4 4M14 10v4h-4M14 14l-4-4M6 14H2v-4M2 14l4-4"/></svg></button>
   <div class="leads"><span class="lbl" data-t="leads"></span><span id="colors" class="leads"></span></div>
   <button class="key iconable" id="btnBug" data-hint="bugHint"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="4.5" y="4.5" width="7" height="9" rx="3.5"/><path d="M6 4.6V4a2 2 0 0 1 4 0v.6M8 7.5V13M1.8 8.5h2.7M11.5 8.5h2.7M2.5 4.8l2.2 1.6M13.5 4.8l-2.2 1.6M2.5 13l2.3-1.4M13.5 13l-2.3-1.4"/></svg><span data-t="bug"></span></button>
-  <button class="key" id="btnSettings"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 4h7M12 4h2M2 8h2M7 8h7M2 12h9M14 12h0"/><circle cx="10.5" cy="4" r="1.6"/><circle cx="5.5" cy="8" r="1.6"/><circle cx="12.5" cy="12" r="1.6"/></svg><span data-t="settings"></span></button>
+  <button class="key" id="btnSettings" data-hint="settings"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 4h7M12 4h2M2 8h2M7 8h7M2 12h9M14 12h0"/><circle cx="10.5" cy="4" r="1.6"/><circle cx="5.5" cy="8" r="1.6"/><circle cx="12.5" cy="12" r="1.6"/></svg><span data-t="settings"></span></button>
   <input type="file" id="fileIn" accept=".json" hidden>
 </header>
 <svg id="bench" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet"></svg>

@@ -1,12 +1,8 @@
-- **Check my wiring:** in a lab sheet, a new button lists what is missing, a lead in the wrong place or an extra one, a probe on the wrong socket and two outputs joined together. The wrong leads turn red on the kit, and the list updates as you fix them.
-- **Share as a link:** Settings → *Share as a link* makes a link with your leads, knobs and scope settings, ready to paste in WhatsApp. Whoever opens it gets the same setup on a phone or a computer. *Open a shared link* opens a pasted link in the desktop app.
-- **What is on this socket?** The socket tip (or the top of a socket's menu on a phone) now names the signal from the wiring: AM, DSBSC, SSB, FM, ASK, FSK, BPSK, QPSK, PWM, carrier, product-detector output, recovered message and more.
-- **Undo / Redo:** two new buttons at the top (and Ctrl+Z / Ctrl+Y) take back a lead, a probe, a knob turn, *Remove all leads* or a loaded experiment.
-- **Term 1 Exp 3, Part E:** the last part of AM demodulation (Figures 7 and 8) now has its lab sheet and a ready-made setup.
-- **Fix:** the full-screen setting and button no longer show on a computer.
-- **افحص توصيلي:** في ورقة التجربة زر جديد يعرض ما ينقص، والسلك الموصّل في مكان خطأ أو الزائد، والمجسّ على مقبس خطأ، والمخرجين الموصّلين معاً. وتظهر الأسلاك الخطأ باللون الأحمر على الجهاز، وتتحدّث القائمة وأنت تصلحها.
-- **مشاركة كرابط:** من الإعدادات ← «مشاركة كرابط» تحصل على رابط فيه أسلاكك والمقابض وضبط راسم الإشارة، جاهز للصقه في واتساب. ومن يفتحه يحصل على نفس التوصيلات على الهاتف أو الكمبيوتر. و«فتح رابط مُشارَك» يفتح رابطاً منسوخاً في برنامج الكمبيوتر.
-- **ما الذي على هذا المقبس؟** تلميح المقبس (أو أعلى قائمة المقبس على الهاتف) يذكر الآن اسم الإشارة حسب التوصيل: AM و DSBSC و SSB و FM و ASK و FSK و BPSK و QPSK و PWM والحامل وخرج كاشف الضرب والرسالة المسترجعة وغيرها.
-- **تراجع وإعادة:** زران جديدان في الأعلى (و Ctrl+Z و Ctrl+Y) يلغيان آخر سلك أو مجسّ أو تدوير لمقبض أو «إزالة كل الأسلاك» أو تجربة تم تحميلها.
-- **الترم الأول، التجربة 3، الجزء E:** أصبح للجزء الأخير من فك تعديل AM (الشكلان 7 و8) ورقة تجربة وتوصيلات جاهزة.
-- **إصلاح:** لم يعد إعداد ملء الشاشة وزره يظهران على الكمبيوتر.
+- **Licences in the desktop app:** the licence texts of Electron and Chromium (the engine the desktop app runs on) now come with the app on Mac too, as their licences ask; on Windows they were already there.
+- **Screen readers:** the *Lab sheets* and *Settings* buttons always have a name now, even when the toolbar is narrow and shows only their icons.
+- **Easier to read:** the *Beta* badge and the *Send* button in *Report or suggest* have stronger colours.
+- **The Windows file details** now name the app's author instead of the department, since the app is unofficial.
+- **التراخيص في برنامج الكمبيوتر:** أصبحت نصوص تراخيص Electron و Chromium (المحرك الذي يعمل عليه البرنامج) مرفقة بالبرنامج على Mac أيضاً كما تشترط تراخيصها، وكانت موجودة بالفعل على Windows.
+- **قارئات الشاشة:** أصبح لزرَّي «أوراق التجارب» و«الإعدادات» اسم دائماً، حتى عندما يضيق شريط الأدوات ولا يظهر منهما إلا الأيقونة.
+- **أسهل في القراءة:** أصبحت ألوان شارة «Beta» وزر «إرسال» في «مشكلة أو اقتراح» أوضح.
+- **بيانات ملف Windows:** أصبحت تذكر اسم صاحب البرنامج بدلاً من القسم، لأن البرنامج غير رسمي.
