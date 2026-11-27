@@ -1,4 +1,6 @@
-- **Lead colours on phones:** on a narrow landscape screen the colour list ran off the right edge, so only the first colour could be seen. It now opens as one row inside the screen.
-- **Phones say "Tap":** the headphone note on the kit says *Tap* instead of *Click* on phones and tablets.
-- **ألوان الأسلاك على الهاتف:** على الشاشة الضيقة والهاتف بالعرض كانت قائمة الألوان تخرج من حافة الشاشة اليمنى فلا يظهر إلا أول لون. أصبحت تفتح كصف واحد داخل الشاشة.
-- **«اضغط» على الهاتف:** ملاحظة السماعة على الجهاز تقول «اضغط» بدلاً من «انقر» على الهاتف والتابلت.
+- **Tablets held upright** (iPad, Galaxy Tab, Nexus 7) keep the full toolbar; only phones are asked to turn sideways.
+- **Short landscape phones:** the socket menu puts CH1, CH2 and EXT TRIG side by side so it fits; Settings and the other menus scroll instead of running off the bottom of the screen.
+- **Easier to tap:** on touch screens the lab-sheet step numbers, *Step-by-step sheet*, the On/Off switches, *All experiments* and the reference index are larger.
+- **التابلت وهو طولي** (iPad و Galaxy Tab و Nexus 7) يبقى شريط الأدوات كاملاً، والهاتف فقط هو الذي يُطلب منه الدوران بالعرض.
+- **الهواتف القصيرة بالعرض:** قائمة المقبس تضع CH1 و CH2 و EXT TRIG بجانب بعضها لتتسع، وقائمة الإعدادات والقوائم الأخرى تتمرّر بدلاً من الخروج من أسفل الشاشة.
+- **أسهل في الضغط:** على شاشات اللمس أصبحت أرقام خطوات ورقة التجربة و«ورقة التجربة خطوة بخطوة» ومفاتيح تشغيل/إيقاف و«كل التجارب» وفهرس المرجع أكبر.
