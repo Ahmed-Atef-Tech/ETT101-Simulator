@@ -4,7 +4,15 @@ import { SOCKET_POS } from './layout.js';
 
 export const LEAD_COLORS = { red: '#d3261f', black: '#4a5057', yellow: '#f2c21b', blue: '#1f5fd1', green: '#1f9a45' };
 const DARK = { red: '#7c120e', black: '#16191c', yellow: '#94720a', blue: '#0e3274', green: '#0d5023' };
-const HOLD_MS = 800; // touch: hold a socket this long (a ring fills meanwhile) for its menu
+const HOLD_MS = 800;
+// A menu opened by holding a finger appears under that finger; lifting the finger then "taps" whatever is there, and
+// right after a tap that made a lead it even counted as "tap twice" and removed that lead. The tap (and double tap)
+// that ends the hold is swallowed; the next touch starts fresh.
+function swallowLiftClick() {
+  const eat = e => { e.stopPropagation(); e.preventDefault(); }; // a click is followed by its dblclick: both are eaten, until the next touch
+  const done = () => { for (const ev of ['click', 'dblclick']) window.removeEventListener(ev, eat, true); window.removeEventListener('pointerdown', done, true); };
+  for (const ev of ['click', 'dblclick']) window.addEventListener(ev, eat, true); window.addEventListener('pointerdown', done, true);
+} // touch: hold a socket this long (a ring fills meanwhile) for its menu
 const PROBE_TAG = { CH1: '#f2d21b', CH2: '#35d0f0', EXT: '#c8c8c8' };
 
 export class Wires {
@@ -79,7 +87,7 @@ export class Wires {
         if (ch || lead) {
           e.preventDefault(); const bd = this.bendDrag = { g, ch, lead, x: e.clientX, y: e.clientY, moved: false, touch: e.pointerType === 'touch' };
           // touch: hold still for half a second = the right-click menu (colour, reset shape, remove)
-          if (bd.touch) bd.press = setTimeout(() => { if (this.bendDrag === bd && !bd.moved) { bd.menu = true; this.longPressT = performance.now(); this.hooks.leadMenu(ch ? { probe: ch } : lead, { clientX: bd.x, clientY: bd.y }); } }, 550);
+          if (bd.touch) bd.press = setTimeout(() => { if (this.bendDrag === bd && !bd.moved) { bd.menu = true; this.longPressT = performance.now(); swallowLiftClick(); this.hooks.leadMenu(ch ? { probe: ch } : lead, { clientX: bd.x, clientY: bd.y }); } }, 550);
         }
       }
       return;
@@ -93,7 +101,7 @@ export class Wires {
     // touch: holding a socket still for a moment opens its menu (connect to CH1 / CH2 / EXT, or tap the other end)
     if (e.pointerType === 'touch') {
       const ring = el('circle', { class: 'holdRing', cx: p0[0], cy: p0[1], r: hit.bnc ? 26 : 16, fill: 'none', 'pointer-events': 'none', pathLength: 100 }, this.dragG);
-      this.hold = { x: e.clientX, y: e.clientY, ring, t: setTimeout(() => { const h = this.hold; if (!h) return; this.hold = null; h.ring.remove(); if (this.tmp) { this.tmp.path.remove(); this.tmp = null; this.svg.classList.remove('dragging'); this.hooks.hoverTarget(null); } this.hooks.socketMenu(hit, { clientX: h.x, clientY: h.y }); }, HOLD_MS) };
+      this.hold = { x: e.clientX, y: e.clientY, ring, t: setTimeout(() => { const h = this.hold; if (!h) return; this.hold = null; h.ring.remove(); swallowLiftClick(); if (this.tmp) { this.tmp.path.remove(); this.tmp = null; this.svg.classList.remove('dragging'); this.hooks.hoverTarget(null); } this.hooks.socketMenu(hit, { clientX: h.x, clientY: h.y }); }, HOLD_MS) };
     }
     this.tmp = { from: hit, p0, path: el('path', { class: 'leadTmp', 'pointer-events': 'none', fill: 'none', stroke: LEAD_COLORS[this.color], 'stroke-width': hit.bnc ? 8 : 6.5, 'stroke-linecap': 'round', opacity: .85 }, this.dragG) };
     this.svg.classList.add('dragging');
